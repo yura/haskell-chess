@@ -2,7 +2,7 @@
 
 module BoardSpec (spec) where
 
-import Test.Hspec ( describe, it, shouldBe, Spec, pending )
+import Test.Hspec
 
 import qualified Data.Map as M
 import Data.List ( nub )
@@ -13,7 +13,7 @@ spec = do
   describe "squareNames" $ do
     it "генерирует 64 названия клеток" $
       length squareNames `shouldBe` 64
-  
+
 
   describe "emptyBoard" $ do
     it "генерирует пустую доску размером 64 клетки" $ do
@@ -48,7 +48,7 @@ spec = do
       let names = [(r, 1) | r <- ['a'..'h']] ++ [('a', c) | c <- [1..8]]
       let result = map (\n -> bottomLeft n) names
       nub result `shouldBe` [[]]
-      
+
   describe "bottomRight" $ do
     it "возращает все имена из центра в начало по главной диагонали" $
       bottomRight ('d', 4) `shouldBe` [('e', 3), ('f', 2), ('g', 1)]
@@ -94,8 +94,67 @@ spec = do
       let result = map (\n -> topLeft n) names
       nub result `shouldBe` [[]]
 
-  describe "bishopPossibleMoves" $ do
-    it "все возможные ходы слона, если слон находится в центре" $ do
-      pending
-      --bishopPossibleMoves emptyBoard "d4" `shouldBe` [ "a1", "b2", "c3", "e5", "f6", "g7", "h8", "g1", "f2", "e3", "c5" "b6" "a7" ]  
+  describe "bishopMoves" $ do
+    it "все ходы слона, если слон находится в центре" $ do
+      bishopMoves ('d', 4) `shouldBe` [ ('c', 3), ('b', 2), ('a', 1), ('e', 3), ('f', 2), ('g', 1), ('e', 5), ('f', 6), ('g', 7), ('h', 8), ('c', 5), ('b', 6), ('a', 7) ]
+
+  describe "knightMoves" $ do
+    it "все ходы коня, если конь находится в центре" $ do
+      knightMoves ('d', 4) `shouldBe` [ ('b', 3), ('c', 2), ('e', 2), ('f', 3), ('f', 5), ('e', 6), ('c', 6), ('b', 5) ]
+
+    it "оба хода коня, если конь находится на 'a1'" $ do
+      knightMoves ('a', 1) `shouldBe` [ ('c', 2), ('b', 3) ]
+
+    it "оба хода коня, если конь находится на 'a1'" $ do
+      knightMoves ('h', 1) `shouldBe` [ ('g', 3), ('f', 2) ]
+
+    it "оба хода коня, если конь находится на 'h8'" $ do
+      knightMoves ('h', 8) `shouldBe` [ ('f', 7), ('g', 6) ]
+
+    it "оба хода коня, если конь находится на 'a8'" $ do
+      knightMoves ('a', 8) `shouldBe` [ ('b', 6), ('c', 7) ]
+
+    it "три хода коня, если конь находится на 'b1'" $ do
+      knightMoves ('b', 1) `shouldBe` [ ('d', 2), ('c', 3), ('a', 3) ]
+
+  describe "rookMoves" $ do
+    it "все ходы ладьи, если ладья находится в центре" $ do
+      rookMoves ('d', 4) `shouldBe`
+        [
+          ('c', 4), ('b', 4), ('a', 4)
+        , ('d', 3), ('d', 2), ('d', 1)
+        , ('e', 4), ('f', 4), ('g', 4), ('h', 4)
+        , ('d', 5), ('d', 6), ('d', 7), ('d', 8)
+        ]
+
+  describe "queenMoves" $ do
+    it "все ходы ферзя, если ферзь находится в центре" $ do
+      queenMoves ('e', 7) `shouldBe`
+        [
+          ('d', 6), ('c', 5), ('b', 4), ('a', 3)
+        , ('f', 6), ('g', 5), ('h', 4)
+        , ('f', 8)
+        , ('d', 8)
+        , ('d', 7), ('c', 7), ('b', 7), ('a', 7)
+        , ('e', 6), ('e', 5), ('e', 4), ('e', 3), ('e', 2), ('e', 1)
+        , ('f', 7), ('g', 7), ('h', 7)
+        , ('e', 8)
+        ]
+
+  describe "kingMoves" $ do
+    it "все ходы короля, если король находится в центре" $ do
+      kingMoves ('h', 6) `shouldBe`
+        [
+          ('g', 5), ('g', 7)
+        , ('g', 6), ('h', 5), ('h', 7)
+        ]
+
+  describe "kingPossibleMoves" $ do
+    context "[рокировка]" $ do
+      it "не ходит под шах" $ pending
+      it "не встречается с королём (частный случай шаха)" $ pending
+      it "не рокируется, если ходил" $ pending
+      it "не рокируется, если ходила ладья?" $ pending
+
+    it "не ходит под шах" $ pending
 
