@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module BoardSpec (spec) where
 
 import Test.Hspec
@@ -14,19 +12,24 @@ spec = do
     it "генерирует 64 названия клеток" $
       length squareNames `shouldBe` 64
 
-
   describe "emptyBoard" $ do
-    it "генерирует пустую доску размером 64 клетки" $ do
+    it "генерирует пустую доску размером 0 клеток" $ do
       let (Board squares) = emptyBoard
-      length squares `shouldBe` 64
-
+      length squares `shouldBe` 0
 
   describe "placePiece" $ do
     it "уставнавливает фигуру на заданную клетку" $ do
       let whitePawn = Piece Pawn White
-      let (Board squares) = placePiece ('d', 4) whitePawn emptyBoard
-      M.lookup ('d', 4) squares `shouldBe` Just (Square ('d', 4) $ Just whitePawn)
+      let (Board squares) = placePiece emptyBoard ('d', 4) whitePawn
+      M.lookup ('d', 4) squares `shouldBe` Just whitePawn
 
+  describe "placePieces" $ do
+    it "уставнавливает фигуры на заданны клетки" $ do
+      let whitePawn = Piece Pawn White
+      let blackPawn = Piece Pawn Black
+      let (Board board) = placePieces emptyBoard [(('a', 2), whitePawn), (('a', 7), blackPawn)]
+      M.lookup ('a', 2) board `shouldBe` Just whitePawn
+      M.lookup ('a', 7) board `shouldBe` Just blackPawn
 
   describe "bottomLeft" $ do
     it "возращает все имена из центра в начало по главной диагонали" $
@@ -148,6 +151,32 @@ spec = do
           ('g', 5), ('g', 7)
         , ('g', 6), ('h', 5), ('h', 7)
         ]
+
+  describe "whitePawnMoves" $ do
+    context "[без взятия фигур противника]" $ do
+      it "со своей начальной позиции может ходить на поле вперед или на два поля вперед" $ do
+        whitePawnMoves ('a', 2) `shouldBe` [ ('a', 3), ('a', 4) ]
+        whitePawnMoves ('e', 2) `shouldBe` [ ('e', 3), ('e', 4) ]
+
+      it "может ходить на поле вперёд не с начальной позиции" $ do
+        whitePawnMoves ('b', 3) `shouldBe` [ ('b', 4) ]
+        whitePawnMoves ('g', 7) `shouldBe` [ ('g', 8) ]
+
+  describe "blackPawnMoves" $ do
+    context "[без взятия фигур противника]" $ do
+      it "со своей начальной позиции может ходить на поле вперед или на два поля вперед" $ do
+        blackPawnMoves ('a', 7) `shouldBe` [ ('a', 6), ('a', 5) ]
+        blackPawnMoves ('e', 7) `shouldBe` [ ('e', 6), ('e', 5) ]
+
+      it "может ходить на поле вперёд не с начальной позиции" $ do
+        blackPawnMoves ('b', 3) `shouldBe` [ ('b', 2) ]
+        blackPawnMoves ('g', 2) `shouldBe` [ ('g', 1) ]
+
+  describe "whitePawnPossibleMoves" $ do
+    context "[со взятием фигуры противника]" $ do
+      it "может рубить фигуру противника" $ pending
+      it "может рубить пешку противника на проходе" $ pending
+      it "не ходит, если король после хода оказывается под шахом" $ pending
 
   describe "kingPossibleMoves" $ do
     context "[рокировка]" $ do
