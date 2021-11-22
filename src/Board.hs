@@ -9,7 +9,6 @@ data Piece = Piece PieceType PieceColor deriving (Eq, Show)
 
 type Square = (Char, Int)
 data Board = Board (M.Map Square Piece)
-
 colNames = ['a'..'h']
 rowNames = [1..8]
 
@@ -26,6 +25,9 @@ placePiece (Board squares) square piece = Board $ M.insert square piece squares
 
 placePieces :: Board -> [(Square, Piece)] -> Board
 placePieces board squaresAndPieces = foldl (\b (square, piece) -> placePiece b square piece) board squaresAndPieces 
+
+findPiece :: Board -> Square -> Maybe Piece
+findPiece (Board squares) square = M.lookup square squares
 
 bottomLeft :: Square -> [Square]
 bottomLeft (col, row)  = zip [pred col, pred (pred col)..head colNames] [pred row, pred (pred row)..head rowNames]
