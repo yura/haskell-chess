@@ -8,9 +8,9 @@ exportFEN :: Board -> T.Text
 exportFEN board = T.intercalate " " [position board, nextMove, castlings board, enPassantTargetSquare, halfmoveClock, fullmoveNumber]
 
 fenSquares :: [[Square]]
-fenSquares = map fenRow $ reverse rowNames
+fenSquares = map fenRow $ reverse rows
   where
-    fenRow row = map (\c -> (c, row)) colNames
+    fenRow row = map (\c -> (c, row)) cols
 
 position :: Board -> T.Text
 position board = T.intercalate "/" $ map (rowToFEN board) fenSquares

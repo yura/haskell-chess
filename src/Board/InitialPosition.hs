@@ -16,7 +16,7 @@ blackPieces :: [(Square, Piece)]
 blackPieces = [blackKing] ++ [blackQueen] ++ blackBishops ++ blackKnights ++ blackRooks ++ blackPawns
 
 pieceCols :: PieceType -> [Char]
-pieceCols Pawn   = colNames
+pieceCols Pawn   = cols
 pieceCols Rook   = ['a', 'h']
 pieceCols Knight = ['b', 'g']
 pieceCols Bishop = ['c', 'f']

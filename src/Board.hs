@@ -1,7 +1,7 @@
 module Board where
 
+import           Data.Char ( ord, chr )
 import qualified Data.Map as M
-import Data.Char ( ord, chr )
 
 data PieceType = King | Queen | Rook | Bishop | Knight | Pawn deriving (Eq, Show)
 data PieceColor = White | Black deriving (Eq, Show)
@@ -9,16 +9,18 @@ data Piece = Piece PieceType PieceColor deriving (Eq, Show)
 
 type Square = (Char, Int)
 data Board = Board (M.Map Square Piece)
-colNames = ['a'..'h']
-rowNames = [1..8]
+
+cols = ['a'..'h']
+rows = [1..8]
 
 squareNames :: [Square]
-squareNames = [(col, row) | col <- colNames, row <- rowNames]
+squareNames = [(col, row) | col <- cols, row <- rows]
 
 emptyBoard :: Board
-emptyBoard = Board $ M.fromList [] --rows
---  where
---    rows = Prelude.map (\squareName -> (squareName, Nothing)) squareNames
+emptyBoard = Board $ M.fromList []
+
+isOnBoard :: Square -> Bool
+isOnBoard (col, row) = col `elem` cols && row `elem` rows
 
 placePiece :: Board -> Square -> Piece -> Board
 placePiece (Board squares) square piece = Board $ M.insert square piece squares
@@ -30,19 +32,16 @@ findPiece :: Board -> Square -> Maybe Piece
 findPiece (Board squares) square = M.lookup square squares
 
 bottomLeft :: Square -> [Square]
-bottomLeft (col, row)  = zip [pred col, pred (pred col)..head colNames] [pred row, pred (pred row)..head rowNames]
+bottomLeft (col, row)  = zip [pred col, pred (pred col)..head cols] [pred row, pred (pred row)..head rows]
 
 bottomRight :: Square -> [Square]
-bottomRight (col, row) = zip [succ col..last colNames] [pred row, pred (pred row)..head rowNames]
+bottomRight (col, row) = zip [succ col..last cols] [pred row, pred (pred row)..head rows]
 
 topRight :: Square -> [Square]
-topRight (col, row)    = zip [succ col.. last colNames] [succ row..last rowNames]
+topRight (col, row)    = zip [succ col.. last cols] [succ row..last rows]
 
 topLeft :: Square -> [Square]
-topLeft (col, row)     = zip [pred col, pred (pred col)..head colNames] [succ row..last rowNames]
-
-dropEmptyLists :: [[a]] -> [[a]]
-dropEmptyLists xss = filter (\xs -> length xs > 0) xss
+topLeft (col, row)     = zip [pred col, pred (pred col)..head cols] [succ row..last rows]
 
 bishopMovesGrouped :: Square -> [[Square]]
 bishopMovesGrouped squareName = dropEmptyLists $ bottomLeft squareName : bottomRight squareName : topRight squareName : topLeft squareName : []
@@ -53,23 +52,20 @@ bishopMoves = concat . bishopMovesGrouped
 knightMoveShifts :: [(Int, Int)]
 knightMoveShifts = [(-2, -1), (-1, -2), (1, -2), (2, -1), (2, 1), (1, 2), (-1, 2), (-2, 1)]
 
-isOnBoard :: Square -> Bool
-isOnBoard (col, row) = col >= head colNames && col <= last colNames && row >= head rowNames && row <= last rowNames
-
 knightMoves :: Square -> [Square]
 knightMoves (col, row) = filter isOnBoard $ map (\(c', r') -> (chr (ord col + c'), row + r')) knightMoveShifts
 
 leftDirection :: Square -> [Square]
-leftDirection (col, row) = map (\c -> (c, row)) [pred col, pred (pred col)..head colNames]
+leftDirection (col, row) = map (\c -> (c, row)) [pred col, pred (pred col)..head cols]
 
 downDirection :: Square -> [Square]
-downDirection (col, row) = map (\r -> (col, r)) [pred row, pred (pred row)..head rowNames]
+downDirection (col, row) = map (\r -> (col, r)) [pred row, pred (pred row)..head rows]
 
 rightDirection :: Square -> [Square]
-rightDirection (col, row) = map (\c -> (c, row)) [succ col..last colNames]
+rightDirection (col, row) = map (\c -> (c, row)) [succ col..last cols]
 
 upDirection :: Square -> [Square]
-upDirection (col, row) = map (\r -> (col, r)) [succ row..last rowNames]
+upDirection (col, row) = map (\r -> (col, r)) [succ row..last rows]
 
 rookMovesGrouped :: Square -> [[Square]]
 rookMovesGrouped squareName = dropEmptyLists $ leftDirection squareName : downDirection squareName : rightDirection squareName : upDirection squareName : []
@@ -92,3 +88,6 @@ blackPawnMoves :: Square -> [Square]
 blackPawnMoves (col, row) | row == 7 =           [(col, 6), (col, 5)]
                           | row < 7 && row > 1 = [(col, pred row)]
                           | otherwise = undefined
+
+dropEmptyLists :: [[a]] -> [[a]]
+dropEmptyLists = filter (not . null)
