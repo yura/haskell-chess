@@ -38,6 +38,7 @@ spaces :: Parser ()
 spaces = skipMany1 space
 
 pieceNames = "KQRBN"
+rowStr = concatMap show rows
 
 parseMove = do
   number    <- many1 digit
@@ -46,7 +47,7 @@ parseMove = do
   pieceName <- option 'P' $ oneOf pieceNames
 
   col       <- oneOf cols
-  row       <- oneOf "12345678"
+  row       <- oneOf rowStr
 
   let color = case dots of
         "..." -> Black
@@ -68,7 +69,7 @@ parsePGNPawnCapture = do
   srcCol    <- oneOf cols
   string "x"
   col       <- oneOf cols
-  row       <- oneOf "12345678"
+  row       <- oneOf rowStr
 
   return $ PGNCapture Pawn (Just srcCol) Nothing (col, digitToInt row)
 
@@ -77,20 +78,43 @@ parsePGNCapture = do
   pieceName <- oneOf pieceNames
   string "x"
   col       <- oneOf cols
-  row       <- oneOf "12345678"
+  row       <- oneOf rowStr
 
   return $ PGNCapture (pieceType pieceName) Nothing Nothing (col, digitToInt row)
+
+parsePGNRegularWithSrcSquare :: Parser PGNMove
+parsePGNRegularWithSrcSquare = do
+  pieceName <- oneOf pieceNames
+  srcCol    <- oneOf cols
+  srcRow    <- oneOf rowStr
+  col       <- oneOf cols
+  row       <- oneOf rowStr
+  return $ PGNMove (pieceType pieceName) (Just srcCol) (Just $ digitToInt srcRow) (col, digitToInt row)
+
+parsePGNRegularWithSrcCol :: Parser PGNMove
+parsePGNRegularWithSrcCol = do
+  pieceName <- oneOf pieceNames
+  srcCol    <- oneOf cols
+  col       <- oneOf cols
+  row       <- oneOf rowStr
+  return $ PGNMove (pieceType pieceName) (Just srcCol) Nothing (col, digitToInt row)
 
 parsePGNRegular :: Parser PGNMove
 parsePGNRegular = do
   pieceName <- option 'P' $ oneOf pieceNames
   col       <- oneOf cols
-  row       <- oneOf "12345678"
+  row       <- oneOf rowStr
   return $ PGNMove (pieceType pieceName) Nothing Nothing (col, digitToInt row)
 
 parsePGNMove :: Parser PGNMove
 parsePGNMove = do
-  try parsePGNQueensideCastling <|> try parsePGNKingsideCastling <|> try parsePGNPawnCapture <|> try parsePGNCapture <|> parsePGNRegular
+      try parsePGNQueensideCastling
+  <|> try parsePGNKingsideCastling
+  <|> try parsePGNPawnCapture
+  <|> try parsePGNCapture
+  <|> try parsePGNRegularWithSrcSquare
+  <|> try parsePGNRegularWithSrcCol
+  <|> parsePGNRegular
 
 pieceType :: Char -> PieceType
 pieceType 'K' = King

@@ -104,29 +104,31 @@ spec = do
   describe "parsePGNMove" $ do
     let parsePGNMove' = parse parsePGNMove "PGN"
 
-    it "рокировка в сторону ферзя" $ do
-      parsePGNMove' "O-O-O" `shouldParse` PGNQueensideCastling
+    context "рокировки" $ do
+      it "рокировка в сторону ферзя" $
+        parsePGNMove' "O-O-O" `shouldParse` PGNQueensideCastling
 
-    it "рокировка в сторону короля" $ do
-      parsePGNMove' "O-O" `shouldParse` PGNKingsideCastling
+      it "рокировка в сторону короля" $
+        parsePGNMove' "O-O" `shouldParse` PGNKingsideCastling
 
-    it "ход пешкой" $ do
-      parsePGNMove' "e4" `shouldParse` PGNMove Pawn Nothing Nothing ('e', 4)
+    context "обычные ходы" $ do
+      it "ход пешкой" $
+        parsePGNMove' "e4" `shouldParse` PGNMove Pawn Nothing Nothing ('e', 4)
 
-    it "ход ладьёй" $ do
-      parsePGNMove' "Ra5" `shouldParse` PGNMove Rook Nothing Nothing ('a', 5)
+      it "ход ладьёй" $
+        parsePGNMove' "Ra5" `shouldParse` PGNMove Rook Nothing Nothing ('a', 5)
 
-    it "ход конём" $ do
-      parsePGNMove' "Ng2" `shouldParse` PGNMove Knight Nothing Nothing ('g', 2)
+      it "ход конём" $
+        parsePGNMove' "Ng2" `shouldParse` PGNMove Knight Nothing Nothing ('g', 2)
 
-    it "ход слоном" $ do
-      parsePGNMove' "Bc7" `shouldParse` PGNMove Bishop Nothing Nothing ('c', 7)
+      it "ход слоном" $
+        parsePGNMove' "Bc7" `shouldParse` PGNMove Bishop Nothing Nothing ('c', 7)
 
-    it "ход ферзём" $ do
-      parsePGNMove' "Qh8" `shouldParse` PGNMove Queen Nothing Nothing ('h', 8)
+      it "ход ферзём" $
+        parsePGNMove' "Qh8" `shouldParse` PGNMove Queen Nothing Nothing ('h', 8)
 
-    it "ход королём" $ do
-      parsePGNMove' "Ka4" `shouldParse` PGNMove King Nothing Nothing ('a', 4)
+      it "ход королём" $
+        parsePGNMove' "Ka4" `shouldParse` PGNMove King Nothing Nothing ('a', 4)
 
     context "ходы со взятием" $ do
       it "взятие пешкой" $
@@ -147,8 +149,36 @@ spec = do
       it "взятие королём" $
         parsePGNMove' "Kxa3" `shouldParse` PGNCapture King Nothing Nothing ('a', 3)
 
-    context "ходы с указанием вертикали" $ do
-      it "ход ладьёй" $ do
-        pending
-        parsePGNMove' "Rae5" `shouldParse` PGNMove Rook (Just 'a') Nothing ('a', 5)
+    context "ходы с указанием исходной вертикали" $ do
+      it "ход ладьёй" $
+        parsePGNMove' "Rae5" `shouldParse` PGNMove Rook (Just 'a') Nothing ('e', 5)
      
+      it "ход конём" $
+        parsePGNMove' "Nbe6" `shouldParse` PGNMove Knight (Just 'b') Nothing ('e', 6)
+     
+      it "ход слоном" $
+        parsePGNMove' "Bcf7" `shouldParse` PGNMove Bishop (Just 'c') Nothing ('f', 7)
+     
+      it "ход ферзём" $
+        parsePGNMove' "Qdg8" `shouldParse` PGNMove Queen (Just 'd') Nothing ('g', 8)
+     
+      it "ход королём" $ do
+        pendingWith "король должен быть один, при указании вертикали короля, скорее всего надо падать"
+        parsePGNMove' "Kab2" `shouldParse` PGNMove King (Just 'a') Nothing ('b', 2)
+
+    context "ходы с указанием исходной клетки" $ do
+      it "ход ладьёй" $
+        parsePGNMove' "Rd1d2" `shouldParse` PGNMove Rook (Just 'd') (Just 1) ('d', 2)
+     
+      it "ход конём" $
+        parsePGNMove' "Nc1d3" `shouldParse` PGNMove Knight (Just 'c') (Just 1) ('d', 3)
+     
+      it "ход слоном" $
+        parsePGNMove' "Be1f2" `shouldParse` PGNMove Bishop (Just 'e') (Just 1) ('f', 2)
+     
+      it "ход ферзём" $
+        parsePGNMove' "Qe4e6" `shouldParse` PGNMove Queen (Just 'e') (Just 4) ('e', 6)
+     
+      it "ход королём" $ do
+        pendingWith "король должен быть один, при указании вертикали короля, скорее всего надо падать"
+        parsePGNMove' "Kab2" `shouldParse` PGNMove King (Just 'a') Nothing ('b', 2)
