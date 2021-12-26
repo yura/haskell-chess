@@ -11,3 +11,9 @@
 ## FIDE Laws of Chess
 
 * https://www.fide.com/FIDE/handbook/LawsOfChess.pdf
+
+## All possible moves
+
+```sh
+ruby get_uniq_moves.rb lichess_db_standard_rated_2013-01.pgn > uniq_moves.txt
+```

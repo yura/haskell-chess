@@ -22,6 +22,7 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 - containers
+- parsec     # parsing PGN
 - text
 
 library:
@@ -53,5 +54,6 @@ tests:
     dependencies:
     - haskell-chess
     - hspec
+    - hspec-parsec
     default-extensions:
       - OverloadedStrings

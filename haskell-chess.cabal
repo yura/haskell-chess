@@ -28,6 +28,7 @@ library
       Board
       Board.InitialPosition
       Format.FEN
+      Format.PGN
   other-modules:
       Paths_haskell_chess
   hs-source-dirs:
@@ -37,6 +38,7 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , parsec
     , text
   default-language: Haskell2010
 
@@ -53,6 +55,7 @@ executable haskell-chess-exe
       base >=4.7 && <5
     , containers
     , haskell-chess
+    , parsec
     , text
   default-language: Haskell2010
 
@@ -63,6 +66,7 @@ test-suite haskell-chess-test
       Board.InitialPositionSpec
       BoardSpec
       Format.FENSpec
+      Format.PGNSpec
       Paths_haskell_chess
   hs-source-dirs:
       test
@@ -74,5 +78,7 @@ test-suite haskell-chess-test
     , containers
     , haskell-chess
     , hspec
+    , hspec-parsec
+    , parsec
     , text
   default-language: Haskell2010
