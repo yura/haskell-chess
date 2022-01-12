@@ -27,6 +27,7 @@ library
   exposed-modules:
       Board
       Board.InitialPosition
+      Display
       Format.FEN
       Format.PGN
   other-modules:
@@ -65,6 +66,7 @@ test-suite haskell-chess-test
   other-modules:
       Board.InitialPositionSpec
       BoardSpec
+      DisplaySpec
       Format.FENSpec
       Format.PGNSpec
       Paths_haskell_chess

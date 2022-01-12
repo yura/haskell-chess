@@ -3,17 +3,18 @@ module Format.FEN where
 import           Data.Char (isDigit, digitToInt)
 import qualified Data.Text as T
 import           Board
+import           Display (squaresDisplayOrder)
 
-exportFEN :: Board -> T.Text
-exportFEN board = T.intercalate " " [position board, nextMove, castlings board, enPassantTargetSquare, halfmoveClock, fullmoveNumber]
-
-fenSquares :: [[Square]]
-fenSquares = map fenRow $ reverse rows
-  where
-    fenRow row = map (\c -> (c, row)) cols
+-- |Экспортирует доску в формат FEN
+exportToFEN :: Board -> T.Text
+exportToFEN board = T.intercalate " " [position board, nextMove, castlings board, enPassantTargetSquare, halfmoveClock, fullmoveNumber]
 
 position :: Board -> T.Text
-position board = T.intercalate "/" $ map (rowToFEN board) fenSquares
+position board = T.intercalate "/" $ map (rowToFEN board) squaresFENOrder
+
+-- |Имена полей на доске, упорядоченных для экспорт в FEN
+squaresFENOrder :: [[Square]]
+squaresFENOrder = squaresDisplayOrder
 
 rowToFEN :: Board -> [Square] -> T.Text
 rowToFEN board row = foldl (\result square -> case findPiece board square of
@@ -80,7 +81,6 @@ halfmoveClock = "0"
 
 fullmoveNumber :: T.Text
 fullmoveNumber = "1"
-
 
 importFEN :: T.Text -> Board
 importFEN text = undefined
