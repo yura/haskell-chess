@@ -20,8 +20,8 @@ main = do
 
   threadDelay 1000000
   clearScreen
-  putStrLn $ T.unpack $ exportToDisplay emptyBoard
+  putStrLn $ T.unpack $ exportToDisplay emptyBoard True
 
   threadDelay 1000000
   clearScreen
-  putStrLn $ T.unpack $ exportToDisplay initialBoard
+  putStrLn $ T.unpack $ exportToDisplay initialBoard True

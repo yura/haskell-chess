@@ -3,13 +3,19 @@ module Display where
 import qualified Data.Text as T
 import           Board (Board(..), Piece(..), PieceType(..), PieceColor(..), Square, cols, rows, findPiece)
 
-exportToDisplay :: Board -> T.Text
-exportToDisplay b = position b
+exportToDisplay :: Board -> Bool -> T.Text
+exportToDisplay board renderNames = boardText <> if renderNames then colNames else ""
+  where
+    boardText = T.intercalate "\n" rowsListWithRowNames
+    rowsListWithRowNames = if renderNames
+      then zipWith (<>) rowNames rowsList
+      else rowsList
+    rowNames = map (\i -> T.pack $ show i <> " ") $ reverse rows
+    rowsList = map (rowToDisplay board) squaresDisplayOrder
+    colNames :: T.Text
+    colNames = "\n\n  " <> T.pack cols
 
-position :: Board -> T.Text
-position board = T.intercalate "\n" $ map (rowToDisplay board) squaresDisplayOrder
-
--- rowToDisplay :: Board -> [Square] -> T.Text
+rowToDisplay :: Board -> [Square] -> T.Text
 rowToDisplay board row = T.concat $ map (\square -> case findPiece board square of
   Nothing    -> " "
   Just piece -> pieceToDisplay piece) row
