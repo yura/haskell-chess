@@ -5,10 +5,14 @@ if ARGV.size == 0
 end
 
 result = []
+suffixes = []
 File.open(ARGV[0]).each do |line|
   if line =~ /^1\./
-    result << line.split.reject { |m| m =~ /^\d+\./ }.map { |i| i.gsub(/\d/, '1').gsub(/[a-h]/, 'a') }
+    moves = line.split.reject { |m| m =~ /^\d+\./ }.map { |i| i.gsub(/\d/, '1').gsub(/[a-h]/, 'a') }
+    result << moves
+    suffixes << moves.map { |m| m.gsub(/[[:alnum:]]/, '') }
   end
 end
 
 puts result.flatten.uniq.sort
+puts suffixes.flatten.uniq.sort

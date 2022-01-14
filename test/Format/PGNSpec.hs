@@ -199,3 +199,33 @@ spec = do
 
       it "чёрная пешка становится ферзём" $
         parsePGNMove' "hxg1=Q" `shouldParse` PGNCapturePromotion 'h' ('g', 1) Queen
+
+  describe "parseMoveAnnotated" $ do
+    let parseMoveAnnotated' = parse parseMoveAnnotated "PGN"
+
+    it "обычный ход" $
+      parseMoveAnnotated' "Bxf6" `shouldParse` MoveAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) Nothing Nothing
+
+    context "шах" $ do
+      it "возращает шах" $
+        parseMoveAnnotated' "Bxf6+" `shouldParse` MoveAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) (Just Check) Nothing
+
+    context "мат" $ do
+      it "возращает мат" $
+        parseMoveAnnotated' "Bxf6#" `shouldParse` MoveAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) (Just Checkmate) Nothing
+
+    context "аннотация" $ do
+      it "возращает ??" $
+        parseMoveAnnotated' "Bxf6??" `shouldParse` MoveAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) Nothing (Just "??")
+
+      it "возращает ?!" $
+        parseMoveAnnotated' "Bxf6?!" `shouldParse` MoveAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) Nothing (Just "?!")
+
+      it "возращает ?" $
+        parseMoveAnnotated' "Bxf6?" `shouldParse` MoveAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) Nothing (Just "?")
+
+      it "шах и аннотация ??" $
+        parseMoveAnnotated' "Bxf6+??" `shouldParse` MoveAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) (Just Check) (Just "??")
+
+    --context "результат партии"
+

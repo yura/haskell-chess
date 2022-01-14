@@ -25,6 +25,15 @@ data PGNMove
   | PGNCapturePromotion           Char                     Square PieceType
   deriving (Eq, Show)
 
+data MoveResult
+  = Check
+  | Checkmate
+  deriving (Eq, Show)
+
+data MoveAnnotated
+  = MoveAnnotated PGNMove (Maybe MoveResult) (Maybe String)
+  deriving (Eq, Show)
+
 data Move
   = Move             Int Piece Square
   | KingsideCastling Int PieceColor
@@ -140,6 +149,20 @@ parsePGNMove = do
   <|> try parsePGNRegularWithSrcSquare
   <|> try parsePGNRegularWithSrcCol
   <|> parsePGNRegular
+
+parseMoveAnnotated :: Parser MoveAnnotated
+parseMoveAnnotated = do
+  move <- parsePGNMove
+
+  mr <- optionMaybe $ try (string "+") <|> try (string "#")
+  let moveResult = case mr of
+        Just "+" -> Just Check
+        Just "#" -> Just Checkmate
+        Nothing  -> Nothing
+
+  annotation <- optionMaybe $ try (string "??") <|> try (string "?!") <|> try (string "?")
+
+  return $ MoveAnnotated move moveResult annotation
 
 pieceType :: Char -> PieceType
 pieceType 'K' = King
