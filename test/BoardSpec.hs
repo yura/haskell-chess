@@ -18,13 +18,13 @@ spec = do
       length squares `shouldBe` 0
 
   describe "placePiece" $ do
-    it "уставнавливает фигуру на заданную клетку" $ do
+    it "ставит фигуру на заданную клетку" $ do
       let whitePawn = Piece Pawn White
       let (Board squares) = placePiece emptyBoard ('d', 4) whitePawn
       M.lookup ('d', 4) squares `shouldBe` Just whitePawn
 
   describe "placePieces" $ do
-    it "уставнавливает фигуры на заданны клетки" $ do
+    it "ставит фигуры на заданные клетки" $ do
       let whitePawn = Piece Pawn White
       let blackPawn = Piece Pawn Black
       let (Board board) = placePieces emptyBoard [(('a', 2), whitePawn), (('a', 7), blackPawn)]

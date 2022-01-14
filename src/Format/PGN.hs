@@ -64,6 +64,28 @@ parsePGNKingsideCastling = do
   string "O-O"
   return PGNKingsideCastling
 
+-- exf8=Q
+parsePGNCapturePromotion :: Parser PGNMove
+parsePGNCapturePromotion = do
+  srcCol    <- oneOf cols
+  string "x"
+  col       <- oneOf cols
+  row       <- oneOf rowStr
+  string "="
+  pieceName <- oneOf pieceNames
+
+  return $ PGNCapturePromotion srcCol (col, digitToInt row) (pieceType pieceName)
+
+-- f8=Q
+parsePGNPromotion :: Parser PGNMove
+parsePGNPromotion = do
+  col       <- oneOf cols
+  row       <- oneOf rowStr
+  string "="
+  pieceName <- oneOf pieceNames
+
+  return $ PGNPromotion (col, digitToInt row) (pieceType pieceName)
+
 parsePGNPawnCapture :: Parser PGNMove
 parsePGNPawnCapture = do
   srcCol    <- oneOf cols
@@ -110,6 +132,9 @@ parsePGNMove :: Parser PGNMove
 parsePGNMove = do
       try parsePGNQueensideCastling
   <|> try parsePGNKingsideCastling
+  <|> try parsePGNCapturePromotion
+  <|> try parsePGNPromotion
+  <|> try parsePGNCapture
   <|> try parsePGNPawnCapture
   <|> try parsePGNCapture
   <|> try parsePGNRegularWithSrcSquare

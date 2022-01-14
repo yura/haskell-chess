@@ -182,3 +182,20 @@ spec = do
       it "ход королём" $ do
         pendingWith "король должен быть один, при указании вертикали короля, скорее всего надо падать"
         parsePGNMove' "Kab2" `shouldParse` PGNMove King (Just 'a') Nothing ('b', 2)
+
+    context "продвижение (c8=Q)" $ do
+      it "белая пешка становится ферзём" $
+        parsePGNMove' "c8=Q" `shouldParse` PGNPromotion ('c', 8) Queen
+
+      it "белая пешка становится конём" $
+        parsePGNMove' "h8=N" `shouldParse` PGNPromotion ('h', 8) Knight
+
+      it "черная пешка становится ладьёй" $
+        parsePGNMove' "a1=R" `shouldParse` PGNPromotion ('a', 1) Rook
+
+    context "взятие с продвижением (exf8=Q)" $ do
+      it "белая пешка становится ферзём" $
+        parsePGNMove' "exf8=Q" `shouldParse` PGNCapturePromotion 'e' ('f', 8) Queen
+
+      it "чёрная пешка становится ферзём" $
+        parsePGNMove' "hxg1=Q" `shouldParse` PGNCapturePromotion 'h' ('g', 1) Queen
