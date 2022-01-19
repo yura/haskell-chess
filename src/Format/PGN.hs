@@ -164,6 +164,16 @@ parseMoveAnnotated = do
 
   return $ MoveAnnotated move moveResult annotation
 
+parseResult :: Parser Result
+parseResult = do
+  r <- try (string "1-0") <|> try (string "0-1") <|> string "1/2-1/2"
+  return $ case r of
+    "1-0"     -> WhiteWon
+    "0-1"     -> BlackWon
+    "1/2-1/2" -> Draw
+
+
+
 pieceType :: Char -> PieceType
 pieceType 'K' = King
 pieceType 'Q' = Queen

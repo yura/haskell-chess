@@ -4,7 +4,6 @@
 
 * Read PGN: -- нужны все возможные ходы, как их правильно записывать
   * draw =
-  * result: 1-0, 0-1, 1/2-1/2
   * position annotion https://en.wikipedia.org/wiki/Chess_annotation_symbols
   * ignore comments {} or ;
 * Random bot: make random moves but following all chess rules

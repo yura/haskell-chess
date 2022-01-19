@@ -10,6 +10,8 @@ data Piece = Piece PieceType PieceColor deriving (Eq, Show)
 type Square = (Char, Int)
 data Board = Board (M.Map Square Piece)
 
+data Result = WhiteWon | BlackWon | Draw deriving (Eq, Show)
+
 cols = ['a'..'h']
 rows = [1..8]
 
