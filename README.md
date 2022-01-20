@@ -4,7 +4,6 @@
 
 * Read PGN: -- нужны все возможные ходы, как их правильно записывать
   * draw =
-  * position annotion https://en.wikipedia.org/wiki/Chess_annotation_symbols
   * ignore comments {} or ;
 * Random bot: make random moves but following all chess rules
 * Lichess integration -- получить рейтинг Эло
@@ -47,4 +46,5 @@ Library implementing chess rules.
 * Read PGN:
   + check +
   + checkmate #
+  + position annotion https://en.wikipedia.org/wiki/Chess_annotation_symbols
 

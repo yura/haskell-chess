@@ -75,8 +75,6 @@ spec = do
 
       
     context "[ход белых отделён от хода чёрных]" $ do
-
-
       context "[пешка (название фигуры пропущено)]" $ do
         it "возращает белую пешку и поле" $ do
           parseMove' "1. e4" `shouldParse` Move 1 (Piece Pawn White) ('e', 4)
@@ -113,104 +111,104 @@ spec = do
 
         it "рокировка в длинную сторону" $ pending
 
-  describe "parsePGNMove" $ do
-    let parsePGNMove' = parse parsePGNMove "PGN"
+  describe "parsePly" $ do
+    let parsePly' = parse parsePly "PGN"
 
     context "рокировки" $ do
       it "рокировка в сторону ферзя" $
-        parsePGNMove' "O-O-O" `shouldParse` PGNQueensideCastling
+        parsePly' "O-O-O" `shouldParse` PGNQueensideCastling
 
       it "рокировка в сторону короля" $
-        parsePGNMove' "O-O" `shouldParse` PGNKingsideCastling
+        parsePly' "O-O" `shouldParse` PGNKingsideCastling
 
     context "обычные ходы" $ do
       it "ход пешкой" $
-        parsePGNMove' "e4" `shouldParse` PGNMove Pawn Nothing Nothing ('e', 4)
+        parsePly' "e4" `shouldParse` Ply Pawn Nothing Nothing ('e', 4)
 
       it "ход ладьёй" $
-        parsePGNMove' "Ra5" `shouldParse` PGNMove Rook Nothing Nothing ('a', 5)
+        parsePly' "Ra5" `shouldParse` Ply Rook Nothing Nothing ('a', 5)
 
       it "ход конём" $
-        parsePGNMove' "Ng2" `shouldParse` PGNMove Knight Nothing Nothing ('g', 2)
+        parsePly' "Ng2" `shouldParse` Ply Knight Nothing Nothing ('g', 2)
 
       it "ход слоном" $
-        parsePGNMove' "Bc7" `shouldParse` PGNMove Bishop Nothing Nothing ('c', 7)
+        parsePly' "Bc7" `shouldParse` Ply Bishop Nothing Nothing ('c', 7)
 
       it "ход ферзём" $
-        parsePGNMove' "Qh8" `shouldParse` PGNMove Queen Nothing Nothing ('h', 8)
+        parsePly' "Qh8" `shouldParse` Ply Queen Nothing Nothing ('h', 8)
 
       it "ход королём" $
-        parsePGNMove' "Ka4" `shouldParse` PGNMove King Nothing Nothing ('a', 4)
+        parsePly' "Ka4" `shouldParse` Ply King Nothing Nothing ('a', 4)
 
     context "ходы со взятием" $ do
       it "взятие пешкой" $
-        parsePGNMove' "bxa5" `shouldParse` PGNCapture Pawn (Just 'b') Nothing ('a', 5)
+        parsePly' "bxa5" `shouldParse` PGNCapture Pawn (Just 'b') Nothing ('a', 5)
 
       it "взятие ладьёй" $
-        parsePGNMove' "Rxa5" `shouldParse` PGNCapture Rook Nothing Nothing ('a', 5)
+        parsePly' "Rxa5" `shouldParse` PGNCapture Rook Nothing Nothing ('a', 5)
 
       it "взятие конём" $
-        parsePGNMove' "Nxg2" `shouldParse` PGNCapture Knight Nothing Nothing ('g', 2)
+        parsePly' "Nxg2" `shouldParse` PGNCapture Knight Nothing Nothing ('g', 2)
 
       it "взятие слоном" $
-        parsePGNMove' "Bxc8" `shouldParse` PGNCapture Bishop Nothing Nothing ('c', 8)
+        parsePly' "Bxc8" `shouldParse` PGNCapture Bishop Nothing Nothing ('c', 8)
 
       it "взятие ферзём" $
-        parsePGNMove' "Qxh6" `shouldParse` PGNCapture Queen Nothing Nothing ('h', 6)
+        parsePly' "Qxh6" `shouldParse` PGNCapture Queen Nothing Nothing ('h', 6)
 
       it "взятие королём" $
-        parsePGNMove' "Kxa3" `shouldParse` PGNCapture King Nothing Nothing ('a', 3)
+        parsePly' "Kxa3" `shouldParse` PGNCapture King Nothing Nothing ('a', 3)
 
     context "ходы с указанием исходной вертикали" $ do
       it "ход ладьёй" $
-        parsePGNMove' "Rae5" `shouldParse` PGNMove Rook (Just 'a') Nothing ('e', 5)
+        parsePly' "Rae5" `shouldParse` Ply Rook (Just 'a') Nothing ('e', 5)
      
       it "ход конём" $
-        parsePGNMove' "Nbe6" `shouldParse` PGNMove Knight (Just 'b') Nothing ('e', 6)
+        parsePly' "Nbe6" `shouldParse` Ply Knight (Just 'b') Nothing ('e', 6)
      
       it "ход слоном" $
-        parsePGNMove' "Bcf7" `shouldParse` PGNMove Bishop (Just 'c') Nothing ('f', 7)
+        parsePly' "Bcf7" `shouldParse` Ply Bishop (Just 'c') Nothing ('f', 7)
      
       it "ход ферзём" $
-        parsePGNMove' "Qdg8" `shouldParse` PGNMove Queen (Just 'd') Nothing ('g', 8)
+        parsePly' "Qdg8" `shouldParse` Ply Queen (Just 'd') Nothing ('g', 8)
      
       it "ход королём" $ do
         pendingWith "король должен быть один, при указании вертикали короля, скорее всего надо падать"
-        parsePGNMove' "Kab2" `shouldParse` PGNMove King (Just 'a') Nothing ('b', 2)
+        parsePly' "Kab2" `shouldParse` Ply King (Just 'a') Nothing ('b', 2)
 
     context "ходы с указанием исходной клетки" $ do
       it "ход ладьёй" $
-        parsePGNMove' "Rd1d2" `shouldParse` PGNMove Rook (Just 'd') (Just 1) ('d', 2)
+        parsePly' "Rd1d2" `shouldParse` Ply Rook (Just 'd') (Just 1) ('d', 2)
      
       it "ход конём" $
-        parsePGNMove' "Nc1d3" `shouldParse` PGNMove Knight (Just 'c') (Just 1) ('d', 3)
+        parsePly' "Nc1d3" `shouldParse` Ply Knight (Just 'c') (Just 1) ('d', 3)
      
       it "ход слоном" $
-        parsePGNMove' "Be1f2" `shouldParse` PGNMove Bishop (Just 'e') (Just 1) ('f', 2)
+        parsePly' "Be1f2" `shouldParse` Ply Bishop (Just 'e') (Just 1) ('f', 2)
      
       it "ход ферзём" $
-        parsePGNMove' "Qe4e6" `shouldParse` PGNMove Queen (Just 'e') (Just 4) ('e', 6)
+        parsePly' "Qe4e6" `shouldParse` Ply Queen (Just 'e') (Just 4) ('e', 6)
      
       it "ход королём" $ do
         pendingWith "король должен быть один, при указании вертикали короля, скорее всего надо падать"
-        parsePGNMove' "Kab2" `shouldParse` PGNMove King (Just 'a') Nothing ('b', 2)
+        parsePly' "Kab2" `shouldParse` Ply King (Just 'a') Nothing ('b', 2)
 
     context "продвижение (c8=Q)" $ do
       it "белая пешка становится ферзём" $
-        parsePGNMove' "c8=Q" `shouldParse` PGNPromotion ('c', 8) Queen
+        parsePly' "c8=Q" `shouldParse` PGNPromotion ('c', 8) Queen
 
       it "белая пешка становится конём" $
-        parsePGNMove' "h8=N" `shouldParse` PGNPromotion ('h', 8) Knight
+        parsePly' "h8=N" `shouldParse` PGNPromotion ('h', 8) Knight
 
       it "черная пешка становится ладьёй" $
-        parsePGNMove' "a1=R" `shouldParse` PGNPromotion ('a', 1) Rook
+        parsePly' "a1=R" `shouldParse` PGNPromotion ('a', 1) Rook
 
     context "взятие с продвижением (exf8=Q)" $ do
       it "белая пешка становится ферзём" $
-        parsePGNMove' "exf8=Q" `shouldParse` PGNCapturePromotion 'e' ('f', 8) Queen
+        parsePly' "exf8=Q" `shouldParse` PGNCapturePromotion 'e' ('f', 8) Queen
 
       it "чёрная пешка становится ферзём" $
-        parsePGNMove' "hxg1=Q" `shouldParse` PGNCapturePromotion 'h' ('g', 1) Queen
+        parsePly' "hxg1=Q" `shouldParse` PGNCapturePromotion 'h' ('g', 1) Queen
 
   describe "parseMoveAnnotated" $ do
     let parseMoveAnnotated' = parse parseMoveAnnotated "PGN"

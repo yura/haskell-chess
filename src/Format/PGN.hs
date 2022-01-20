@@ -10,13 +10,13 @@ import Board
 --importGame :: T.Text -> Game
 --importGame string = undefined
 
-data PGNMove
+data Ply
   -- рокировка в сторону ферзя
   = PGNQueensideCastling
   -- рокировка в сторону короля
   | PGNKingsideCastling
   -- обычнй ход
-  | PGNMove             PieceType (Maybe Char) (Maybe Int) Square
+  | Ply             PieceType (Maybe Char) (Maybe Int) Square
   -- взятие
   | PGNCapture          PieceType (Maybe Char) (Maybe Int) Square
   -- превращение пешки
@@ -31,7 +31,7 @@ data MoveResult
   deriving (Eq, Show)
 
 data MoveAnnotated
-  = MoveAnnotated PGNMove (Maybe MoveResult) (Maybe String)
+  = MoveAnnotated Ply (Maybe MoveResult) (Maybe String)
   deriving (Eq, Show)
 
 data Move
@@ -63,18 +63,18 @@ parseMove = do
         _     -> White
   return $ Move (read number) (Piece (pieceType pieceName) color) (col, digitToInt row) 
 
-parsePGNQueensideCastling :: Parser PGNMove
+parsePGNQueensideCastling :: Parser Ply
 parsePGNQueensideCastling = do
   string "O-O-O"
   return PGNQueensideCastling
 
-parsePGNKingsideCastling :: Parser PGNMove
+parsePGNKingsideCastling :: Parser Ply
 parsePGNKingsideCastling = do
   string "O-O"
   return PGNKingsideCastling
 
 -- exf8=Q
-parsePGNCapturePromotion :: Parser PGNMove
+parsePGNCapturePromotion :: Parser Ply
 parsePGNCapturePromotion = do
   srcCol    <- oneOf cols
   string "x"
@@ -86,7 +86,7 @@ parsePGNCapturePromotion = do
   return $ PGNCapturePromotion srcCol (col, digitToInt row) (pieceType pieceName)
 
 -- f8=Q
-parsePGNPromotion :: Parser PGNMove
+parsePGNPromotion :: Parser Ply
 parsePGNPromotion = do
   col       <- oneOf cols
   row       <- oneOf rowStr
@@ -95,7 +95,7 @@ parsePGNPromotion = do
 
   return $ PGNPromotion (col, digitToInt row) (pieceType pieceName)
 
-parsePGNPawnCapture :: Parser PGNMove
+parsePGNPawnCapture :: Parser Ply
 parsePGNPawnCapture = do
   srcCol    <- oneOf cols
   string "x"
@@ -104,7 +104,7 @@ parsePGNPawnCapture = do
 
   return $ PGNCapture Pawn (Just srcCol) Nothing (col, digitToInt row)
 
-parsePGNCapture :: Parser PGNMove
+parsePGNCapture :: Parser Ply
 parsePGNCapture = do
   pieceName <- oneOf pieceNames
   string "x"
@@ -113,32 +113,32 @@ parsePGNCapture = do
 
   return $ PGNCapture (pieceType pieceName) Nothing Nothing (col, digitToInt row)
 
-parsePGNRegularWithSrcSquare :: Parser PGNMove
+parsePGNRegularWithSrcSquare :: Parser Ply
 parsePGNRegularWithSrcSquare = do
   pieceName <- oneOf pieceNames
   srcCol    <- oneOf cols
   srcRow    <- oneOf rowStr
   col       <- oneOf cols
   row       <- oneOf rowStr
-  return $ PGNMove (pieceType pieceName) (Just srcCol) (Just $ digitToInt srcRow) (col, digitToInt row)
+  return $ Ply (pieceType pieceName) (Just srcCol) (Just $ digitToInt srcRow) (col, digitToInt row)
 
-parsePGNRegularWithSrcCol :: Parser PGNMove
+parsePGNRegularWithSrcCol :: Parser Ply
 parsePGNRegularWithSrcCol = do
   pieceName <- oneOf pieceNames
   srcCol    <- oneOf cols
   col       <- oneOf cols
   row       <- oneOf rowStr
-  return $ PGNMove (pieceType pieceName) (Just srcCol) Nothing (col, digitToInt row)
+  return $ Ply (pieceType pieceName) (Just srcCol) Nothing (col, digitToInt row)
 
-parsePGNRegular :: Parser PGNMove
+parsePGNRegular :: Parser Ply
 parsePGNRegular = do
   pieceName <- option 'P' $ oneOf pieceNames
   col       <- oneOf cols
   row       <- oneOf rowStr
-  return $ PGNMove (pieceType pieceName) Nothing Nothing (col, digitToInt row)
+  return $ Ply (pieceType pieceName) Nothing Nothing (col, digitToInt row)
 
-parsePGNMove :: Parser PGNMove
-parsePGNMove = do
+parsePly :: Parser Ply
+parsePly = do
       try parsePGNQueensideCastling
   <|> try parsePGNKingsideCastling
   <|> try parsePGNCapturePromotion
@@ -152,7 +152,7 @@ parsePGNMove = do
 
 parseMoveAnnotated :: Parser MoveAnnotated
 parseMoveAnnotated = do
-  move <- parsePGNMove
+  move <- parsePly
 
   mr <- optionMaybe $ try (string "+") <|> try (string "#")
   let moveResult = case mr of
