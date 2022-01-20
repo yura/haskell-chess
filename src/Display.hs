@@ -1,7 +1,7 @@
 module Display where
 
 import qualified Data.Text as T
-import           Board (Board(..), Piece(..), PieceType(..), PieceColor(..), Square, cols, rows, findPiece)
+import           Board (Board(..), Piece(..), PieceType(..), Color(..), Square, cols, rows, findPiece)
 
 exportToDisplay :: Board -> Bool -> T.Text
 exportToDisplay board renderNames = boardText <> if renderNames then colNames else ""

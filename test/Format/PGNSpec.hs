@@ -32,6 +32,17 @@ spec = do
     it "возвращает ничью чёрных, если результат записан в виде '1/2-1/2'" $
       parseResult' "1/2-1/2" `shouldParse` Draw
 
+  describe "parseMove" $ do
+    let parseMove' = parse parseMove "PGN"
+
+    context "[ход белых и чёрных объединены под одним номером]" $ do
+      context "[пешка (название фигуры пропущено)]" $ do
+        it "возращает белую пешку и поле" $ do
+          parseMove' "1. e4" `shouldParse` Move 1 White (Ply Pawn Nothing Nothing ('e', 4))
+
+        it "возращает чёрную пешку и поле" $
+          parseMove' "1... e4" `shouldParse` Move 1 Black (Ply Pawn Nothing Nothing ('e', 5))
+
 {-
   describe "parseMove" $ do
     let parseMove' = parse parseMove "PGN"

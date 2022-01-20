@@ -23,7 +23,7 @@ pieceCols Bishop = ['c', 'f']
 pieceCols Queen  = ['d']
 pieceCols King   = ['e']
 
-pieceRow :: PieceType -> PieceColor -> Int
+pieceRow :: PieceType -> Color -> Int
 pieceRow Pawn White = 2
 pieceRow Pawn _     = 7
 pieceRow _    White = 1
@@ -65,7 +65,7 @@ whiteKing = head $ initialSquaresFor King White
 blackKing :: (Square, Piece)
 blackKing = head $ initialSquaresFor King Black
 
-initialSquaresFor :: PieceType -> PieceColor -> [(Square, Piece)]
+initialSquaresFor :: PieceType -> Color -> [(Square, Piece)]
 initialSquaresFor pieceType pieceColor = [((colName, row), piece) | colName <- pieceCols pieceType ]
   where
     row = pieceRow pieceType pieceColor

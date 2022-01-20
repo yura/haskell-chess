@@ -25,6 +25,10 @@ data Ply
   | CapturePromotion           Char                     Square PieceType
   deriving (Eq, Show)
 
+data Move
+  = Move Int Color PlyAnnotated
+  deriving (Eq, Show)
+
 data MoveResult
   = Check
   | Checkmate

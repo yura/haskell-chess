@@ -4,8 +4,8 @@ import           Data.Char ( ord, chr )
 import qualified Data.Map as M
 
 data PieceType = King | Queen | Rook | Bishop | Knight | Pawn deriving (Eq, Show)
-data PieceColor = White | Black deriving (Eq, Show)
-data Piece = Piece PieceType PieceColor deriving (Eq, Show)
+data Color = White | Black deriving (Eq, Show)
+data Piece = Piece PieceType Color deriving (Eq, Show)
 
 type Square = (Char, Int)
 data Board = Board (M.Map Square Piece)
