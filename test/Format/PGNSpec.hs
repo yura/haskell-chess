@@ -32,6 +32,7 @@ spec = do
     it "возвращает ничью чёрных, если результат записан в виде '1/2-1/2'" $
       parseResult' "1/2-1/2" `shouldParse` Draw
 
+{-
   describe "parseMove" $ do
     let parseMove' = parse parseMove "PGN"
 
@@ -71,8 +72,6 @@ spec = do
         it "рокировка в короткую сторону" $ pending
 
         it "рокировка в длинную сторону" $ pending
-
-
       
     context "[ход белых отделён от хода чёрных]" $ do
       context "[пешка (название фигуры пропущено)]" $ do
@@ -110,16 +109,17 @@ spec = do
         it "рокировка в короткую сторону" $ pending
 
         it "рокировка в длинную сторону" $ pending
+  -}
 
   describe "parsePly" $ do
     let parsePly' = parse parsePly "PGN"
 
     context "рокировки" $ do
       it "рокировка в сторону ферзя" $
-        parsePly' "O-O-O" `shouldParse` PGNQueensideCastling
+        parsePly' "O-O-O" `shouldParse` QueensideCastling
 
       it "рокировка в сторону короля" $
-        parsePly' "O-O" `shouldParse` PGNKingsideCastling
+        parsePly' "O-O" `shouldParse` KingsideCastling
 
     context "обычные ходы" $ do
       it "ход пешкой" $
@@ -142,22 +142,22 @@ spec = do
 
     context "ходы со взятием" $ do
       it "взятие пешкой" $
-        parsePly' "bxa5" `shouldParse` PGNCapture Pawn (Just 'b') Nothing ('a', 5)
+        parsePly' "bxa5" `shouldParse` Capture Pawn (Just 'b') Nothing ('a', 5)
 
       it "взятие ладьёй" $
-        parsePly' "Rxa5" `shouldParse` PGNCapture Rook Nothing Nothing ('a', 5)
+        parsePly' "Rxa5" `shouldParse` Capture Rook Nothing Nothing ('a', 5)
 
       it "взятие конём" $
-        parsePly' "Nxg2" `shouldParse` PGNCapture Knight Nothing Nothing ('g', 2)
+        parsePly' "Nxg2" `shouldParse` Capture Knight Nothing Nothing ('g', 2)
 
       it "взятие слоном" $
-        parsePly' "Bxc8" `shouldParse` PGNCapture Bishop Nothing Nothing ('c', 8)
+        parsePly' "Bxc8" `shouldParse` Capture Bishop Nothing Nothing ('c', 8)
 
       it "взятие ферзём" $
-        parsePly' "Qxh6" `shouldParse` PGNCapture Queen Nothing Nothing ('h', 6)
+        parsePly' "Qxh6" `shouldParse` Capture Queen Nothing Nothing ('h', 6)
 
       it "взятие королём" $
-        parsePly' "Kxa3" `shouldParse` PGNCapture King Nothing Nothing ('a', 3)
+        parsePly' "Kxa3" `shouldParse` Capture King Nothing Nothing ('a', 3)
 
     context "ходы с указанием исходной вертикали" $ do
       it "ход ладьёй" $
@@ -195,47 +195,45 @@ spec = do
 
     context "продвижение (c8=Q)" $ do
       it "белая пешка становится ферзём" $
-        parsePly' "c8=Q" `shouldParse` PGNPromotion ('c', 8) Queen
+        parsePly' "c8=Q" `shouldParse` Promotion ('c', 8) Queen
 
       it "белая пешка становится конём" $
-        parsePly' "h8=N" `shouldParse` PGNPromotion ('h', 8) Knight
+        parsePly' "h8=N" `shouldParse` Promotion ('h', 8) Knight
 
       it "черная пешка становится ладьёй" $
-        parsePly' "a1=R" `shouldParse` PGNPromotion ('a', 1) Rook
+        parsePly' "a1=R" `shouldParse` Promotion ('a', 1) Rook
 
     context "взятие с продвижением (exf8=Q)" $ do
       it "белая пешка становится ферзём" $
-        parsePly' "exf8=Q" `shouldParse` PGNCapturePromotion 'e' ('f', 8) Queen
+        parsePly' "exf8=Q" `shouldParse` CapturePromotion 'e' ('f', 8) Queen
 
       it "чёрная пешка становится ферзём" $
-        parsePly' "hxg1=Q" `shouldParse` PGNCapturePromotion 'h' ('g', 1) Queen
+        parsePly' "hxg1=Q" `shouldParse` CapturePromotion 'h' ('g', 1) Queen
 
   describe "parsePlyAnnotated" $ do
     let parsePlyAnnotated' = parse parsePlyAnnotated "PGN"
 
     it "обычный ход" $
-      parsePlyAnnotated' "Bxf6" `shouldParse` PlyAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) Nothing Nothing
+      parsePlyAnnotated' "Bxf6" `shouldParse` PlyAnnotated (Capture Bishop Nothing Nothing ('f', 6)) Nothing Nothing
 
     context "шах" $ do
       it "возращает шах" $
-        parsePlyAnnotated' "Bxf6+" `shouldParse` PlyAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) (Just Check) Nothing
+        parsePlyAnnotated' "Bxf6+" `shouldParse` PlyAnnotated (Capture Bishop Nothing Nothing ('f', 6)) (Just Check) Nothing
 
     context "мат" $ do
       it "возращает мат" $
-        parsePlyAnnotated' "Bxf6#" `shouldParse` PlyAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) (Just Checkmate) Nothing
+        parsePlyAnnotated' "Bxf6#" `shouldParse` PlyAnnotated (Capture Bishop Nothing Nothing ('f', 6)) (Just Checkmate) Nothing
 
     context "аннотация" $ do
       it "возращает ??" $
-        parsePlyAnnotated' "Bxf6??" `shouldParse` PlyAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) Nothing (Just "??")
+        parsePlyAnnotated' "Bxf6??" `shouldParse` PlyAnnotated (Capture Bishop Nothing Nothing ('f', 6)) Nothing (Just "??")
 
       it "возращает ?!" $
-        parsePlyAnnotated' "Bxf6?!" `shouldParse` PlyAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) Nothing (Just "?!")
+        parsePlyAnnotated' "Bxf6?!" `shouldParse` PlyAnnotated (Capture Bishop Nothing Nothing ('f', 6)) Nothing (Just "?!")
 
       it "возращает ?" $
-        parsePlyAnnotated' "Bxf6?" `shouldParse` PlyAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) Nothing (Just "?")
+        parsePlyAnnotated' "Bxf6?" `shouldParse` PlyAnnotated (Capture Bishop Nothing Nothing ('f', 6)) Nothing (Just "?")
 
       it "шах и аннотация ??" $
-        parsePlyAnnotated' "Bxf6+??" `shouldParse` PlyAnnotated (PGNCapture Bishop Nothing Nothing ('f', 6)) (Just Check) (Just "??")
-
-    --context "результат партии"
+        parsePlyAnnotated' "Bxf6+??" `shouldParse` PlyAnnotated (Capture Bishop Nothing Nothing ('f', 6)) (Just Check) (Just "??")
 
