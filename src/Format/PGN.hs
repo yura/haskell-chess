@@ -30,8 +30,8 @@ data MoveResult
   | Checkmate
   deriving (Eq, Show)
 
-data MoveAnnotated
-  = MoveAnnotated Ply (Maybe MoveResult) (Maybe String)
+data PlyAnnotated
+  = PlyAnnotated Ply (Maybe MoveResult) (Maybe String)
   deriving (Eq, Show)
 
 data Move
@@ -150,8 +150,8 @@ parsePly = do
   <|> try parsePGNRegularWithSrcCol
   <|> parsePGNRegular
 
-parseMoveAnnotated :: Parser MoveAnnotated
-parseMoveAnnotated = do
+parsePlyAnnotated :: Parser PlyAnnotated
+parsePlyAnnotated = do
   move <- parsePly
 
   mr <- optionMaybe $ try (string "+") <|> try (string "#")
@@ -162,7 +162,7 @@ parseMoveAnnotated = do
 
   annotation <- optionMaybe $ try (string "??") <|> try (string "?!") <|> try (string "?")
 
-  return $ MoveAnnotated move moveResult annotation
+  return $ PlyAnnotated move moveResult annotation
 
 parseResult :: Parser Result
 parseResult = do
