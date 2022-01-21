@@ -25,18 +25,19 @@ data Ply
   | CapturePromotion           Char                     Square PieceType
   deriving (Eq, Show)
 
-data Move
-  = Move Int Color PlyAnnotated
-  deriving (Eq, Show)
-
-data MoveResult
+data PlyResult
   = Check
   | Checkmate
   deriving (Eq, Show)
 
 data PlyAnnotated
-  = PlyAnnotated Ply (Maybe MoveResult) (Maybe String)
+  = PlyAnnotated Ply (Maybe PlyResult) (Maybe String)
   deriving (Eq, Show)
+
+data Move
+  = Move Int Color PlyAnnotated
+  deriving (Eq, Show)
+
 
 spaces :: Parser ()
 spaces = skipMany1 space
@@ -44,21 +45,21 @@ spaces = skipMany1 space
 pieceNames = "KQRBN"
 rowStr = concatMap show rows
 
-{-
+parseMove :: Parser [Move]
 parseMove = do
-  number    <- many1 digit
-  dots      <- try (string "...") <|> string "."
+  number  <- many1 digit
+  dots    <- try (string "...") <|> string "."
   spaces
-  pieceName <- option 'P' $ oneOf pieceNames
-
-  col       <- oneOf cols
-  row       <- oneOf rowStr
+  ply     <- parsePlyAnnotated
+  ply'    <- optionMaybe $ try (spaces >> parsePlyAnnotated)
 
   let color = case dots of
         "..." -> Black
         _     -> White
-  return $ Move (read number) (Piece (pieceType pieceName) color) (col, digitToInt row) 
--}
+
+  return $ case ply' of
+    Just p -> [Move (read number) color ply, Move (read number) Black p]
+    _      -> [Move (read number) color ply]
 
 parseQueensideCastling :: Parser Ply
 parseQueensideCastling = do
@@ -149,7 +150,7 @@ parsePly = do
 
 parsePlyAnnotated :: Parser PlyAnnotated
 parsePlyAnnotated = do
-  move <- parsePly
+  ply <- parsePly
 
   mr <- optionMaybe $ try (string "+") <|> try (string "#")
   let moveResult = case mr of
@@ -159,7 +160,7 @@ parsePlyAnnotated = do
 
   annotation <- optionMaybe $ try (string "??") <|> try (string "?!") <|> try (string "?")
 
-  return $ PlyAnnotated move moveResult annotation
+  return $ PlyAnnotated ply moveResult annotation
 
 pieceType :: Char -> PieceType
 pieceType 'K' = King

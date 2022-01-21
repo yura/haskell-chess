@@ -35,13 +35,23 @@ spec = do
   describe "parseMove" $ do
     let parseMove' = parse parseMove "PGN"
 
-    context "[ход белых и чёрных объединены под одним номером]" $ do
-      context "[пешка (название фигуры пропущено)]" $ do
+    context "[ход белых отделён от хода чёрных]" $ do
         it "возращает белую пешку и поле" $ do
-          parseMove' "1. e4" `shouldParse` Move 1 White (Ply Pawn Nothing Nothing ('e', 4))
+          parseMove' "1. e4" `shouldParse`
+            [ Move 1 White (PlyAnnotated (Ply Pawn Nothing Nothing ('e', 4)) Nothing Nothing)
+            ]
 
         it "возращает чёрную пешку и поле" $
-          parseMove' "1... e4" `shouldParse` Move 1 Black (Ply Pawn Nothing Nothing ('e', 5))
+          parseMove' "1... e5" `shouldParse`
+            [ Move 1 Black (PlyAnnotated (Ply Pawn Nothing Nothing ('e', 5)) Nothing Nothing)
+            ]
+
+    context "[ход белых и чёрных объединены под одним номером]" $ do
+      it "возращает оба хода" $ do
+        parseMove' "1. e4 e5" `shouldParse`
+          [ Move 1 White (PlyAnnotated (Ply Pawn Nothing Nothing ('e', 4)) Nothing Nothing)
+          , Move 1 Black (PlyAnnotated (Ply Pawn Nothing Nothing ('e', 5)) Nothing Nothing)
+          ]
 
 {-
   describe "parseMove" $ do
