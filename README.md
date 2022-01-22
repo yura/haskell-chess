@@ -3,7 +3,7 @@
 ## TODO
 
 * Read PGN: -- нужны все возможные ходы, как их правильно записывать
-  * parseGame
+  * прогнать parseGame на всей базе
   * draw =
   * ignore comments {} or ;
 * Random bot: make random moves but following all chess rules

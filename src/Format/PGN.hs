@@ -7,9 +7,6 @@ import Text.ParserCombinators.Parsec hiding (spaces)
 
 import Board
 
---importGame :: T.Text -> Game
---importGame string = undefined
-
 data Ply
   -- рокировка в сторону ферзя
   = QueensideCastling
