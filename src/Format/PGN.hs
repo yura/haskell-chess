@@ -38,12 +38,25 @@ data Move
   = Move Int Color PlyAnnotated
   deriving (Eq, Show)
 
+data Game
+  = Game [Move] Result
+  deriving (Eq, Show)
 
 spaces :: Parser ()
 spaces = skipMany1 space
 
 pieceNames = "KQRBN"
 rowStr = concatMap show rows
+
+parseGame :: Parser Game
+parseGame = do
+  firstMove <- parseMove
+  moves     <- manyTill (spaces >> parseMove) (lookAhead parseResult)
+  --spaces
+  result    <- parseResult
+  eof
+
+  return $ Game (concat $ firstMove:moves) result
 
 parseMove :: Parser [Move]
 parseMove = do
@@ -172,10 +185,9 @@ pieceType _   = Pawn
 
 parseResult :: Parser Result
 parseResult = do
-  r <- try (string "1-0") <|> try (string "0-1") <|> string "1/2-1/2"
+  r <- try (string " 1-0") <|> try (string " 0-1") <|> try (string " 1/2-1/2")
   return $ case r of
-    "1-0"     -> WhiteWon
-    "0-1"     -> BlackWon
-    "1/2-1/2" -> Draw
-
+    " 1-0"     -> WhiteWon
+    " 0-1"     -> BlackWon
+    " 1/2-1/2" -> Draw
 

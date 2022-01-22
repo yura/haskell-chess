@@ -20,17 +20,29 @@ spec = do
       parseMove' "1. e4 e5" `shouldParse` [Move 1 (Piece Pawn White) ('e', 4), Move 1 (Piece Pawn Black)]
 -}
 
+  describe "parseGame" $ do
+    let parseGame' = parse parseGame "PGN"
+
+    it "возращает игру со списком ходов и результатом" $
+      parseGame' "1. d4 f5 2. Nc3 Qh4 0-1" `shouldParse`
+        Game
+          [ Move 1 White (PlyAnnotated (Ply Pawn Nothing Nothing ('d', 4)) Nothing Nothing)
+          , Move 1 Black (PlyAnnotated (Ply Pawn Nothing Nothing ('f', 5)) Nothing Nothing)
+          , Move 2 White (PlyAnnotated (Ply Knight Nothing Nothing ('c', 3)) Nothing Nothing)
+          , Move 2 Black (PlyAnnotated (Ply Queen Nothing Nothing ('h', 4)) Nothing Nothing)
+          ] BlackWon
+
   describe "parseResult" $ do
     let parseResult' = parse parseResult "PGN"
 
     it "возвращает победу белых, если результат записан в виде '1-0'" $
-      parseResult' "1-0" `shouldParse` WhiteWon
+      parseResult' " 1-0" `shouldParse` WhiteWon
 
     it "возвращает победу чёрных, если результат записан в виде '0-1'" $
-      parseResult' "0-1" `shouldParse` BlackWon
+      parseResult' " 0-1" `shouldParse` BlackWon
 
     it "возвращает ничью чёрных, если результат записан в виде '1/2-1/2'" $
-      parseResult' "1/2-1/2" `shouldParse` Draw
+      parseResult' " 1/2-1/2" `shouldParse` Draw
 
   describe "parseMove" $ do
     let parseMove' = parse parseMove "PGN"
