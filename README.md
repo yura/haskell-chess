@@ -2,12 +2,12 @@
 
 ## TODO
 
+* Random bot: make random moves but following all chess rules
+* Lichess integration -- получить рейтинг Эло
 * Read PGN: -- нужны все возможные ходы, как их правильно записывать
   * прогнать parseGame на всей базе
   * draw =
   * ignore comments {} or ;
-* Random bot: make random moves but following all chess rules
-* Lichess integration -- получить рейтинг Эло
 
 * Brute-force bot: make best move looking N moves ahead
 * Read FEN -- нужно для решения задач
@@ -40,6 +40,9 @@ A simple and fast library for generating legal chess moves. Also includes a modu
 ### hchesslib https://github.com/nablaa/hchesslib
 
 Library implementing chess rules.
+
+
+### https://github.com/tromp/ChessPositionRanking
 
 
 ## DONE

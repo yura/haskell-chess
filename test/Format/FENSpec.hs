@@ -36,7 +36,7 @@ spec = do
       exportToFEN initialBoard `shouldBe` "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
     it "чёрный король на a8, белый - на a1, белая пешка на a2, ход белых" $ do
-      let board = placePieces emptyBoard [(('a', 2), Piece Pawn White), (('a', 1), Piece King White), (('a', 8), Piece King Black)]
+      let board = placePieces [(('a', 2), Piece Pawn White), (('a', 1), Piece King White), (('a', 8), Piece King Black)] emptyBoard 
       exportToFEN board `shouldBe` "k7/8/8/8/8/8/P7/K7 w - - 0 1"
 
   describe "incrementLastNumber" $ do

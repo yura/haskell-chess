@@ -30,6 +30,7 @@ library
       Display
       Format.FEN
       Format.PGN
+      Laws
   other-modules:
       Paths_haskell_chess
   hs-source-dirs:
@@ -69,6 +70,7 @@ test-suite haskell-chess-test
       DisplaySpec
       Format.FENSpec
       Format.PGNSpec
+      LawsSpec
       Paths_haskell_chess
   hs-source-dirs:
       test

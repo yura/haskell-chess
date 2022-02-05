@@ -7,7 +7,7 @@ import Test.Hspec.Parsec
 import Text.Parsec
 
 --import Game
-import Board
+import Board hiding (Move(..))
 import Format.PGN
 
 spec :: Spec

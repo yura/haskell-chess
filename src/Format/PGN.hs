@@ -5,7 +5,7 @@ module Format.PGN where
 import Data.Char (digitToInt)
 import Text.ParserCombinators.Parsec hiding (spaces)
 
-import Board
+import Board hiding (Move(..))
 
 data Ply
   -- рокировка в сторону ферзя
