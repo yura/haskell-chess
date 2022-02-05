@@ -6,20 +6,11 @@ import Test.Hspec
 import Test.Hspec.Parsec
 import Text.Parsec
 
---import Game
 import Board hiding (Move(..))
 import Format.PGN
 
 spec :: Spec
 spec = do
-{-
-  describe "parseMoves" $ do
-    let parseMoves' = parse parseMoves "PGN"
-
-    it "возращает белую пешку и поле" $ do
-      parseMove' "1. e4 e5" `shouldParse` [Move 1 pawnWhite ('e', 4), Move 1 pawnBlack]
--}
-
   describe "parseGame" $ do
     let parseGame' = parse parseGame "PGN"
 
@@ -64,85 +55,6 @@ spec = do
           [ Move 1 White (PlyAnnotated (Ply Pawn Nothing Nothing ('e', 4)) Nothing Nothing)
           , Move 1 Black (PlyAnnotated (Ply Pawn Nothing Nothing ('e', 5)) Nothing Nothing)
           ]
-
-{-
-  describe "parseMove" $ do
-    let parseMove' = parse parseMove "PGN"
-
-    context "[ход белых и чёрных объединены под одним номером]" $ do
-      context "[пешка (название фигуры пропущено)]" $ do
-        it "возращает белую пешку и поле" $ do
-          parseMove' "1. e4" `shouldParse` Move 1 pawnWhite ('e', 4)
-
-        it "возращает чёрную пешку и поле" $
-          parseMove' "1... e5" `shouldParse` Move 1 pawnBlack ('e', 5)
-
-        context "[превращение пешки]" $ do
-          it "превращение пешки" $ do
-            pending
-            --parseMove' "6. d8=Q" `shouldParse` Promotion 6 ('d', 8) queenWhite  
-
-        --it "взятие с превращение пешки" $
-        --  parseMove' "6. d8=Q" `shouldParse` 
-
-      context "[ладья]" $ do
-        it "возращает фигуру и поле" $ do
-          parseMove' "15. Ra7" `shouldParse` Move 15 rookWhite ('a', 7)
-
-        it "возращает фигуру и поле" $
-          parseMove' "17... Rh7" `shouldParse` Move 17 rookBlack ('h', 7)
-
-        it "взятие" $ do
-          pending
-          parseMove' "19. Rxc6" `shouldParse` Capture 19 rookWhite ('c', 6)
-
-        it "шах после хода" $ pending
-
-        it "шах после взятия" $ pending
-
-        it "указание с какого места был ход" $ pending
-
-        it "рокировка в короткую сторону" $ pending
-
-        it "рокировка в длинную сторону" $ pending
-      
-    context "[ход белых отделён от хода чёрных]" $ do
-      context "[пешка (название фигуры пропущено)]" $ do
-        it "возращает белую пешку и поле" $ do
-          parseMove' "1. e4" `shouldParse` Move 1 pawnWhite ('e', 4)
-
-        it "возращает чёрную пешку и поле" $
-          parseMove' "1... e5" `shouldParse` Move 1 pawnBlack ('e', 5)
-
-        context "[превращение пешки]" $ do
-          it "превращение пешки" $ do
-            pending
-            --parseMove' "6. d8=Q" `shouldParse` Promotion 6 ('d', 8) queenWhite  
-
-        --it "взятие с превращение пешки" $
-        --  parseMove' "6. d8=Q" `shouldParse` 
-
-      context "[ладья]" $ do
-        it "возращает фигуру и поле" $ do
-          parseMove' "15. Ra7" `shouldParse` Move 15 rookWhite ('a', 7)
-
-        it "возращает фигуру и поле" $
-          parseMove' "17... Rh7" `shouldParse` Move 17 rookBlack ('h', 7)
-
-        it "взятие" $ do
-          pending
-          parseMove' "19. Rxc6" `shouldParse` Capture 19 rookWhite ('c', 6)
-
-        it "шах после хода" $ pending
-
-        it "шах после взятия" $ pending
-
-        it "указание с какого места был ход" $ pending
-
-        it "рокировка в короткую сторону" $ pending
-
-        it "рокировка в длинную сторону" $ pending
-  -}
 
   describe "parsePly" $ do
     let parsePly' = parse parsePly "PGN"
