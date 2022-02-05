@@ -17,7 +17,7 @@ spec = do
     let parseMoves' = parse parseMoves "PGN"
 
     it "возращает белую пешку и поле" $ do
-      parseMove' "1. e4 e5" `shouldParse` [Move 1 (Piece Pawn White) ('e', 4), Move 1 (Piece Pawn Black)]
+      parseMove' "1. e4 e5" `shouldParse` [Move 1 pawnWhite ('e', 4), Move 1 pawnBlack]
 -}
 
   describe "parseGame" $ do
@@ -72,29 +72,29 @@ spec = do
     context "[ход белых и чёрных объединены под одним номером]" $ do
       context "[пешка (название фигуры пропущено)]" $ do
         it "возращает белую пешку и поле" $ do
-          parseMove' "1. e4" `shouldParse` Move 1 (Piece Pawn White) ('e', 4)
+          parseMove' "1. e4" `shouldParse` Move 1 pawnWhite ('e', 4)
 
         it "возращает чёрную пешку и поле" $
-          parseMove' "1... e5" `shouldParse` Move 1 (Piece Pawn Black) ('e', 5)
+          parseMove' "1... e5" `shouldParse` Move 1 pawnBlack ('e', 5)
 
         context "[превращение пешки]" $ do
           it "превращение пешки" $ do
             pending
-            --parseMove' "6. d8=Q" `shouldParse` Promotion 6 ('d', 8) (Piece Queen White)  
+            --parseMove' "6. d8=Q" `shouldParse` Promotion 6 ('d', 8) queenWhite  
 
         --it "взятие с превращение пешки" $
         --  parseMove' "6. d8=Q" `shouldParse` 
 
       context "[ладья]" $ do
         it "возращает фигуру и поле" $ do
-          parseMove' "15. Ra7" `shouldParse` Move 15 (Piece Rook White) ('a', 7)
+          parseMove' "15. Ra7" `shouldParse` Move 15 rookWhite ('a', 7)
 
         it "возращает фигуру и поле" $
-          parseMove' "17... Rh7" `shouldParse` Move 17 (Piece Rook Black) ('h', 7)
+          parseMove' "17... Rh7" `shouldParse` Move 17 rookBlack ('h', 7)
 
         it "взятие" $ do
           pending
-          parseMove' "19. Rxc6" `shouldParse` Capture 19 (Piece Rook White) ('c', 6)
+          parseMove' "19. Rxc6" `shouldParse` Capture 19 rookWhite ('c', 6)
 
         it "шах после хода" $ pending
 
@@ -109,29 +109,29 @@ spec = do
     context "[ход белых отделён от хода чёрных]" $ do
       context "[пешка (название фигуры пропущено)]" $ do
         it "возращает белую пешку и поле" $ do
-          parseMove' "1. e4" `shouldParse` Move 1 (Piece Pawn White) ('e', 4)
+          parseMove' "1. e4" `shouldParse` Move 1 pawnWhite ('e', 4)
 
         it "возращает чёрную пешку и поле" $
-          parseMove' "1... e5" `shouldParse` Move 1 (Piece Pawn Black) ('e', 5)
+          parseMove' "1... e5" `shouldParse` Move 1 pawnBlack ('e', 5)
 
         context "[превращение пешки]" $ do
           it "превращение пешки" $ do
             pending
-            --parseMove' "6. d8=Q" `shouldParse` Promotion 6 ('d', 8) (Piece Queen White)  
+            --parseMove' "6. d8=Q" `shouldParse` Promotion 6 ('d', 8) queenWhite  
 
         --it "взятие с превращение пешки" $
         --  parseMove' "6. d8=Q" `shouldParse` 
 
       context "[ладья]" $ do
         it "возращает фигуру и поле" $ do
-          parseMove' "15. Ra7" `shouldParse` Move 15 (Piece Rook White) ('a', 7)
+          parseMove' "15. Ra7" `shouldParse` Move 15 rookWhite ('a', 7)
 
         it "возращает фигуру и поле" $
-          parseMove' "17... Rh7" `shouldParse` Move 17 (Piece Rook Black) ('h', 7)
+          parseMove' "17... Rh7" `shouldParse` Move 17 rookBlack ('h', 7)
 
         it "взятие" $ do
           pending
-          parseMove' "19. Rxc6" `shouldParse` Capture 19 (Piece Rook White) ('c', 6)
+          parseMove' "19. Rxc6" `shouldParse` Capture 19 rookWhite ('c', 6)
 
         it "шах после хода" $ pending
 

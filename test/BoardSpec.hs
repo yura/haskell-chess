@@ -36,6 +36,6 @@ spec = do
   describe "move" $ do
     context "ход белых" $ do
       it "белая пешка с начальной позиции" $ do
-        let resultBoard = (\(Board b) -> Map.delete ('e', 2) $ Map.insert ('e', 4) (Piece Pawn White) b) initialBoard
-        (move initialBoard $ Move (Piece Pawn White) ('e',2) ('e',4)) `shouldBe` Board resultBoard
+        let resultBoard = (\(Board b) -> Map.delete ('e', 2) $ Map.insert ('e', 4) pawnWhite b) initialBoard
+        (move initialBoard $ Move pawnWhite ('e',2) ('e',4)) `shouldBe` Board resultBoard
 

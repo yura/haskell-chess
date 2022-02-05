@@ -52,16 +52,16 @@ castlings board = if T.length result == 0 then "-" else result
     result = whiteKingsideCastling board <> whiteQueensideCastling board <> blackKingsideCastling board <> blackQueensideCastling board
 
 whiteKingsideCastling :: Board -> T.Text
-whiteKingsideCastling board = castling board (Piece King White)
+whiteKingsideCastling board = castling board kingWhite
 
 whiteQueensideCastling :: Board -> T.Text
-whiteQueensideCastling board = castling board (Piece Queen White)
+whiteQueensideCastling board = castling board queenWhite
 
 blackKingsideCastling :: Board -> T.Text
-blackKingsideCastling board = castling board (Piece King Black)
+blackKingsideCastling board = castling board kingBlack
 
 blackQueensideCastling :: Board -> T.Text
-blackQueensideCastling board = castling board (Piece Queen Black)
+blackQueensideCastling board = castling board queenBlack
 
 castling :: Board -> Piece -> T.Text
 castling board piece@(Piece side color) = case findPiece board (col, row) of
