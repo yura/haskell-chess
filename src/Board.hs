@@ -6,6 +6,19 @@ data PieceType = King | Queen | Rook | Bishop | Knight | Pawn deriving (Eq, Show
 data Color = White | Black deriving (Eq, Show)
 data Piece = Piece PieceType Color deriving (Eq, Show)
 
+kingWhite   = Piece King White
+queenWhite  = Piece Queen White
+rookWhite   = Piece Rook White
+bishopWhite = Piece Bishop White
+knightWhite = Piece Knight White
+pawnWhite   = Piece Pawn White
+kingBlack   = Piece King Black
+queenBlack  = Piece Queen Black
+rookBlack   = Piece Rook Black
+bishopBlack = Piece Bishop Black
+knightBlack = Piece Knight Black
+pawnBlack   = Piece Pawn Black
+
 type Square = (Char, Int)
 data Board = Board (M.Map Square Piece) deriving (Eq, Show)
 
@@ -60,11 +73,11 @@ move (Board board) (Promotion        from to piece) = Board $ M.delete from $ M.
 move (Board board) (CapturePromotion from to piece) = Board $ M.delete from $ M.insert to piece board
 move (Board board) (QueensideCastling color)
   = Board
-  $ M.insert ('f', row) (Piece Rook White) $ M.delete ('h', row)
-  $ M.insert ('g', row) (Piece King White) $ M.delete ('e', row) board
+  $ M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row)
+  $ M.insert ('g', row) (Piece King color) $ M.delete ('e', row) board
   where row = if color == White then 1 else 8
 move (Board board) (KingsideCastling color)
   = Board
-  $ M.insert ('d', row) (Piece Rook White) $ M.delete ('a', row)
-  $ M.insert ('c', row) (Piece King White) $ M.delete ('e', row) board
+  $ M.insert ('d', row) (Piece Rook color) $ M.delete ('a', row)
+  $ M.insert ('c', row) (Piece King color) $ M.delete ('e', row) board
   where row = if color == White then 1 else 8
