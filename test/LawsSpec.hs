@@ -5,8 +5,9 @@ import Test.Hspec
 import qualified Data.Map as M
 import           Data.List ( nub )
 import qualified Data.Map as Map
+
+import           Board
 import           Laws
-import           Board.InitialPosition
 
 spec :: Spec
 spec = do
@@ -153,7 +154,10 @@ spec = do
 
   describe "whitePawnPossibleMoves" $ do
     context "[со взятием фигуры противника]" $ do
-      it "может рубить фигуру противника" $ pending
+      it "может рубить фигуру противника" $ do
+        let board = placePieces [(('e', 4), Piece Pawn White), (('d', 5), Piece Pawn Black)] emptyBoard
+        whitePawnPossibleMoves ('e', 4) board `shouldBe` [Capture pawnWhite ('e', 4) ('d', 5), Move pawnWhite ('e', 4) ('e', 5)]
+
       it "может рубить пешку противника на проходе" $ pending
       it "не ходит, если король после хода оказывается под шахом" $ pending
 

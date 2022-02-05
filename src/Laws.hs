@@ -63,3 +63,21 @@ blackPawnMoves (col, row) | row == 7 =           [(col, 6), (col, 5)]
 
 dropEmptyLists :: [[a]] -> [[a]]
 dropEmptyLists = filter (not . null)
+
+whitePawnCaptureSquares :: Square -> [Square]
+whitePawnCaptureSquares ('a', row) = [('b', succ row)]
+whitePawnCaptureSquares ('h', row) = [('g', succ row)]
+whitePawnCaptureSquares (col, row) = [(pred col, succ row), (succ col, succ row)]
+
+whitePawnCaptures :: Board -> Square -> [Move]
+whitePawnCaptures board from@(_, row) | row == 7  = [f piece | f <- capturePromotions, piece <- [queenWhite, rookWhite, bishopWhite, knightWhite]]
+                                      | otherwise = captures
+  where
+    capturePromotions = map (\to -> CapturePromotion from to) blackPieceSquares
+    captures = map (\to -> Capture pawnWhite from to) blackPieceSquares
+    blackPieceSquares = filter (takenByBlacks board) $ whitePawnCaptureSquares from
+
+whitePawnPossibleMoves :: Square -> Board -> [Move]
+whitePawnPossibleMoves from@(_, row) board = whitePawnCaptures board from ++ moves
+  where
+    moves = map (\to -> Move pawnWhite from to) $ whitePawnMoves from

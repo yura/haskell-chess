@@ -48,11 +48,21 @@ squareNames = [(col, row) | col <- cols, row <- rows]
 emptyBoard :: Board
 emptyBoard = Board $ M.fromList []
 
+isOnBoard :: Square -> Bool
+isOnBoard (col, row) = col `elem` cols && row `elem` rows
+
 findPiece :: Board -> Square -> Maybe Piece
 findPiece (Board squares) square = M.lookup square squares
 
-isOnBoard :: Square -> Bool
-isOnBoard (col, row) = col `elem` cols && row `elem` rows
+takenByBlacks :: Board -> Square -> Bool
+takenByBlacks board square = case findPiece board square of
+  Just (Piece _ Black) -> True
+  _                    -> False
+
+takenByWhites :: Board -> Square -> Bool
+takenByWhites board square = case findPiece board square of
+  Just (Piece _ White) -> True
+  _                    -> False
 
 placePiece :: Square -> Piece -> Board -> Board
 placePiece square piece (Board squares) = Board $ M.insert square piece squares
