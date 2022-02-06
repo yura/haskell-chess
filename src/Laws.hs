@@ -51,10 +51,10 @@ queenMoves squareName = bishopMoves squareName ++ rookMoves squareName
 kingMoves :: Square -> [Square]
 kingMoves squareName = map (\group -> head group) (bishopMovesGrouped squareName ++ rookMovesGrouped squareName) -- ++ rookMovesGrouped squareName)
 
-whitePawnMoves :: Square -> [Square]
-whitePawnMoves (col, row) | row == 2 =           [(col, 3), (col, 4)]
-                          | row > 2 && row < 8 = [(col, succ row)]
-                          | otherwise = undefined
+whitePawnMoveSquares :: Square -> [Square]
+whitePawnMoveSquares (col, row) | row == 2 =           [(col, 3), (col, 4)]
+                                | row > 2 && row < 8 = [(col, succ row)]
+                                | otherwise = undefined
 
 blackPawnMoves :: Square -> [Square]
 blackPawnMoves (col, row) | row == 7 =           [(col, 6), (col, 5)]
@@ -64,20 +64,29 @@ blackPawnMoves (col, row) | row == 7 =           [(col, 6), (col, 5)]
 dropEmptyLists :: [[a]] -> [[a]]
 dropEmptyLists = filter (not . null)
 
+whitePawnMoves :: Square -> Board -> [Move]
+whitePawnMoves from@(col, row) board | row == 2 && taken board (col, 3) = []
+                                     | otherwise = map (\to -> Move pawnWhite from to) $ filter (not . taken board) $ whitePawnMoveSquares from
+
 whitePawnCaptureSquares :: Square -> [Square]
 whitePawnCaptureSquares ('a', row) = [('b', succ row)]
 whitePawnCaptureSquares ('h', row) = [('g', succ row)]
 whitePawnCaptureSquares (col, row) = [(pred col, succ row), (succ col, succ row)]
 
-whitePawnCaptures :: Board -> Square -> [Move]
-whitePawnCaptures board from@(_, row) | row == 7  = [f piece | f <- capturePromotions, piece <- [queenWhite, rookWhite, bishopWhite, knightWhite]]
+whitePawnCaptures :: Square -> Board -> [Move]
+whitePawnCaptures from@(_, row) board | row == 7  = [f piece | f <- capturePromotions, piece <- [queenWhite, rookWhite, bishopWhite, knightWhite]]
                                       | otherwise = captures
   where
     capturePromotions = map (\to -> CapturePromotion from to) blackPieceSquares
     captures = map (\to -> Capture pawnWhite from to) blackPieceSquares
     blackPieceSquares = filter (takenByBlacks board) $ whitePawnCaptureSquares from
 
+whitePawnEnPassantCapture :: Square -> Board -> [Move]
+whitePawnEnPassantCapture (col, 5) (Board squares (Just enPassantTarget@(targetCol, _)))
+  = if succ targetCol == col || pred targetCol == col
+      then [EnPassantCapture pawnWhite (col, 5) enPassantTarget]
+      else []
+whitePawnEnPassantCapture _ _ = []
+
 whitePawnPossibleMoves :: Square -> Board -> [Move]
-whitePawnPossibleMoves from@(_, row) board = whitePawnCaptures board from ++ moves
-  where
-    moves = map (\to -> Move pawnWhite from to) $ whitePawnMoves from
+whitePawnPossibleMoves from@(col, row) board = whitePawnEnPassantCapture from board ++ whitePawnCaptures from board ++ whitePawnMoves from board

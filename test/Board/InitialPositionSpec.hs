@@ -11,7 +11,7 @@ spec :: Spec
 spec = do
   describe "initialBoard" $ do
     it "возвращает 32 клетки" $ do
-      let (Board squares) = initialBoard
+      let (Board squares _) = initialBoard
       length squares `shouldBe` 32
 
   describe "pieces" $ do

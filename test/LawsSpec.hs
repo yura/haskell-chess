@@ -132,15 +132,15 @@ spec = do
         , ('g', 6), ('h', 5), ('h', 7)
         ]
 
-  describe "whitePawnMoves" $ do
+  describe "whitePawnMoveSquares" $ do
     context "[без взятия фигур противника]" $ do
       it "со своей начальной позиции может ходить на поле вперед или на два поля вперед" $ do
-        whitePawnMoves ('a', 2) `shouldBe` [ ('a', 3), ('a', 4) ]
-        whitePawnMoves ('e', 2) `shouldBe` [ ('e', 3), ('e', 4) ]
+        whitePawnMoveSquares ('a', 2) `shouldBe` [ ('a', 3), ('a', 4) ]
+        whitePawnMoveSquares ('e', 2) `shouldBe` [ ('e', 3), ('e', 4) ]
 
       it "может ходить на поле вперёд не с начальной позиции" $ do
-        whitePawnMoves ('b', 3) `shouldBe` [ ('b', 4) ]
-        whitePawnMoves ('g', 7) `shouldBe` [ ('g', 8) ]
+        whitePawnMoveSquares ('b', 3) `shouldBe` [ ('b', 4) ]
+        whitePawnMoveSquares ('g', 7) `shouldBe` [ ('g', 8) ]
 
   describe "blackPawnMoves" $ do
     context "[без взятия фигур противника]" $ do
@@ -153,12 +153,88 @@ spec = do
         blackPawnMoves ('g', 2) `shouldBe` [ ('g', 1) ]
 
   describe "whitePawnPossibleMoves" $ do
-    context "[со взятием фигуры противника]" $ do
+    context "[пешка на начальной позиции]" $ do
+      it "ходит вперед и через поле" $ do
+        let board = placePiece ('e', 2) pawnWhite emptyBoard
+        whitePawnPossibleMoves ('e', 2) board `shouldBe` [Move pawnWhite ('e', 2) ('e', 3), Move pawnWhite ('e', 2) ('e', 4)]
+
+      it "не ходит вперед и не перепрыгивает через фигуру, если стоит своя фигура" $ do
+        let board = placePieces [(('e', 2), pawnWhite), (('e', 3), knightWhite)] emptyBoard
+        whitePawnPossibleMoves ('e', 2) board `shouldBe` []
+
+      it "не ходит вперед и не перепрыгивает через фигуру, если стоит фигура противника" $ do
+        let board = placePieces [(('e', 2), pawnWhite), (('e', 3), knightBlack)] emptyBoard
+        whitePawnPossibleMoves ('e', 2) board `shouldBe` []
+
+      it "не ходит через клетку, если поле занято своей фигурой" $ do
+        let board = placePieces [(('e', 2), pawnWhite), (('e', 4), pawnWhite)] emptyBoard
+        whitePawnPossibleMoves ('e', 2) board `shouldBe` [Move pawnWhite ('e', 2) ('e', 3)]
+
+      it "не ходит через клетку, если поле занято фигурой противника" $ do
+        let board = placePieces [(('e', 2), pawnWhite), (('e', 4), pawnBlack)] emptyBoard
+        whitePawnPossibleMoves ('e', 2) board `shouldBe` [Move pawnWhite ('e', 2) ('e', 3)]
+
+      it "не ходит, если король после хода оказывается под шахом" $ pending
+      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+
+    context "[пешка не в начальной позиции]" $ do
+      it "ходит вперед" $ do
+        let board = placePiece ('e', 4) pawnWhite emptyBoard
+        whitePawnPossibleMoves ('e', 4) board `shouldBe` [Move pawnWhite ('e', 4) ('e', 5)]
+        
+      it "не ходит вперед, если стоит своя фигура" $ do
+        let board = placePieces [(('e', 4), pawnWhite), (('e', 5), knightWhite)] emptyBoard
+        whitePawnPossibleMoves ('e', 4) board `shouldBe` []
+
+      it "не ходит вперед, если стоит фигура противника" $ do
+        let board = placePieces [(('e', 4), pawnWhite), (('e', 5), knightBlack)] emptyBoard
+        whitePawnPossibleMoves ('e', 4) board `shouldBe` []
+
+      it "рубит фигуру противника" $ do
+        let board = placePieces [(('e', 4), pawnWhite), (('d', 5), pawnBlack)] emptyBoard
+        whitePawnPossibleMoves ('e', 4) board `shouldBe` [Capture pawnWhite ('e', 4) ('d', 5), Move pawnWhite ('e', 4) ('e', 5)]
+
+      it "не рубит свою фигуру" $ do
+        let board = placePieces [(('e', 4), pawnWhite), (('d', 5), pawnWhite)] emptyBoard
+        whitePawnPossibleMoves ('e', 4) board `shouldBe` [Move pawnWhite ('e', 4) ('e', 5)]
+
+      it "не ходит, если король после хода оказывается под шахом" $ pending
+      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+
+    context "взятие на проходе" $ do
+      it "рубит пешку противника на проходе" $ do
+        let board = move (placePiece ('e', 5) pawnWhite emptyBoard) (Move pawnBlack ('f', 7) ('f', 5)) 
+        whitePawnPossibleMoves ('e', 5) board `shouldBe` [EnPassantCapture pawnWhite ('e', 5) ('f', 6), Move pawnWhite ('e', 5) ('e', 6)]
+
+      it "не ходит, если король после хода оказывается под шахом" $ pending
+      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+
+
+    context "продвижение" $ do
+      it "продвигается до ферзя, ладьи, слона или коня" $ pending
+      it "может рубить фигуры противника с последующим продвижением" $ pending
+      it "не может рубить свои фигуры с последующим продвижением" $ pending
+
+      it "не ходит, если король после хода оказывается под шахом" $ pending
+      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+
+  describe "kingPossibleMoves" $ do
+    context "[рокировка]" $ do
+      it "не ходит через клетку вперед, если поле занято своей фигурой" $ pending
+      it "не ходит через клетку вперед, если поле занято фигурой противника" $ pending
+
       it "может рубить фигуру противника" $ do
         let board = placePieces [(('e', 4), Piece Pawn White), (('d', 5), Piece Pawn Black)] emptyBoard
         whitePawnPossibleMoves ('e', 4) board `shouldBe` [Capture pawnWhite ('e', 4) ('d', 5), Move pawnWhite ('e', 4) ('e', 5)]
 
-      it "может рубить пешку противника на проходе" $ pending
+      it "не рубит свои фигуры" $ pending
+        --let board = placePieces [(('e', 4), Piece Pawn White), (('d', 5), Piece Pawn Black)] emptyBoard
+        --whitePawnPossibleMoves ('e', 4) board `shouldBe` [Capture pawnWhite ('e', 4) ('d', 5), Move pawnWhite ('e', 4) ('e', 5)]
+
+      it "может рубить пешку противника на проходе" $ do
+        let board = placePieces [(('e', 4), Piece Pawn White), (('d', 5), Piece Pawn Black)] emptyBoard
+        whitePawnPossibleMoves ('e', 4) board `shouldBe` [Capture pawnWhite ('e', 4) ('d', 5), Move pawnWhite ('e', 4) ('e', 5)]
+
       it "не ходит, если король после хода оказывается под шахом" $ pending
 
   describe "kingPossibleMoves" $ do

@@ -4,7 +4,7 @@ import Board
 import qualified Data.Map as M
 
 initialBoard :: Board
-initialBoard = Board $ M.fromList pieces
+initialBoard = Board (M.fromList pieces) Nothing
 
 pieces :: [(Square, Piece)]
 pieces = whitePieces ++ blackPieces

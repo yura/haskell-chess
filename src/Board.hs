@@ -20,7 +20,9 @@ knightBlack = Piece Knight Black
 pawnBlack   = Piece Pawn Black
 
 type Square = (Char, Int)
-data Board = Board (M.Map Square Piece) deriving (Eq, Show)
+data Board = Board (M.Map Square Piece) (Maybe Square) deriving (Eq, Show)
+
+enPassantTarget (Board _ target) = target
 
 data Result = WhiteWon | BlackWon | Draw deriving (Eq, Show)
 
@@ -33,6 +35,8 @@ data Move
   | Move              Piece Square Square
   -- взятие
   | Capture           Piece Square Square
+  -- взятие на проходе
+  | EnPassantCapture  Piece Square Square
   -- превращение пешки
   | Promotion               Square Square Piece
   -- взятие с последующим превращением пешки
@@ -46,13 +50,13 @@ squareNames :: [Square]
 squareNames = [(col, row) | col <- cols, row <- rows]
 
 emptyBoard :: Board
-emptyBoard = Board $ M.fromList []
+emptyBoard = Board (M.fromList []) Nothing
 
 isOnBoard :: Square -> Bool
 isOnBoard (col, row) = col `elem` cols && row `elem` rows
 
 findPiece :: Board -> Square -> Maybe Piece
-findPiece (Board squares) square = M.lookup square squares
+findPiece (Board squares _) square = M.lookup square squares
 
 takenByBlacks :: Board -> Square -> Bool
 takenByBlacks board square = case findPiece board square of
@@ -64,12 +68,20 @@ takenByWhites board square = case findPiece board square of
   Just (Piece _ White) -> True
   _                    -> False
 
+-- Занято ли поле. Для хода пешкой вперёд, если поле занято,
+-- то ходить вперёд нельзя (неважно какой фигурой занято поле).
+taken :: Board -> Square -> Bool
+taken board square = case findPiece board square of
+  Just _  -> True
+  Nothing -> False
+
 placePiece :: Square -> Piece -> Board -> Board
-placePiece square piece (Board squares) = Board $ M.insert square piece squares
+placePiece square piece (Board squares enPassantTarget) = Board (M.insert square piece squares) enPassantTarget
 
 deletePiece :: Square -> Board -> Board
-deletePiece square (Board squares) = Board $ M.delete square squares
+deletePiece square (Board squares enPassantTarget) = Board (M.delete square squares) enPassantTarget
 
+-- FIXME: может быть первым параметром поставить Piece?
 movePiece :: Square -> Square -> Piece -> Board -> Board
 movePiece from to piece board = placePiece to piece $ deletePiece from board
 
@@ -77,17 +89,19 @@ placePieces :: [(Square, Piece)] -> Board -> Board
 placePieces squaresAndPieces board = foldl (\b (square, piece) -> placePiece square piece b) board squaresAndPieces 
 
 move :: Board -> Move -> Board
-move (Board board) (Move      piece  from to) = Board $ M.delete from $ M.insert to piece board
-move (Board board) (Capture   piece  from to) = Board $ M.delete from $ M.insert to piece board
-move (Board board) (Promotion        from to piece) = Board $ M.delete from $ M.insert to piece board
-move (Board board) (CapturePromotion from to piece) = Board $ M.delete from $ M.insert to piece board
-move (Board board) (QueensideCastling color)
-  = Board
-  $ M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row)
-  $ M.insert ('g', row) (Piece King color) $ M.delete ('e', row) board
+move (Board board _) (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4)) = Board (M.delete from $ M.insert to piece board) $ Just (col, 3)
+move (Board board _) (Move piece@(Piece Pawn Black) from@(_, 7) to@(col, 5)) = Board (M.delete from $ M.insert to piece board) $ Just (col, 6)
+move (Board board _) (Move piece from to)                     = Board (M.delete from $ M.insert to piece board) Nothing
+move (Board board _) (Capture   piece  from to) = Board (M.delete from $ M.insert to piece board) Nothing
+move (Board board _) (Promotion        from to piece)         = Board (M.delete from $ M.insert to piece board) Nothing
+move (Board board _) (CapturePromotion from to piece)         = Board (M.delete from $ M.insert to piece board) Nothing
+move (Board board _) (QueensideCastling color)
+  = Board 
+  ( M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row)
+  $ M.insert ('g', row) (Piece King color) $ M.delete ('e', row) board) Nothing
   where row = if color == White then 1 else 8
-move (Board board) (KingsideCastling color)
+move (Board board _) (KingsideCastling color)
   = Board
-  $ M.insert ('d', row) (Piece Rook color) $ M.delete ('a', row)
-  $ M.insert ('c', row) (Piece King color) $ M.delete ('e', row) board
+  ( M.insert ('d', row) (Piece Rook color) $ M.delete ('a', row)
+  $ M.insert ('c', row) (Piece King color) $ M.delete ('e', row) board) Nothing
   where row = if color == White then 1 else 8
