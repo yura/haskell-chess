@@ -209,7 +209,6 @@ spec = do
       it "не ходит, если король после хода оказывается под шахом" $ pending
       it "не ходит через поле, если король после хода оказывается под шахом" $ pending
 
-
     context "продвижение" $ do
       it "продвигается до ферзя, ладьи, слона или коня" $ do
         let board = placePiece ('e', 7) pawnWhite emptyBoard
@@ -220,8 +219,27 @@ spec = do
           , Promotion ('e', 7) ('e', 8) knightWhite
           ]
         
-      it "может рубить фигуры противника с последующим продвижением" $ pending
-      it "не может рубить свои фигуры с последующим продвижением" $ pending
+      it "рубит фигуры противника с последующим продвижением" $ do
+        let board = placePieces [(('e', 7), pawnWhite), (('d', 8), queenBlack)] emptyBoard
+        whitePawnPossibleMoves ('e', 7) board `shouldBe`
+          [ CapturePromotion ('e', 7) ('d', 8) queenWhite
+          , CapturePromotion ('e', 7) ('d', 8) rookWhite
+          , CapturePromotion ('e', 7) ('d', 8) bishopWhite
+          , CapturePromotion ('e', 7) ('d', 8) knightWhite
+          , Promotion ('e', 7) ('e', 8) queenWhite
+          , Promotion ('e', 7) ('e', 8) rookWhite
+          , Promotion ('e', 7) ('e', 8) bishopWhite
+          , Promotion ('e', 7) ('e', 8) knightWhite
+          ]
+ 
+      it "не рубит свои фигуры с последующим продвижением" $ do
+        let board = placePieces [(('e', 7), pawnWhite), (('d', 8), queenWhite)] emptyBoard
+        whitePawnPossibleMoves ('e', 7) board `shouldBe`
+          [ Promotion ('e', 7) ('e', 8) queenWhite
+          , Promotion ('e', 7) ('e', 8) rookWhite
+          , Promotion ('e', 7) ('e', 8) bishopWhite
+          , Promotion ('e', 7) ('e', 8) knightWhite
+          ]
 
       it "не ходит, если король после хода оказывается под шахом" $ pending
       it "не ходит через поле, если король после хода оказывается под шахом" $ pending
