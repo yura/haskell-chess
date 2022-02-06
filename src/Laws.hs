@@ -66,6 +66,8 @@ dropEmptyLists = filter (not . null)
 
 whitePawnMoves :: Square -> Board -> [Move]
 whitePawnMoves from@(col, row) board | row == 2 && taken board (col, 3) = []
+                                     | row == 7 && taken board (col, 8) = []
+                                     | row == 7 = map (\p -> Promotion from (col, 8) p) [queenWhite, rookWhite, bishopWhite, knightWhite]
                                      | otherwise = map (\to -> Move pawnWhite from to) $ filter (not . taken board) $ whitePawnMoveSquares from
 
 whitePawnCaptureSquares :: Square -> [Square]

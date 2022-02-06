@@ -211,7 +211,15 @@ spec = do
 
 
     context "продвижение" $ do
-      it "продвигается до ферзя, ладьи, слона или коня" $ pending
+      it "продвигается до ферзя, ладьи, слона или коня" $ do
+        let board = placePiece ('e', 7) pawnWhite emptyBoard
+        whitePawnPossibleMoves ('e', 7) board `shouldBe`
+          [ Promotion ('e', 7) ('e', 8) queenWhite
+          , Promotion ('e', 7) ('e', 8) rookWhite
+          , Promotion ('e', 7) ('e', 8) bishopWhite
+          , Promotion ('e', 7) ('e', 8) knightWhite
+          ]
+        
       it "может рубить фигуры противника с последующим продвижением" $ pending
       it "не может рубить свои фигуры с последующим продвижением" $ pending
 
