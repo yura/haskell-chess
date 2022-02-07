@@ -52,20 +52,28 @@ squareNames = [(col, row) | col <- cols, row <- rows]
 emptyBoard :: Board
 emptyBoard = Board (M.fromList []) Nothing
 
+opponent :: Color -> Color
+opponent White = Black
+opponent _ = White
+
 isOnBoard :: Square -> Bool
 isOnBoard (col, row) = col `elem` cols && row `elem` rows
 
 findPiece :: Board -> Square -> Maybe Piece
 findPiece (Board squares _) square = M.lookup square squares
 
-takenByBlacks :: Board -> Square -> Bool
-takenByBlacks board square = case findPiece board square of
-  Just (Piece _ Black) -> True
-  _                    -> False
+takenBy :: Color -> Board -> Square -> Bool
+takenBy White = takenByWhites
+takenBy Black = takenByBlacks
 
 takenByWhites :: Board -> Square -> Bool
 takenByWhites board square = case findPiece board square of
   Just (Piece _ White) -> True
+  _                    -> False
+
+takenByBlacks :: Board -> Square -> Bool
+takenByBlacks board square =  case findPiece board square of
+  Just (Piece _ Black) -> True
   _                    -> False
 
 -- Занято ли поле. Для хода пешкой вперёд, если поле занято,

@@ -19,6 +19,28 @@ spec = do
       let (Board squares _) = emptyBoard
       length squares `shouldBe` 0
 
+  describe "takenBy" $ do
+    context "[поле не занято ни белыми, ни чёрными]" $ do
+      it "возращает False, при запросе занято ли белыми" $ do
+        takenBy White emptyBoard ('e', 2) `shouldBe` False
+
+      it "возращает False, при запросе занято ли чёрными" $ do
+        takenBy Black emptyBoard ('e', 2) `shouldBe` False
+
+    context "[поле занято белыми]" $ do
+      it "возращает True, при запросе занято ли белыми" $ do
+        takenBy White initialBoard ('e', 2) `shouldBe` True
+
+      it "возращает False, при запросе занято ли чёрными" $ do
+        takenBy Black initialBoard ('e', 2) `shouldBe` False
+
+    context "[поле занято чёрными]" $ do
+      it "возращает False, при запросе занято ли белыми" $ do
+        takenBy White initialBoard ('e', 7) `shouldBe` False
+
+      it "возращает True, при запросе занято ли чёрными" $ do
+        takenBy Black initialBoard ('e', 7) `shouldBe` True
+
   describe "placePiece" $ do
     it "ставит фигуру на заданную клетку" $ do
       let (Board squares _) = placePiece ('d', 4) pawnWhite emptyBoard 
