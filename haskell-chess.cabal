@@ -27,6 +27,7 @@ library
   exposed-modules:
       Board
       Board.InitialPosition
+      Bot.Random
       Display
       Format.FEN
       Format.PGN
