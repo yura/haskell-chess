@@ -83,6 +83,9 @@ taken board square = case findPiece board square of
   Just _  -> True
   Nothing -> False
 
+pawnSquares :: Color -> [Square]
+pawnSquares = undefined
+
 placePiece :: Square -> Piece -> Board -> Board
 placePiece square piece (Board squares enPassantTarget) = Board (M.insert square piece squares) enPassantTarget
 

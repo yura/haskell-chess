@@ -2,6 +2,7 @@ module Laws where
 
 import           Data.Char ( ord, chr )
 import           Board
+import           Laws.Pawn
 
 bottomLeft :: Square -> [Square]
 bottomLeft (col, row)  = zip [pred col, pred (pred col)..head cols] [pred row, pred (pred row)..head rows]
@@ -54,50 +55,8 @@ kingMoves squareName = map (\group -> head group) (bishopMovesGrouped squareName
 dropEmptyLists :: [[a]] -> [[a]]
 dropEmptyLists = filter (not . null)
 
-{-
-whitePawnMoveSquares :: Square -> [Square]
-whitePawnMoveSquares (col, row)
-  | row == 2 =           [(col, 3), (col, 4)]
-  | row > 2 && row < 8 = [(col, succ row)]
-  | otherwise = undefined
+possibleMoves :: Color -> Board -> [Move]
+possibleMoves color board = concatMap (\s -> pawnPossibleMoves color s board) $ pawnSquares color
 
-whitePawnCaptureSquares :: Square -> [Square]
-whitePawnCaptureSquares ('a', row) = [('b', succ row)]
-whitePawnCaptureSquares ('h', row) = [('g', succ row)]
-whitePawnCaptureSquares (col, row) = [(pred col, succ row), (succ col, succ row)]
-
-whitePawnMoves :: Square -> Board -> [Move]
-whitePawnMoves from@(col, row) board
-  | row == 2 && taken board (col, 3) = [] -- этот случай рассматривается отдельно, чтобы избежать "перепрыгиваний"
-  | row == 7 && taken board (col, 8) = []
-  | row == 7  = map (\p -> Promotion from (col, 8) p) [queenWhite, rookWhite, bishopWhite, knightWhite]
-  | otherwise = map (\to -> Move pawnWhite from to) $ filter (not . taken board) $ whitePawnMoveSquares from
-
-whitePawnCaptures :: Square -> Board -> [Move]
-whitePawnCaptures from@(_, row) board
-  | row == 7  = [f piece | f <- capturePromotions, piece <- [queenWhite, rookWhite, bishopWhite, knightWhite]]
-  | otherwise = captures
-  where
-    capturePromotions = map (\to -> CapturePromotion from to) blackPieceSquares
-    captures = map (\to -> Capture pawnWhite from to) blackPieceSquares
-    blackPieceSquares = filter (takenByBlacks board) $ whitePawnCaptureSquares from
-
-whitePawnEnPassantCapture :: Square -> Board -> [Move]
-whitePawnEnPassantCapture (col, 5) (Board _ (Just enPassantTarget@(targetCol, _)))
-  = if succ targetCol == col || pred targetCol == col
-      then [EnPassantCapture pawnWhite (col, 5) enPassantTarget]
-      else []
-whitePawnEnPassantCapture _ _ = []
-
-whitePawnPossibleMoves :: Square -> Board -> [Move]
-whitePawnPossibleMoves from board
-  =  whitePawnEnPassantCapture from board
-  ++ whitePawnCaptures from board
-  ++ whitePawnMoves from board
-
-blackPawnMoveSquares :: Square -> [Square]
-blackPawnMoveSquares (col, row)
-  | row == 7 =           [(col, 6), (col, 5)]
-  | row < 7 && row > 1 = [(col, pred row)]
-  | otherwise = undefined
--}
+isMate :: Color -> Board -> Bool
+isMate = undefined

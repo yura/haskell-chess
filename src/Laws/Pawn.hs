@@ -68,15 +68,15 @@ enPassantCapture color (col, row) (Board _ (Just enPassantTarget@(targetCol, _))
       else []
 enPassantCapture _ _ _ = []
 
-possibleMoves :: Color -> Square -> Board -> [Move]
-possibleMoves color from board
+pawnPossibleMoves :: Color -> Square -> Board -> [Move]
+pawnPossibleMoves color from board
   =  enPassantCapture color from board
   ++ captures color from board
   ++ moves color from board
 
 whitePawnPossibleMoves :: Square -> Board -> [Move]
-whitePawnPossibleMoves = possibleMoves White
+whitePawnPossibleMoves = pawnPossibleMoves White
 
 blackPawnPossibleMoves :: Square -> Board -> [Move]
-blackPawnPossibleMoves = possibleMoves Black
+blackPawnPossibleMoves = pawnPossibleMoves Black
 

@@ -6,6 +6,7 @@ import Data.Text as T
 import Text.Parsec
 
 import Board
+import Laws
 import Board.InitialPosition
 import Display
 import qualified Format.PGN as PGN
@@ -17,16 +18,22 @@ clearScreen = do
   putStrLn $ chr 27 : "[2J"
   putStrLn $ chr 27 : "[;H"
 
+play
+  :: (Color -> Board -> [Move] -> IO (Board, [Move]))
+  -> (Color -> Board -> [Move] -> IO (Board, [Move]))
+  ->  Color -> Board -> [Move] -> IO (Board, [Move], Result)
+play bot1 bot2 color board moves = do
+  let bot = if color == White then bot1 else bot2
+  (newBoard, newMoves) <- bot color board moves
+  let mResult = if isMate (opponent color) newBoard
+                  then
+                    if color == White then Just WhiteWon else Just BlackWon
+                  else
+                    Nothing
 
-play :: (Color -> Board -> [Move] -> (Board, [Move], Maybe Result)) -> (Color -> Board -> [Move] -> (Board, [Move], Maybe Result)) -> Color -> Board -> [Move] -> (Board, [Move], Result)
-
-play bot1 bot2 color board moves = case mResult of
-    Just r  -> (newBoard, newMoves, r)
+  case mResult of
+    Just r  -> return $ (newBoard, newMoves, r)
     Nothing -> play bot1 bot2 (opponent color) newBoard newMoves
-  where
-    bot = if color == White then bot1 else bot2
-    result@(newBoard, newMoves, mResult) = bot color board moves
-
 
 main :: IO ()
 main = do
