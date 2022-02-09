@@ -83,8 +83,9 @@ taken board square = case findPiece board square of
   Just _  -> True
   Nothing -> False
 
-pawnSquares :: Color -> [Square]
-pawnSquares = undefined
+pawnSquares :: Color -> Board -> [Square]
+pawnSquares color (Board squares _)
+  = foldl (\result (square, Piece pt c) -> if color == c && pt == Pawn then square:result else result) [] $ M.toList squares
 
 placePiece :: Square -> Piece -> Board -> Board
 placePiece square piece (Board squares enPassantTarget) = Board (M.insert square piece squares) enPassantTarget

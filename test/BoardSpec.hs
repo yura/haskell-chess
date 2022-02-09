@@ -41,6 +41,18 @@ spec = do
       it "возращает True, при запросе занято ли чёрными" $ do
         takenBy Black initialBoard ('e', 7) `shouldBe` True
 
+  describe "pawnSquares" $ do
+    it "возращает пустой список, если доска пустая белых пешек" $
+      pawnSquares White emptyBoard `shouldBe` []
+
+    it "возращает пустой список, если на доске не пешек данного цвета" $ do
+      let board = placePiece ('e', 2) pawnWhite emptyBoard
+      pawnSquares Black board `shouldBe` []
+
+    it "возращает все поля занятые пешками данного цвета" $ do
+      let board = placePieces [(('d', 2), pawnWhite), (('e', 2), pawnWhite)] emptyBoard
+      pawnSquares White board `shouldBe` [('e', 2), ('d', 2)]
+
   describe "placePiece" $ do
     it "ставит фигуру на заданную клетку" $ do
       let (Board squares _) = placePiece ('d', 4) pawnWhite emptyBoard 
