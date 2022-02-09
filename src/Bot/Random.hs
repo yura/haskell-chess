@@ -8,6 +8,10 @@ import Laws
 randomMove :: [Move] -> IO Move
 randomMove moves = do
   randomIndex <- getRandomR (0, length moves - 1)
+  putStrLn $ show moves
+  putStrLn $ show $ length moves
+  putStrLn $ show randomIndex
+
   return $ (moves !! randomIndex)
 
 --makeMove :: (MonadRandom m) => Color -> Board -> [Move] -> m (Board, [Move])

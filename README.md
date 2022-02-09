@@ -2,6 +2,7 @@
 
 ## TODO
 
+* return $ (moves !! randomIndex) -- negative index или index too large
 * isMate :: Color -> Board -> Bool
 * Random bot: make random moves but following all chess rules
 * Lichess integration -- получить рейтинг Эло

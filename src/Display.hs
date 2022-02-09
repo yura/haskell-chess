@@ -1,7 +1,20 @@
 module Display where
 
+import           Control.Concurrent (threadDelay)
+import           Data.Char (chr)
 import qualified Data.Text as T
 import           Board (Board(..), Piece(..), PieceType(..), Color(..), Square, cols, rows, findPiece)
+
+clearScreen :: IO ()
+clearScreen = do
+  putStrLn $ chr 27 : "[2J"
+  putStrLn $ chr 27 : "[;H"
+
+renderBoard :: Board -> IO ()
+renderBoard board = do
+  threadDelay 500000
+  clearScreen
+  putStrLn $ T.unpack $ exportToDisplay board True
 
 exportToDisplay :: Board -> Bool -> T.Text
 exportToDisplay board renderNames = boardText <> if renderNames then colNames else ""

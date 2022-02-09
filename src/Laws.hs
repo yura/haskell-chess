@@ -59,4 +59,4 @@ possibleMoves :: Color -> Board -> [Move]
 possibleMoves color board = concatMap (\s -> pawnPossibleMoves color s board) $ pawnSquares color board
 
 isMate :: Color -> Board -> Bool
-isMate = undefined
+isMate color board = False
