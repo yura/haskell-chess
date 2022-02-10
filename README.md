@@ -2,8 +2,13 @@
 
 ## TODO
 
+* isCheck :: Color -> Board -> Bool
 * return $ (moves !! randomIndex) -- negative index или index too large
 * isMate :: Color -> Board -> Bool
+* isDraw :: Color -> Board -> Bool
+  * остались два короля
+  * троекратное повторение позиции
+  * ...
 * Random bot: make random moves but following all chess rules
 * Lichess integration -- получить рейтинг Эло
 * Read PGN: -- нужны все возможные ходы, как их правильно записывать

@@ -7,6 +7,7 @@ import           Data.List ( nub )
 import qualified Data.Map as Map
 
 import           Board
+import           Board.InitialPosition
 import           Laws
 
 spec :: Spec
@@ -145,4 +146,25 @@ spec = do
       it "не рокируется, если ходила ладья?" $ pending
 
     it "не ходит под шах" $ pending
+
+  describe "beatenSquares" $ do
+    context "[белая пешка]" $ do
+      it "возращает список всех полей, которые бьёт белая пешка" $ do
+        beatenSquares White (placePiece ('e', 2) pawnWhite emptyBoard) `shouldBe` [('d', 3), ('f' , 3)]
+
+      it "возращает список всех полей, которые бьют две белые пешки" $ do
+        beatenSquares White (placePieces [(('e', 2), pawnWhite), (('d', 2), pawnWhite)] emptyBoard) `shouldBe` [('c',3),('e',3),('d',3),('f',3)]
+
+    context "[чёрная пешка]" $ do
+      it "возращает список всех полей, которые бьёт чёрная пешка" $ do
+        beatenSquares Black (placePiece ('e', 7) pawnBlack emptyBoard) `shouldBe` [('d', 6), ('f' , 6)]
+
+      it "возращает список всех полей, которые бьют две черные пешки" $ do
+        beatenSquares Black (placePieces [(('e', 7), pawnBlack), (('d', 7), pawnBlack)] emptyBoard) `shouldBe` [('c',6),('e',6),('d',6),('f',6)]
+
+
+  describe "isCheck" $ do
+    it "возращает False в начальной позиции" $ do
+      isCheck White initialBoard `shouldBe` False
+      isCheck Black initialBoard `shouldBe` False
 

@@ -1,6 +1,7 @@
 module Board where
 
-import qualified Data.Map as M
+import qualified Data.List as L
+import qualified Data.Map  as M
 
 data PieceType = King | Queen | Rook | Bishop | Knight | Pawn deriving (Eq, Show)
 data Color = White | Black deriving (Eq, Show)
@@ -98,7 +99,13 @@ movePiece :: Square -> Square -> Piece -> Board -> Board
 movePiece from to piece board = placePiece to piece $ deletePiece from board
 
 placePieces :: [(Square, Piece)] -> Board -> Board
-placePieces squaresAndPieces board = foldl (\b (square, piece) -> placePiece square piece b) board squaresAndPieces 
+placePieces squaresAndPieces board = foldl (\b (square, piece) -> placePiece square piece b) board squaresAndPieces
+
+pieceAt :: Piece -> Board -> [Square]
+pieceAt (Piece pieceType color) (Board squares _) = map fst $ L.filter (\(square, Piece pt c) -> pt == pieceType && c == color) $ M.toList squares
+
+kingAt :: Color -> Board -> Square
+kingAt color board = head $ pieceAt (Piece King color) board
 
 move :: Board -> Move -> Board
 move (Board board _) (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4)) = Board (M.delete from $ M.insert to piece board) $ Just (col, 3)

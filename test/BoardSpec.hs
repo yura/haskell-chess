@@ -64,6 +64,11 @@ spec = do
       M.lookup ('a', 2) board `shouldBe` Just pawnWhite
       M.lookup ('a', 7) board `shouldBe` Just pawnBlack
 
+  describe "kingAt" $ do
+    it "возращает позицию короля" $ do
+      kingAt White initialBoard `shouldBe` ('e', 1)
+      kingAt Black initialBoard `shouldBe` ('e', 8)
+
   describe "move" $ do
     context "ход белых" $ do
       it "белая пешка с начальной позиции" $ do

@@ -1,8 +1,10 @@
 module Laws where
 
 import           Data.Char ( ord, chr )
+import           Data.List (nub)
+import qualified Data.Map as Map
 import           Board
-import           Laws.Pawn
+import qualified Laws.Pawn as P
 
 bottomLeft :: Square -> [Square]
 bottomLeft (col, row)  = zip [pred col, pred (pred col)..head cols] [pred row, pred (pred row)..head rows]
@@ -56,7 +58,19 @@ dropEmptyLists :: [[a]] -> [[a]]
 dropEmptyLists = filter (not . null)
 
 possibleMoves :: Color -> Board -> [Move]
-possibleMoves color board = concatMap (\s -> pawnPossibleMoves color s board) $ pawnSquares color board
+possibleMoves color board = concatMap (\s -> P.pawnPossibleMoves color s board) $ pawnSquares color board
+
+possibleCatures :: Square -> Piece -> Board -> [Square]
+possibleCatures square (Piece Pawn White) (Board board enPassantTarget) = P.captureSquares White square
+possibleCatures square (Piece Pawn Black) (Board board enPassantTarget) = P.captureSquares Black square
+possibleCatures _ _ _ = []
+
+beatenSquares :: Color -> Board -> [Square]
+beatenSquares color board@(Board squares enPassantTarget)
+  = nub $ concatMap (\(square, piece) -> possibleCatures square piece board) $ Map.toList $ Map.filter (\(Piece _ c) -> c == color) squares
+
+isCheck :: Color -> Board -> Bool
+isCheck color board = kingAt color board `elem` beatenSquares (opponent color) board
 
 isMate :: Color -> Board -> Bool
 isMate color board = False
