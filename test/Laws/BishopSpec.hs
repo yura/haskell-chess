@@ -80,10 +80,10 @@ spec = do
     it "все ходы слона, если слон находится в центре" $ do
       bishopMoves ('d', 4) `shouldBe` [ ('c', 3), ('b', 2), ('a', 1), ('e', 3), ('f', 2), ('g', 1), ('e', 5), ('f', 6), ('g', 7), ('h', 8), ('c', 5), ('b', 6), ('a', 7) ]
 
-  describe "bishopCaptures" $ do
+  describe "captureThreatSquares" $ do
     it "все взятия слона фигур противника" $ do
-      bishopCaptures White ('b', 2) initialBoard `shouldBe` [('g', 7)]
+      captureThreatSquares White ('b', 2) initialBoard `shouldBe` [('g', 7)]
 
     it "возращает пустой список если нет фигур для взятия" $ do
-      bishopCaptures White ('a', 1) (placePiece ('g', 7) pawnWhite initialBoard) `shouldBe` []
+      captureThreatSquares White ('a', 1) (placePiece ('g', 7) pawnWhite initialBoard) `shouldBe` []
 

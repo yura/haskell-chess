@@ -35,18 +35,18 @@ kingMoves squareName = map (\group -> head group) (B.bishopMovesGrouped squareNa
 possibleMoves :: Color -> Board -> [Move]
 possibleMoves color board = concatMap (\s -> P.pawnPossibleMoves color s board) $ pawnSquares color board
 
-possibleCatures :: Square -> Piece -> Board -> [Square]
-possibleCatures square (Piece Pawn color)   board = P.captureThreats color square board
-possibleCatures square (Piece Knight color) board = K.captureThreats color square board
-possibleCatures square (Piece Bishop color) board = B.bishopCaptures color square board
-possibleCatures _ _ _ = []
+captureThreatSquares :: Square -> Piece -> Board -> [Square]
+captureThreatSquares square (Piece Pawn color)   board = P.captureThreatSquares color square board
+captureThreatSquares square (Piece Knight color) board = K.captureThreatSquares color square board
+captureThreatSquares square (Piece Bishop color) board = B.captureThreatSquares color square board
+captureThreatSquares _ _ _ = []
 
-beatenSquares :: Color -> Board -> [Square]
-beatenSquares color board@(Board squares enPassantTarget)
-  = nub $ concatMap (\(square, piece) -> possibleCatures square piece board) $ Map.toList $ Map.filter (\(Piece _ c) -> c == color) squares
+allCaptureThreatSquares :: Color -> Board -> [Square]
+allCaptureThreatSquares color board@(Board squares enPassantTarget)
+  = nub $ concatMap (\(square, piece) -> captureThreatSquares square piece board) $ Map.toList $ Map.filter (\(Piece _ c) -> c == color) squares
 
 isCheck :: Color -> Board -> Bool
-isCheck color board = kingAt color board `elem` beatenSquares (opponent color) board
+isCheck color board = kingAt color board `elem` allCaptureThreatSquares (opponent color) board
 
 isMate :: Color -> Board -> Bool
 isMate color board = False

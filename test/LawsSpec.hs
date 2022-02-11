@@ -58,31 +58,38 @@ spec = do
 
     it "не ходит под шах" $ pending
 
-  describe "beatenSquares" $ do
+  describe "allCaptureThreatSquares" $ do
     context "[белая пешка]" $ do
-      it "возращает список всех полей, которые бьёт белая пешка" $ do
-        beatenSquares White (placePiece ('e', 6) pawnWhite initialBoard) `shouldBe` [('d', 7), ('f' , 7)]
+      it "возращает список всех полей, которым угрожает белая пешка" $ do
+        allCaptureThreatSquares White (placePiece ('e', 6) pawnWhite initialBoard) `shouldBe` [('d', 7), ('f' , 7)]
 
-      it "возращает список всех полей, которые бьют две белые пешки" $ do
-        beatenSquares White (placePieces [(('e', 6), pawnWhite), (('d', 6), pawnWhite)] initialBoard) `shouldBe` [('c',7),('e',7),('d',7),('f',7)]
+      it "возращает список всех полей, которым угрожают две белые пешки" $ do
+        allCaptureThreatSquares White (placePieces [(('e', 6), pawnWhite), (('d', 6), pawnWhite)] initialBoard) `shouldBe` [('c',7),('e',7),('d',7),('f',7)]
 
     context "[чёрная пешка]" $ do
-      it "возращает список всех полей, которые бьёт чёрная пешка" $ do
-        beatenSquares Black (placePiece ('e', 3) pawnBlack initialBoard) `shouldBe` [('d', 2), ('f' , 2)]
+      it "возращает список всех полей, которым угрожает чёрная пешка" $ do
+        allCaptureThreatSquares Black (placePiece ('e', 3) pawnBlack initialBoard) `shouldBe` [('d', 2), ('f' , 2)]
 
-      it "возращает список всех полей, которые бьют две черные пешки" $ do
-        beatenSquares Black (placePieces [(('e', 3), pawnBlack), (('d', 3), pawnBlack)] initialBoard) `shouldBe` [('c',2),('e',2),('d',2),('f',2)]
+      it "возращает список всех полей, которым угрожают две черные пешки" $ do
+        allCaptureThreatSquares Black (placePieces [(('e', 3), pawnBlack), (('d', 3), pawnBlack)] initialBoard) `shouldBe` [('c',2),('e',2),('d',2),('f',2)]
 
     context "[конь]" $ do
-      it "возращает список полей, на которые может сходить конь" $ do
-        beatenSquares White (placePiece ('e', 6) knightWhite initialBoard) `shouldBe` [('g', 7), ('f' , 8), ('d', 8), ('c', 7)]
-        beatenSquares Black (placePiece ('e', 2) knightBlack initialBoard) `shouldBe` [('c', 1), ('g' , 1)]
+      it "возращает список полей, которым угрожает конь" $ do
+        allCaptureThreatSquares White (placePiece ('e', 6) knightWhite initialBoard) `shouldBe` [('g', 7), ('f' , 8), ('d', 8), ('c', 7)]
+        allCaptureThreatSquares Black (placePiece ('e', 2) knightBlack initialBoard) `shouldBe` [('c', 1), ('g' , 1)]
 
     context "[слон]" $ do
-      it "возращает список полей, на которые может бить слон, если доска пустая" $ do
-        beatenSquares White (placePieces [(('e', 4), bishopWhite), (('b', 7), pawnBlack), (('h', 7), pawnBlack)] emptyBoard) `shouldBe`
+      it "возращает список полей, которым угрожает слон" $ do
+        allCaptureThreatSquares White (placePieces [(('e', 4), bishopWhite), (('b', 7), pawnBlack), (('h', 7), pawnBlack)] emptyBoard) `shouldBe`
           [('h', 7), ('b' , 7)]
-        beatenSquares Black (placePieces [(('e', 4), bishopBlack), (('c', 2), pawnWhite), (('g', 2), pawnWhite)] emptyBoard) `shouldBe`
+        allCaptureThreatSquares Black (placePieces [(('e', 4), bishopBlack), (('c', 2), pawnWhite), (('g', 2), pawnWhite)] emptyBoard) `shouldBe`
+          [('c', 2), ('g', 2)]
+
+    context "[ладья]" $ do
+      it "возращает список полей, которым угрожает ладья" $ do
+        allCaptureThreatSquares White (placePieces [(('e', 4), bishopWhite), (('b', 7), pawnBlack), (('h', 7), pawnBlack)] emptyBoard) `shouldBe`
+          [('h', 7), ('b' , 7)]
+        allCaptureThreatSquares Black (placePieces [(('e', 4), bishopBlack), (('c', 2), pawnWhite), (('g', 2), pawnWhite)] emptyBoard) `shouldBe`
           [('c', 2), ('g', 2)]
 
   describe "isCheck" $ do

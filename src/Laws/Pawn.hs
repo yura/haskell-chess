@@ -41,8 +41,8 @@ captureSquares color ('h', row) = [('g', nextSquare color row)]
 captureSquares color (col, row) = [(pred col, nextSquare color row), (succ col, nextSquare color row)]
 
 -- Угрозы взятия фигур соперника
-captureThreats :: Color -> Square -> Board -> [Square]
-captureThreats color square board = filterThreats color board $ captureSquares color square
+captureThreatSquares :: Color -> Square -> Board -> [Square]
+captureThreatSquares color square board = filterThreats color board $ captureSquares color square
 
 whitePawnCaptureSquares :: Square -> [Square]
 whitePawnCaptureSquares = captureSquares White
@@ -63,7 +63,7 @@ captures color from@(_, row) board
   | otherwise = map (\to -> Capture (Piece Pawn color) from to) squares
   where
     capturePromotions = map (\to -> CapturePromotion from to) squares
-    squares = captureThreats color from board
+    squares = captureThreatSquares color from board
 
 enPassantCapture :: Color -> Square -> Board -> [Move]
 enPassantCapture color (col, row) (Board _ (Just enPassantTarget@(targetCol, _)))

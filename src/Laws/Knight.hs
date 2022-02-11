@@ -12,6 +12,6 @@ knightMoveShifts = [(-2, -1), (-1, -2), (1, -2), (2, -1), (2, 1), (1, 2), (-1, 2
 knightMoves :: Square -> [Square]
 knightMoves (col, row) = filter isOnBoard $ map (\(c', r') -> (chr (ord col + c'), row + r')) knightMoveShifts
 
-captureThreats :: Color -> Square -> Board -> [Square]
-captureThreats color square board = filterThreats color board $ knightMoves square
+captureThreatSquares :: Color -> Square -> Board -> [Square]
+captureThreatSquares color square board = filterThreats color board $ knightMoves square
 

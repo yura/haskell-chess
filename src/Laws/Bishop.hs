@@ -33,8 +33,8 @@ findOrStop Black board (square:squares) = case findPiece board square of
   Just (Piece _ Black) -> Nothing
   Nothing              -> findOrStop Black board squares
 
-bishopCaptures :: Color -> Square -> Board -> [Square]
-bishopCaptures color square board
+captureThreatSquares :: Color -> Square -> Board -> [Square]
+captureThreatSquares color square board
   = map fromJust
   $ filter isJust
   $ map (findOrStop color board)
