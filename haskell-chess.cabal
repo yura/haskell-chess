@@ -35,6 +35,7 @@ library
       Laws.Bishop
       Laws.Knight
       Laws.Pawn
+      Laws.Rook
       Laws.Util
   other-modules:
       Paths_haskell_chess
@@ -80,6 +81,7 @@ test-suite haskell-chess-test
       Laws.BishopSpec
       Laws.KnightSpec
       Laws.PawnSpec
+      Laws.RookSpec
       LawsSpec
       Paths_haskell_chess
   hs-source-dirs:

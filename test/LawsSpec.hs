@@ -12,16 +12,6 @@ import           Laws
 
 spec :: Spec
 spec = do
-  describe "rookMoves" $ do
-    it "все ходы ладьи, если ладья находится в центре" $ do
-      rookMoves ('d', 4) `shouldBe`
-        [
-          ('c', 4), ('b', 4), ('a', 4)
-        , ('d', 3), ('d', 2), ('d', 1)
-        , ('e', 4), ('f', 4), ('g', 4), ('h', 4)
-        , ('d', 5), ('d', 6), ('d', 7), ('d', 8)
-        ]
-
   describe "queenMoves" $ do
     it "все ходы ферзя, если ферзь находится в центре" $ do
       queenMoves ('e', 7) `shouldBe`
