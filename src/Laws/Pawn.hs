@@ -1,6 +1,7 @@
 module Laws.Pawn where
 
 import Board
+import Laws.Util
 
 initialRow :: Color -> Int
 initialRow White = 2
@@ -39,12 +40,15 @@ captureSquares color ('a', row) = [('b', nextSquare color row)]
 captureSquares color ('h', row) = [('g', nextSquare color row)]
 captureSquares color (col, row) = [(pred col, nextSquare color row), (succ col, nextSquare color row)]
 
+-- Угрозы взятия фигур соперника
+captureThreats :: Color -> Square -> Board -> [Square]
+captureThreats color square board = filterThreats color board $ captureSquares color square
+
 whitePawnCaptureSquares :: Square -> [Square]
 whitePawnCaptureSquares = captureSquares White
 
 blackPawnCaptureSquares :: Square -> [Square]
 blackPawnCaptureSquares = captureSquares Black
-
 
 moves :: Color -> Square -> Board -> [Move]
 moves color from@(col, row) board
@@ -56,10 +60,10 @@ moves color from@(col, row) board
 captures :: Color -> Square -> Board -> [Move]
 captures color from@(_, row) board
   | nextSquare color row == finalRow color = [f piece | f <- capturePromotions, piece <- [Piece Queen color, Piece Rook color, Piece Bishop color, Piece Knight color]]
-  | otherwise = map (\to -> Capture (Piece Pawn color) from to) opponentSquares
+  | otherwise = map (\to -> Capture (Piece Pawn color) from to) squares
   where
-    capturePromotions = map (\to -> CapturePromotion from to) opponentSquares
-    opponentSquares = filter (takenBy (opponent color) board) $ captureSquares color from
+    capturePromotions = map (\to -> CapturePromotion from to) squares
+    squares = captureThreats color from board
 
 enPassantCapture :: Color -> Square -> Board -> [Move]
 enPassantCapture color (col, row) (Board _ (Just enPassantTarget@(targetCol, _)))

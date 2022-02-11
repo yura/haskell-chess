@@ -36,9 +36,8 @@ possibleMoves :: Color -> Board -> [Move]
 possibleMoves color board = concatMap (\s -> P.pawnPossibleMoves color s board) $ pawnSquares color board
 
 possibleCatures :: Square -> Piece -> Board -> [Square]
-possibleCatures square (Piece Pawn White) _   = P.captureSquares White square
-possibleCatures square (Piece Pawn Black) _   = P.captureSquares Black square
-possibleCatures square (Piece Knight _) _     = K.knightMoves square
+possibleCatures square (Piece Pawn color)   board = P.captureThreats color square board
+possibleCatures square (Piece Knight color) board = K.captureThreats color square board
 possibleCatures square (Piece Bishop color) board = B.bishopCaptures color square board
 possibleCatures _ _ _ = []
 

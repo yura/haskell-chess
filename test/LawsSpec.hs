@@ -61,22 +61,22 @@ spec = do
   describe "beatenSquares" $ do
     context "[белая пешка]" $ do
       it "возращает список всех полей, которые бьёт белая пешка" $ do
-        beatenSquares White (placePiece ('e', 2) pawnWhite emptyBoard) `shouldBe` [('d', 3), ('f' , 3)]
+        beatenSquares White (placePiece ('e', 6) pawnWhite initialBoard) `shouldBe` [('d', 7), ('f' , 7)]
 
       it "возращает список всех полей, которые бьют две белые пешки" $ do
-        beatenSquares White (placePieces [(('e', 2), pawnWhite), (('d', 2), pawnWhite)] emptyBoard) `shouldBe` [('c',3),('e',3),('d',3),('f',3)]
+        beatenSquares White (placePieces [(('e', 6), pawnWhite), (('d', 6), pawnWhite)] initialBoard) `shouldBe` [('c',7),('e',7),('d',7),('f',7)]
 
     context "[чёрная пешка]" $ do
       it "возращает список всех полей, которые бьёт чёрная пешка" $ do
-        beatenSquares Black (placePiece ('e', 7) pawnBlack emptyBoard) `shouldBe` [('d', 6), ('f' , 6)]
+        beatenSquares Black (placePiece ('e', 3) pawnBlack initialBoard) `shouldBe` [('d', 2), ('f' , 2)]
 
       it "возращает список всех полей, которые бьют две черные пешки" $ do
-        beatenSquares Black (placePieces [(('e', 7), pawnBlack), (('d', 7), pawnBlack)] emptyBoard) `shouldBe` [('c',6),('e',6),('d',6),('f',6)]
+        beatenSquares Black (placePieces [(('e', 3), pawnBlack), (('d', 3), pawnBlack)] initialBoard) `shouldBe` [('c',2),('e',2),('d',2),('f',2)]
 
     context "[конь]" $ do
       it "возращает список полей, на которые может сходить конь" $ do
-        beatenSquares White (placePiece ('e', 2) knightWhite emptyBoard) `shouldBe` [('c', 1), ('g' , 1), ('g', 3), ('f', 4), ('d', 4), ('c', 3)]
-        beatenSquares Black (placePiece ('e', 2) knightBlack emptyBoard) `shouldBe` [('c', 1), ('g' , 1), ('g', 3), ('f', 4), ('d', 4), ('c', 3)]
+        beatenSquares White (placePiece ('e', 6) knightWhite initialBoard) `shouldBe` [('g', 7), ('f' , 8), ('d', 8), ('c', 7)]
+        beatenSquares Black (placePiece ('e', 2) knightBlack initialBoard) `shouldBe` [('c', 1), ('g' , 1)]
 
     context "[слон]" $ do
       it "возращает список полей, на которые может бить слон, если доска пустая" $ do

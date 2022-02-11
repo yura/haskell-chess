@@ -3,7 +3,6 @@ module Laws.Bishop where
 import           Data.List (find)
 import           Data.Maybe (fromJust, isJust)
 import           Board
-import           Laws.Util
 
 sw :: Square -> [Square]
 sw (col, row) = zip [pred col, pred (pred col)..head cols] [pred row, pred (pred row)..head rows]
@@ -18,7 +17,6 @@ nw :: Square -> [Square]
 nw (col, row) = zip [pred col, pred (pred col)..head cols] [succ row..last rows]
 
 bishopMovesGrouped :: Square -> [[Square]]
--- bishopMovesGrouped square = dropEmptyLists $ sw square : se square : ne square : nw square : []
 bishopMovesGrouped square = filter (not . null) $ map (\f -> f square) [sw, se, ne, nw]
 
 bishopMoves :: Square -> [Square]
