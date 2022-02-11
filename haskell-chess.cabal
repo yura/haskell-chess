@@ -32,7 +32,10 @@ library
       Format.FEN
       Format.PGN
       Laws
+      Laws.Bishop
+      Laws.Knight
       Laws.Pawn
+      Laws.Util
   other-modules:
       Paths_haskell_chess
   hs-source-dirs:
@@ -74,6 +77,8 @@ test-suite haskell-chess-test
       DisplaySpec
       Format.FENSpec
       Format.PGNSpec
+      Laws.BishopSpec
+      Laws.KnightSpec
       Laws.PawnSpec
       LawsSpec
       Paths_haskell_chess

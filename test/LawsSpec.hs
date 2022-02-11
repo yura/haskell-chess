@@ -12,95 +12,6 @@ import           Laws
 
 spec :: Spec
 spec = do
-  describe "bottomLeft" $ do
-    it "возращает все имена из центра в начало по главной диагонали" $
-      bottomLeft ('d', 4) `shouldBe` [('c', 3), ('b', 2), ('a', 1)]
-
-    it "возращает пустой список из 'a2'" $
-      bottomLeft ('a', 2) `shouldBe` []
-
-    it "возращает пустой список из 'b1'" $
-      bottomLeft ('b', 1) `shouldBe` []
-
-    it "возращает 'a7' из 'b8'" $
-      bottomLeft ('b', 8) `shouldBe` [('a', 7)]
-
-    it "возращает главную диагональ из 'h8'" $
-      bottomLeft ('h', 8) `shouldBe` [('g', 7), ('f', 6), ('e', 5), ('d', 4), ('c', 3), ('b', 2), ('a', 1)]
-
-    it "возращает пустой список из 'a1..a8' и 'a1..h1'" $ do
-      let names = [(r, 1) | r <- ['a'..'h']] ++ [('a', c) | c <- [1..8]]
-      let result = map (\n -> bottomLeft n) names
-      nub result `shouldBe` [[]]
-
-  describe "bottomRight" $ do
-    it "возращает все имена из центра в начало по главной диагонали" $
-      bottomRight ('d', 4) `shouldBe` [('e', 3), ('f', 2), ('g', 1)]
-
-    it "возращает 'b1' из 'a2'" $
-      bottomRight ('a', 2) `shouldBe` [('b', 1)]
-
-    it "возращает пустой список из 'b1'" $
-      bottomRight ('b', 1) `shouldBe` []
-
-    it "возращает всю диагональ из 'b8'" $
-      bottomRight ('b', 8) `shouldBe` [('c', 7), ('d', 6), ('e', 5), ('f', 4), ('g', 3), ('h', 2)]
-
-    it "возращает пустой список из 'h8'" $
-      bottomRight ('h', 8) `shouldBe` []
-
-    it "возращает пустой список из 'a1..h1' и 'h1..h8'" $ do
-      let names = [(r, 1) | r <- ['a'..'h']] ++ [('h', c) | c <- [1..8]]
-      let result = map (\n -> bottomRight n) names
-      nub result `shouldBe` [[]]
-
-  describe "topRight" $ do
-    it "возращает все имена из центра в конец по главной диагонали" $
-      topRight ('d', 4) `shouldBe` [('e', 5), ('f', 6), ('g', 7), ('h', 8)]
-
-    it "возращает всю диагональ из 'a2'" $
-      topRight ('a', 2) `shouldBe` [('b', 3), ('c', 4), ('d', 5), ('e', 6), ('f', 7), ('g', 8)]
-
-    it "возращает пустой список из 'a8..h8' и 'h1..h8'" $ do
-      let names = [(r, 8) | r <- ['a'..'h']] ++ [('h', c) | c <- [1..8]]
-      let result = map (\n -> topRight n) names
-      nub result `shouldBe` [[]]
-
-  describe "topLeft" $ do
-    it "возращает все имена из центра в конец по главной диагонали" $
-      topLeft ('d', 4) `shouldBe` [('c', 5), ('b', 6), ('a', 7)]
-
-    it "возращает всю диагональ из 'h4'" $
-      topLeft ('h', 4) `shouldBe` [('g', 5), ('f', 6), ('e', 7), ('d', 8)]
-
-    it "возращает пустой список из 'a8..h8' и 'h1..h8'" $ do
-      let names = [(r, 8) | r <- ['a'..'h']] ++ [('a', c) | c <- [1..8]]
-      let result = map (\n -> topLeft n) names
-      nub result `shouldBe` [[]]
-
-  describe "bishopMoves" $ do
-    it "все ходы слона, если слон находится в центре" $ do
-      bishopMoves ('d', 4) `shouldBe` [ ('c', 3), ('b', 2), ('a', 1), ('e', 3), ('f', 2), ('g', 1), ('e', 5), ('f', 6), ('g', 7), ('h', 8), ('c', 5), ('b', 6), ('a', 7) ]
-
-  describe "knightMoves" $ do
-    it "все ходы коня, если конь находится в центре" $ do
-      knightMoves ('d', 4) `shouldBe` [ ('b', 3), ('c', 2), ('e', 2), ('f', 3), ('f', 5), ('e', 6), ('c', 6), ('b', 5) ]
-
-    it "оба хода коня, если конь находится на 'a1'" $ do
-      knightMoves ('a', 1) `shouldBe` [ ('c', 2), ('b', 3) ]
-
-    it "оба хода коня, если конь находится на 'a1'" $ do
-      knightMoves ('h', 1) `shouldBe` [ ('g', 3), ('f', 2) ]
-
-    it "оба хода коня, если конь находится на 'h8'" $ do
-      knightMoves ('h', 8) `shouldBe` [ ('f', 7), ('g', 6) ]
-
-    it "оба хода коня, если конь находится на 'a8'" $ do
-      knightMoves ('a', 8) `shouldBe` [ ('b', 6), ('c', 7) ]
-
-    it "три хода коня, если конь находится на 'b1'" $ do
-      knightMoves ('b', 1) `shouldBe` [ ('d', 2), ('c', 3), ('a', 3) ]
-
   describe "rookMoves" $ do
     it "все ходы ладьи, если ладья находится в центре" $ do
       rookMoves ('d', 4) `shouldBe`
@@ -162,9 +73,37 @@ spec = do
       it "возращает список всех полей, которые бьют две черные пешки" $ do
         beatenSquares Black (placePieces [(('e', 7), pawnBlack), (('d', 7), pawnBlack)] emptyBoard) `shouldBe` [('c',6),('e',6),('d',6),('f',6)]
 
+    context "[конь]" $ do
+      it "возращает список полей, на которые может сходить конь" $ do
+        beatenSquares White (placePiece ('e', 2) knightWhite emptyBoard) `shouldBe` [('c', 1), ('g' , 1), ('g', 3), ('f', 4), ('d', 4), ('c', 3)]
+        beatenSquares Black (placePiece ('e', 2) knightBlack emptyBoard) `shouldBe` [('c', 1), ('g' , 1), ('g', 3), ('f', 4), ('d', 4), ('c', 3)]
+
+    context "[слон]" $ do
+      it "возращает список полей, на которые может бить слон, если доска пустая" $ do
+        beatenSquares White (placePieces [(('e', 4), bishopWhite), (('b', 7), pawnBlack), (('h', 7), pawnBlack)] emptyBoard) `shouldBe`
+          [('h', 7), ('b' , 7)]
+        beatenSquares Black (placePieces [(('e', 4), bishopBlack), (('c', 2), pawnWhite), (('g', 2), pawnWhite)] emptyBoard) `shouldBe`
+          [('c', 2), ('g', 2)]
 
   describe "isCheck" $ do
     it "возращает False в начальной позиции" $ do
       isCheck White initialBoard `shouldBe` False
       isCheck Black initialBoard `shouldBe` False
+
+    it "возращает False, если пешка не шахует короля" $ do
+      isCheck Black (placePieces [(('e', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+
+    it "возращает True, если пешка шахует короля" $ do
+      isCheck Black (placePieces [(('d', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+
+    context "[слон]" $ do
+      it "возращает True, если слон противника может сходить на поле короля" $ do
+        isCheck Black (placePieces [(('a', 4), bishopWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+
+      it "возращает False, если короля прикрывает фигура противника" $ do
+        isCheck Black (placePieces [(('a', 4), bishopWhite), (('d', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+
+      it "возращает False, если свой слон может сходить на поле короля" $ do
+        isCheck Black (placePieces [(('a', 4), bishopBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+
 
