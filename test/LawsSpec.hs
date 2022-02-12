@@ -77,10 +77,10 @@ spec = do
 
     context "[ладья]" $ do
       it "возращает список полей, которым угрожает ладья" $ do
-        allCaptureThreatSquares White (placePieces [(('e', 4), bishopWhite), (('b', 7), pawnBlack), (('h', 7), pawnBlack)] emptyBoard) `shouldBe`
-          [('h', 7), ('b' , 7)]
-        allCaptureThreatSquares Black (placePieces [(('e', 4), bishopBlack), (('c', 2), pawnWhite), (('g', 2), pawnWhite)] emptyBoard) `shouldBe`
-          [('c', 2), ('g', 2)]
+        allCaptureThreatSquares White (placePieces [(('e', 4), rookWhite), (('e', 7), pawnBlack), (('a', 4), pawnBlack)] emptyBoard) `shouldBe`
+          [('a', 4), ('e' , 7)]
+        allCaptureThreatSquares Black (placePieces [(('d', 5), rookBlack), (('h', 5), pawnWhite), (('d', 2), pawnWhite)] emptyBoard) `shouldBe`
+          [('d', 2), ('h', 5)]
 
   describe "isCheck" $ do
     it "возращает False в начальной позиции" $ do
@@ -93,8 +93,18 @@ spec = do
     it "возращает True, если пешка шахует короля" $ do
       isCheck Black (placePieces [(('d', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
 
+    context "[конь]" $ do
+      it "возращает True, если конь угрожает королю противника" $ do
+        isCheck Black (placePieces [(('d', 6), knightWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+
+      it "возращает True, если короля 'прикрывает' фигура противника" $ do
+        isCheck Black (placePiece ('d', 6) knightWhite initialBoard) `shouldBe` True
+
+      it "возращает False, если конь может сходить на поле своего же короля" $ do
+        isCheck Black (placePieces [(('d', 6), knightBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+
     context "[слон]" $ do
-      it "возращает True, если слон противника может сходить на поле короля" $ do
+      it "возращает True, если слон угрожает королю противника" $ do
         isCheck Black (placePieces [(('a', 4), bishopWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
 
       it "возращает False, если короля прикрывает фигура противника" $ do
@@ -103,4 +113,14 @@ spec = do
       it "возращает False, если свой слон может сходить на поле короля" $ do
         isCheck Black (placePieces [(('a', 4), bishopBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
 
+    context "[ладья]" $ do
+      it "возращает True, если ладья угрожает королю противника" $ do
+        isCheck Black (placePieces [(('e', 1), rookWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+        isCheck Black (placePieces [(('a', 8), rookWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+
+      it "возращает False, если короля прикрывает фигура противника" $ do
+        isCheck Black (placePieces [(('e', 1), rookWhite), (('e', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+
+      it "возращает False, если своя ладья может сходить на поле короля" $ do
+        isCheck Black (placePieces [(('e', 1), rookBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
 
