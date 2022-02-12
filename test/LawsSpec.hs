@@ -12,20 +12,6 @@ import           Laws
 
 spec :: Spec
 spec = do
-  describe "queenMoves" $ do
-    it "все ходы ферзя, если ферзь находится в центре" $ do
-      queenMoves ('e', 7) `shouldBe`
-        [
-          ('d', 6), ('c', 5), ('b', 4), ('a', 3)
-        , ('f', 6), ('g', 5), ('h', 4)
-        , ('f', 8)
-        , ('d', 8)
-        , ('d', 7), ('c', 7), ('b', 7), ('a', 7)
-        , ('e', 6), ('e', 5), ('e', 4), ('e', 3), ('e', 2), ('e', 1)
-        , ('f', 7), ('g', 7), ('h', 7)
-        , ('e', 8)
-        ]
-
   describe "kingMoves" $ do
     it "все ходы короля, если король находится в центре" $ do
       kingMoves ('h', 6) `shouldBe`
@@ -82,6 +68,13 @@ spec = do
         allCaptureThreatSquares Black (placePieces [(('d', 5), rookBlack), (('h', 5), pawnWhite), (('d', 2), pawnWhite)] emptyBoard) `shouldBe`
           [('d', 2), ('h', 5)]
 
+    context "[ферзь]" $ do
+      it "возращает список полей, которым угрожает ладья" $ do
+        allCaptureThreatSquares White (placePiece ('d', 4) queenWhite initialBoard) `shouldBe`
+          [('g', 7), ('a' , 7), ('d', 7)]
+        allCaptureThreatSquares Black (placePieces [(('d', 5), rookBlack), (('h', 5), pawnWhite), (('d', 2), pawnWhite)] emptyBoard) `shouldBe`
+          [('d', 2), ('h', 5)]
+
   describe "isCheck" $ do
     it "возращает False в начальной позиции" $ do
       isCheck White initialBoard `shouldBe` False
@@ -120,6 +113,19 @@ spec = do
 
       it "возращает False, если короля прикрывает фигура противника" $ do
         isCheck Black (placePieces [(('e', 1), rookWhite), (('e', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+
+      it "возращает False, если своя ладья может сходить на поле короля" $ do
+        isCheck Black (placePieces [(('e', 1), rookBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+
+    context "[ферзь]" $ do
+      it "возращает True, если ферзь угрожает королю противника" $ do
+        isCheck Black (placePieces [(('e', 1), queenWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+        isCheck Black (placePieces [(('a', 8), queenWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+        isCheck Black (placePieces [(('b', 5), queenWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+
+      it "возращает False, если короля прикрывает фигура противника" $ do
+        isCheck Black (placePieces [(('e', 1), queenWhite), (('e', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+        isCheck Black (placePieces [(('b', 5), queenWhite), (('d', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
 
       it "возращает False, если своя ладья может сходить на поле короля" $ do
         isCheck Black (placePieces [(('e', 1), rookBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False

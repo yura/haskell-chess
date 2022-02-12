@@ -7,10 +7,8 @@ import qualified Laws.Pawn   as P
 import qualified Laws.Knight as K
 import qualified Laws.Bishop as B
 import qualified Laws.Rook   as R
+import qualified Laws.Queen  as Q
 import           Laws.Util
-
-queenMoves :: Square -> [Square]
-queenMoves squareName = B.bishopMoves squareName ++ R.rookMoves squareName
 
 kingMoves :: Square -> [Square]
 kingMoves squareName = map (\group -> head group) (B.bishopMovesGrouped squareName ++ R.rookMovesGrouped squareName)
@@ -23,6 +21,7 @@ captureThreatSquares square (Piece Pawn color)   board = P.captureThreatSquares 
 captureThreatSquares square (Piece Knight color) board = K.captureThreatSquares color square board
 captureThreatSquares square (Piece Bishop color) board = B.captureThreatSquares color square board
 captureThreatSquares square (Piece Rook color)   board = R.captureThreatSquares color square board
+captureThreatSquares square (Piece Queen color)  board = Q.captureThreatSquares color square board
 captureThreatSquares _ _ _ = []
 
 allCaptureThreatSquares :: Color -> Board -> [Square]
