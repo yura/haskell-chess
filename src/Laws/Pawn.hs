@@ -34,11 +34,14 @@ whitePawnMoveSquares = moveSquares White
 blackPawnMoveSquares :: Square -> [Square]
 blackPawnMoveSquares = moveSquares Black
 
-
 captureSquares :: Color -> Square -> [Square]
 captureSquares color ('a', row) = [('b', nextSquare color row)]
 captureSquares color ('h', row) = [('g', nextSquare color row)]
 captureSquares color (col, row) = [(pred col, nextSquare color row), (succ col, nextSquare color row)]
+
+-- Поля, которые атакует пешка находясь в данной позиции
+underAttackSquares :: Board -> Color -> Square -> [Square]
+underAttackSquares (Board squares _) color square = captureSquares color square
 
 -- Угрозы взятия фигур соперника
 captureThreatSquares :: Color -> Square -> Board -> [Square]

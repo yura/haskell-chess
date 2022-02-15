@@ -10,10 +10,6 @@ import           Board.InitialPosition
 
 spec :: Spec
 spec = do
-  describe "squareNames" $ do
-    it "генерирует 64 названия клеток" $
-      length squareNames `shouldBe` 64
-
   describe "emptyBoard" $ do
     it "генерирует пустую доску размером 0 клеток" $ do
       let (Board squares _) = emptyBoard

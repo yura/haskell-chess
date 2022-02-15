@@ -47,9 +47,6 @@ data Move
 cols = ['a'..'h']
 rows = [1..8]
 
-squareNames :: [Square]
-squareNames = [(col, row) | col <- cols, row <- rows]
-
 emptyBoard :: Board
 emptyBoard = Board (M.fromList []) Nothing
 

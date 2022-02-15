@@ -1,8 +1,9 @@
 module Laws.Bishop where
 
-import           Data.Maybe (fromJust, isJust)
+import           Data.Maybe (mapMaybe)
 import           Board
 import           Laws.Util
+import Laws.Knight (underAttackSquares)
 
 sw :: Square -> [Square]
 sw (col, row) = zip [pred col, pred (pred col)..head cols] [pred row, pred (pred row)..head rows]
@@ -22,9 +23,9 @@ bishopMovesGrouped square = filter (not . null) $ map (\f -> f square) [sw, se, 
 bishopMoves :: Square -> [Square]
 bishopMoves = concat . bishopMovesGrouped
 
+underAttackSquares :: Board -> Color -> Square -> [Square]
+underAttackSquares board color square = concatMap (filterAllEmptyOrFirstOpposite board color) $ bishopMovesGrouped square
+
 captureThreatSquares :: Color -> Square -> Board -> [Square]
 captureThreatSquares color square board
-  = map fromJust
-  $ filter isJust
-  $ map (findOrStop color board)
-  $ bishopMovesGrouped square
+  = mapMaybe (findOrStop color board) (bishopMovesGrouped square)

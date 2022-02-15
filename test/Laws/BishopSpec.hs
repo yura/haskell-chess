@@ -28,7 +28,7 @@ spec = do
 
     it "возращает пустой список из 'a1..a8' и 'a1..h1'" $ do
       let names = [(r, 1) | r <- ['a'..'h']] ++ [('a', c) | c <- [1..8]]
-      let result = map (\n -> sw n) names
+      let result = map sw names
       nub result `shouldBe` [[]]
 
   describe "se" $ do
@@ -49,7 +49,7 @@ spec = do
 
     it "возращает пустой список из 'a1..h1' и 'h1..h8'" $ do
       let names = [(r, 1) | r <- ['a'..'h']] ++ [('h', c) | c <- [1..8]]
-      let result = map (\n -> se n) names
+      let result = map se names
       nub result `shouldBe` [[]]
 
   describe "ne" $ do
@@ -61,7 +61,7 @@ spec = do
 
     it "возращает пустой список из 'a8..h8' и 'h1..h8'" $ do
       let names = [(r, 8) | r <- ['a'..'h']] ++ [('h', c) | c <- [1..8]]
-      let result = map (\n -> ne n) names
+      let result = map ne names
       nub result `shouldBe` [[]]
 
   describe "nw" $ do
@@ -73,12 +73,19 @@ spec = do
 
     it "возращает пустой список из 'a8..h8' и 'h1..h8'" $ do
       let names = [(r, 8) | r <- ['a'..'h']] ++ [('a', c) | c <- [1..8]]
-      let result = map (\n -> nw n) names
+      let result = map nw names
       nub result `shouldBe` [[]]
 
   describe "bishopMoves" $ do
     it "все ходы слона, если слон находится в центре" $ do
       bishopMoves ('d', 4) `shouldBe` [ ('c', 3), ('b', 2), ('a', 1), ('e', 3), ('f', 2), ('g', 1), ('e', 5), ('f', 6), ('g', 7), ('h', 8), ('c', 5), ('b', 6), ('a', 7) ]
+
+  describe "underAttackSquares" $ do
+    it "все поля, которые бьёт слон" $ do
+      underAttackSquares initialBoard White ('b', 2) `shouldBe` [('c', 3), ('d', 4), ('e', 5), ('f', 6), ('g', 7), ('a', 3)]
+
+    it "возращает пустой список если нет фигур для взятия" $ do
+      captureThreatSquares White ('a', 1) (placePiece ('g', 7) pawnWhite initialBoard) `shouldBe` []
 
   describe "captureThreatSquares" $ do
     it "все взятия слона фигур противника" $ do

@@ -12,6 +12,10 @@ knightMoveShifts = [(-2, -1), (-1, -2), (1, -2), (2, -1), (2, 1), (1, 2), (-1, 2
 knightMoves :: Square -> [Square]
 knightMoves (col, row) = filter isOnBoard $ map (\(c', r') -> (chr (ord col + c'), row + r')) knightMoveShifts
 
+-- Конь бьёт все поля в соответстии с возможными ходами
+underAttackSquares :: Square -> [Square]
+underAttackSquares = knightMoves
+
 captureThreatSquares :: Color -> Square -> Board -> [Square]
 captureThreatSquares color square board = filterThreats color board $ knightMoves square
 

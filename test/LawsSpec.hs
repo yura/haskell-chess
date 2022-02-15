@@ -12,28 +12,6 @@ import           Laws
 
 spec :: Spec
 spec = do
-  describe "kingMoves" $ do
-    it "все ходы короля, если король находится в центре" $ do
-      kingMoves ('h', 6) `shouldBe`
-        [
-          ('g', 5), ('g', 7)
-        , ('g', 6), ('h', 5), ('h', 7)
-        ]
-
-  describe "kingPossibleMoves" $ do
-    context "[рокировка]" $ do
-      it "не ходит через клетку вперед, если поле занято своей фигурой" $ pending
-      it "не ходит через клетку вперед, если поле занято фигурой противника" $ pending
-
-  describe "kingPossibleMoves" $ do
-    context "[рокировка]" $ do
-      it "не ходит под шах" $ pending
-      it "не встречается с королём (частный случай шаха)" $ pending
-      it "не рокируется, если ходил" $ pending
-      it "не рокируется, если ходила ладья?" $ pending
-
-    it "не ходит под шах" $ pending
-
   describe "allCaptureThreatSquares" $ do
     context "[белая пешка]" $ do
       it "возращает список всех полей, которым угрожает белая пешка" $ do
@@ -69,22 +47,46 @@ spec = do
           [('d', 2), ('h', 5)]
 
     context "[ферзь]" $ do
-      it "возращает список полей, которым угрожает ладья" $ do
+      it "возращает список полей, которым угрожает ферзь" $ do
         allCaptureThreatSquares White (placePiece ('d', 4) queenWhite initialBoard) `shouldBe`
           [('g', 7), ('a' , 7), ('d', 7)]
         allCaptureThreatSquares Black (placePieces [(('d', 5), rookBlack), (('h', 5), pawnWhite), (('d', 2), pawnWhite)] emptyBoard) `shouldBe`
           [('d', 2), ('h', 5)]
+
+    context "[король]" $ do
+      it "возращает список полей, которым угрожает король" $ do
+        let board = placePieces [ (('e', 6), kingWhite), (('d', 7), pawnBlack), (('e', 7), pawnBlack), (('f', 7), pawnBlack)] emptyBoard
+        allCaptureThreatSquares White board `shouldBe` [('f', 7), ('d', 7)]
+
+      it "не угрожает фигурам, которые находятся под защитой ферзя" $ do
+        let board = placePieces
+              [ (('e', 6), kingWhite)
+              , (('d', 7), pawnBlack)
+              , (('e', 7), pawnBlack)
+              , (('f', 7), pawnBlack)
+              , (('e', 8), queenBlack)] emptyBoard
+        allCaptureThreatSquares White board `shouldBe` []
+
+      it "не угрожает фигурам, которые находятся под защитой короля" $ do
+        let board = placePieces
+              [ (('e', 6), kingWhite)
+              , (('d', 7), pawnBlack)
+              , (('e', 7), pawnBlack)
+              , (('f', 7), pawnBlack)
+              , (('e', 8), kingBlack)] emptyBoard
+        allCaptureThreatSquares White board `shouldBe` []
 
   describe "isCheck" $ do
     it "возращает False в начальной позиции" $ do
       isCheck White initialBoard `shouldBe` False
       isCheck Black initialBoard `shouldBe` False
 
-    it "возращает False, если пешка не шахует короля" $ do
-      isCheck Black (placePieces [(('e', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+    context "[пешка]" $ do
+      it "возращает False, если пешка не шахует короля" $ do
+        isCheck Black (placePieces [(('e', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
 
-    it "возращает True, если пешка шахует короля" $ do
-      isCheck Black (placePieces [(('d', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+      it "возращает True, если пешка шахует короля" $ do
+        isCheck Black (placePieces [(('d', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
 
     context "[конь]" $ do
       it "возращает True, если конь угрожает королю противника" $ do
@@ -130,3 +132,4 @@ spec = do
       it "возращает False, если своя ладья может сходить на поле короля" $ do
         isCheck Black (placePieces [(('e', 1), rookBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
 
+     -- Король не может шаховать

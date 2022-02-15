@@ -33,6 +33,7 @@ library
       Format.PGN
       Laws
       Laws.Bishop
+      Laws.King
       Laws.Knight
       Laws.Pawn
       Laws.Queen
@@ -80,6 +81,7 @@ test-suite haskell-chess-test
       Format.FENSpec
       Format.PGNSpec
       Laws.BishopSpec
+      Laws.KingSpec
       Laws.KnightSpec
       Laws.PawnSpec
       Laws.QueenSpec

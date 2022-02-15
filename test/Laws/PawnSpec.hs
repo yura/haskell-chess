@@ -7,10 +7,24 @@ import           Data.List ( nub )
 import qualified Data.Map as Map
 
 import           Board
+import           Board.InitialPosition
 import           Laws.Pawn
 
 spec :: Spec
 spec = do
+  describe "underAttackSquares - значит королю на них ходить нельзя" $ do
+    context "[белая пешка]" $ do
+      it "возращает поля, которые атакует пешка" $
+        underAttackSquares initialBoard White ('e', 2) `shouldBe` [('d', 3), ('f', 3)] 
+
+      it "что делать со взятием на проходе? - похоже ничего не делать, пропускаем, потому что функция используется для нахождения свободных полей для хода короля" $ pending
+
+    context "[чёрная пешка]" $ do
+      it "возращает поля, которые атакует пешка" $
+        underAttackSquares initialBoard Black ('e', 7) `shouldBe` [('d', 6), ('f', 6)] 
+
+      it "что делать со взятием на проходе?" $ pending
+
   describe "whitePawnMoveSquares" $ do
     context "[без взятия фигур противника]" $ do
       it "со своей начальной позиции может ходить на поле вперед или на два поля вперед" $ do

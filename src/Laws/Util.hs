@@ -21,3 +21,11 @@ findOrStop Black board (square:squares) = case findPiece board square of
   Just (Piece _ White) -> Just square
   Just (Piece _ Black) -> Nothing
   Nothing              -> findOrStop Black board squares
+
+-- Выбирает все пустые поля пока не дойдёт до конца, либо до своей фигуры,
+-- либо до фигуры противника, которую тоже включает в список 
+filterAllEmptyOrFirstOpposite :: Board -> Color -> [Square] -> [Square]
+filterAllEmptyOrFirstOpposite board color [] = []
+filterAllEmptyOrFirstOpposite board color (square:squares) = case findPiece board square of
+  Nothing          -> square : filterAllEmptyOrFirstOpposite board color squares
+  Just (Piece _ c) -> [square | c /= color]
