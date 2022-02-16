@@ -1,6 +1,6 @@
 module Laws.Queen where
 
-import           Data.Maybe (fromJust, isJust)
+import           Data.Maybe (mapMaybe)
 import           Board
 import qualified Laws.Bishop as B
 import qualified Laws.Rook   as R
@@ -14,7 +14,4 @@ queenMoves square = B.bishopMoves square ++ R.rookMoves square
 
 captureThreatSquares :: Color -> Square -> Board -> [Square]
 captureThreatSquares color square board
-  = map fromJust
-  $ filter isJust
-  $ map (findOrStop color board)
-  $ queenMovesGrouped square
+  = mapMaybe (findOrStop color board) (queenMovesGrouped square)

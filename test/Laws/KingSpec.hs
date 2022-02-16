@@ -26,16 +26,16 @@ spec = do
         ]
 
     it "не может приближаться к пешкам" $ do
-      kingValidMoveSquares White ('h', 5) initialBoard `shouldBe`
+      let board = movePiece ('e', 1) ('h', 5) kingWhite initialBoard 
+      kingValidMoveSquares White ('h', 5) board `shouldBe`
         [ ('g', 4)
         , ('g', 5), ('h', 4)
         ]
 
     context "[рокировка]" $ do
-      it "не ходит через клетку вперед, если поле занято своей фигурой" $ pending
-      it "не ходит через клетку вперед, если поле занято фигурой противника" $ pending
-      it "не ходит под шах" $ pending
-      it "не встречается с королём (частный случай шаха)" $ pending
-      it "не рокируется, если ходил" $ pending
-      it "не рокируется, если ходила ладья?" $ pending
-
+      it "не ходит через клетку вперед, если поле занято своей фигурой" pending
+      it "не ходит через клетку вперед, если поле занято фигурой противника" pending
+      it "не ходит под шах" pending
+      it "не встречается с королём (частный случай шаха)" pending
+      it "не рокируется, если ходил" pending
+      it "не рокируется, если ходила ладья?" pending

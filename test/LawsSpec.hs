@@ -55,8 +55,12 @@ spec = do
 
     context "[король]" $ do
       it "возращает список полей, которым угрожает король" $ do
-        let board = placePieces [ (('e', 6), kingWhite), (('d', 7), pawnBlack), (('e', 7), pawnBlack), (('f', 7), pawnBlack)] emptyBoard
-        allCaptureThreatSquares White board `shouldBe` [('f', 7), ('d', 7)]
+        let board = placePieces
+              [ (('e', 6), kingWhite)
+              , (('d', 7), pawnBlack)
+              , (('e', 7), pawnBlack)
+              , (('f', 7), pawnBlack)] emptyBoard
+        allCaptureThreatSquares White board `shouldBe` [('f', 7), ('d', 7), ('e', 7)]
 
       it "не угрожает фигурам, которые находятся под защитой ферзя" $ do
         let board = placePieces

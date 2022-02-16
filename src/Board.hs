@@ -7,22 +7,35 @@ data PieceType = King | Queen | Rook | Bishop | Knight | Pawn deriving (Eq, Show
 data Color = White | Black deriving (Eq, Show)
 data Piece = Piece PieceType Color deriving (Eq, Show)
 
+kingWhite :: Piece
 kingWhite   = Piece King White
+queenWhite :: Piece
 queenWhite  = Piece Queen White
+rookWhite :: Piece
 rookWhite   = Piece Rook White
+bishopWhite :: Piece
 bishopWhite = Piece Bishop White
+knightWhite :: Piece
 knightWhite = Piece Knight White
+pawnWhite :: Piece
 pawnWhite   = Piece Pawn White
+kingBlack :: Piece
 kingBlack   = Piece King Black
+queenBlack :: Piece
 queenBlack  = Piece Queen Black
+rookBlack :: Piece
 rookBlack   = Piece Rook Black
+bishopBlack :: Piece
 bishopBlack = Piece Bishop Black
+knightBlack :: Piece
 knightBlack = Piece Knight Black
+pawnBlack :: Piece
 pawnBlack   = Piece Pawn Black
 
 type Square = (Char, Int)
 data Board = Board (M.Map Square Piece) (Maybe Square) deriving (Eq, Show)
 
+enPassantTarget :: Board -> Maybe Square
 enPassantTarget (Board _ target) = target
 
 data Result = WhiteWon | BlackWon | Draw deriving (Eq, Show)
@@ -44,11 +57,13 @@ data Move
   | CapturePromotion        Square Square Piece
   deriving (Eq, Show)
 
+cols :: [Char]
 cols = ['a'..'h']
+rows :: [Int]
 rows = [1..8]
 
 emptyBoard :: Board
-emptyBoard = Board (M.fromList []) Nothing
+emptyBoard = Board M.empty Nothing
 
 opponent :: Color -> Color
 opponent White = Black
@@ -112,7 +127,7 @@ move (Board board _) (Capture   piece  from to) = Board (M.delete from $ M.inser
 move (Board board _) (Promotion        from to piece)         = Board (M.delete from $ M.insert to piece board) Nothing
 move (Board board _) (CapturePromotion from to piece)         = Board (M.delete from $ M.insert to piece board) Nothing
 move (Board board _) (QueensideCastling color)
-  = Board 
+  = Board
   ( M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row)
   $ M.insert ('g', row) (Piece King color) $ M.delete ('e', row) board) Nothing
   where row = if color == White then 1 else 8
