@@ -97,8 +97,26 @@ taken board square = case findPiece board square of
   Nothing -> False
 
 pawnSquares :: Color -> Board -> [Square]
-pawnSquares color (Board squares _)
-  = foldl (\result (square, Piece pt c) -> if color == c && pt == Pawn then square:result else result) [] $ M.toList squares
+pawnSquares = pieceTypeSquares Pawn
+
+knightSquares :: Color -> Board -> [Square]
+knightSquares = pieceTypeSquares Knight
+
+bishopSquares :: Color -> Board -> [Square]
+bishopSquares = pieceTypeSquares Bishop
+
+rookSquares :: Color -> Board -> [Square]
+rookSquares = pieceTypeSquares Rook
+
+queenSquares :: Color -> Board -> [Square]
+queenSquares = pieceTypeSquares Queen
+
+kingSquares :: Color -> Board -> [Square]
+kingSquares = pieceTypeSquares King
+
+pieceTypeSquares :: PieceType -> Color -> Board -> [Square]
+pieceTypeSquares pieceType color (Board squares _) 
+  = foldl (\result (square, Piece pt c) -> if color == c && pt == pieceType then square:result else result) [] $ M.toList squares
 
 placePiece :: Square -> Piece -> Board -> Board
 placePiece square piece (Board squares enPassantTarget) = Board (M.insert square piece squares) enPassantTarget

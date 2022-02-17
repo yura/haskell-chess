@@ -41,7 +41,7 @@ captureSquares color (col, row) = [(pred col, nextSquare color row), (succ col, 
 
 -- Поля, которые атакует пешка находясь в данной позиции
 underAttackSquares :: Board -> Color -> Square -> [Square]
-underAttackSquares (Board squares _) color square = captureSquares color square
+underAttackSquares _ = captureSquares
 
 -- Угрозы взятия фигур соперника
 captureThreatSquares :: Color -> Square -> Board -> [Square]
@@ -57,22 +57,20 @@ moves :: Color -> Square -> Board -> [Move]
 moves color from@(col, row) board
   | row == initialRow color && taken board (col, nextSquare color row) = [] -- этот случай рассматривается отдельно, чтобы избежать "перепрыгиваний"
   | row == predFinalRow color && taken board (col, finalRow color) = []
-  | row == predFinalRow color = map (\p -> Promotion from (col, finalRow color) p) [Piece Queen color, Piece Rook color, Piece Bishop color, Piece Knight color]
-  | otherwise = map (\to -> Move (Piece Pawn color) from to) $ filter (not . taken board) $ moveSquares color from
+  | row == predFinalRow color = map (Promotion from (col, finalRow color)) [Piece Queen color, Piece Rook color, Piece Bishop color, Piece Knight color]
+  | otherwise = map (Move (Piece Pawn color) from) $ filter (not . taken board) $ moveSquares color from
 
 captures :: Color -> Square -> Board -> [Move]
 captures color from@(_, row) board
   | nextSquare color row == finalRow color = [f piece | f <- capturePromotions, piece <- [Piece Queen color, Piece Rook color, Piece Bishop color, Piece Knight color]]
-  | otherwise = map (\to -> Capture (Piece Pawn color) from to) squares
+  | otherwise = map (Capture (Piece Pawn color) from) squares
   where
-    capturePromotions = map (\to -> CapturePromotion from to) squares
+    capturePromotions = map (CapturePromotion from) squares
     squares = captureThreatSquares color from board
 
 enPassantCapture :: Color -> Square -> Board -> [Move]
 enPassantCapture color (col, row) (Board _ (Just enPassantTarget@(targetCol, _)))
-  = if row == enPassantRow color && (succ targetCol == col || pred targetCol == col)
-      then [EnPassantCapture (Piece Pawn color) (col, enPassantRow color) enPassantTarget]
-      else []
+  = [EnPassantCapture (Piece Pawn color) (col, enPassantRow color) enPassantTarget | row == enPassantRow color && (succ targetCol == col || pred targetCol == col)]
 enPassantCapture _ _ _ = []
 
 pawnPossibleMoves :: Color -> Square -> Board -> [Move]

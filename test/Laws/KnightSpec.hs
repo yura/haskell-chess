@@ -1,7 +1,10 @@
 module Laws.KnightSpec (spec) where
 
 import           Test.Hspec
+import           Board
 import           Laws.Knight
+--import Laws (possibleMoves)
+import Control.Applicative (Alternative(empty))
 
 spec :: Spec
 spec = do
@@ -27,3 +30,42 @@ spec = do
   describe "underAttackSquares" $ do
     it "все ходы коня" $ do
       underAttackSquares ('d', 4) `shouldBe` [('b', 3), ('c', 2), ('e', 2), ('f', 3), ('f', 5), ('e', 6), ('c', 6), ('b', 5)]
+
+  describe "possibleMoves" $ do
+    it "все возможные ходы коня на пустой доске" $ do
+      let board = placePiece ('d', 4) knightWhite emptyBoard
+      possibleMoves board White ('d', 4) `shouldBe`
+        [ Move knightWhite ('d', 4) ('b', 3)
+        , Move knightWhite ('d', 4) ('c', 2)
+        , Move knightWhite ('d', 4) ('e', 2)
+        , Move knightWhite ('d', 4) ('f', 3)
+        , Move knightWhite ('d', 4) ('f', 5)
+        , Move knightWhite ('d', 4) ('e', 6)
+        , Move knightWhite ('d', 4) ('c', 6)
+        , Move knightWhite ('d', 4) ('b', 5)
+        ]
+
+    it "взятие фигур соперника" $ do
+      let board = placePieces [(('d', 4), knightWhite), (('e', 6), pawnBlack)] emptyBoard
+      possibleMoves board White ('d', 4) `shouldBe`
+        [ Capture knightWhite ('d', 4) ('e', 6)
+        , Move knightWhite ('d', 4) ('b', 3)
+        , Move knightWhite ('d', 4) ('c', 2)
+        , Move knightWhite ('d', 4) ('e', 2)
+        , Move knightWhite ('d', 4) ('f', 3)
+        , Move knightWhite ('d', 4) ('f', 5)
+        , Move knightWhite ('d', 4) ('c', 6)
+        , Move knightWhite ('d', 4) ('b', 5)
+        ]
+
+    it "не может ходить на поля, которые заняты своими фигурами" $ do
+      let board = placePieces [(('d', 4), knightWhite), (('e', 6), pawnWhite)] emptyBoard
+      possibleMoves board White ('d', 4) `shouldBe`
+        [ Move knightWhite ('d', 4) ('b', 3)
+        , Move knightWhite ('d', 4) ('c', 2)
+        , Move knightWhite ('d', 4) ('e', 2)
+        , Move knightWhite ('d', 4) ('f', 3)
+        , Move knightWhite ('d', 4) ('f', 5)
+        , Move knightWhite ('d', 4) ('c', 6)
+        , Move knightWhite ('d', 4) ('b', 5)
+        ]

@@ -12,9 +12,17 @@ import qualified Laws.Rook   as R
 import qualified Laws.Queen  as Q
 import qualified Laws.King   as K
 import           Laws.Util
+import Laws.Pawn (pawnPossibleMoves)
 
 possibleMoves :: Color -> Board -> [Move]
-possibleMoves color board = concatMap (\s -> P.pawnPossibleMoves color s board) $ pawnSquares color board
+possibleMoves color board = pawnMoves ++ knightMoves ++ bishopMoves ++ rookMoves ++ queenMoves ++ kingMoves
+  where
+    pawnMoves   = concatMap (pawnValidMoves board color) $ pawnSquares color board
+    knightMoves = concatMap (knightValidMoves board color) $ knightSquares color board
+    bishopMoves = []
+    rookMoves = []
+    queenMoves = []
+    kingMoves = []
 
 -- Фигуры соперника, которые находятся под угрозой взятия.
 captureThreatSquares :: Piece -> Square -> Board -> [Square]
@@ -51,6 +59,12 @@ allCheckThreatSquares color board@(Board squares enPassantTarget)
   = nub $ concatMap (\(square, piece) -> checkThreatSquares piece square board) $ Map.toList $ Map.filter (\(Piece _ c) -> c == color) squares
 
 -- Допустимые ходы в соответствии с правилами:
+pawnValidMoves :: Board -> Color -> Square -> [Move]
+pawnValidMoves board color square = filter (not . isCheck color . move board) $ P.pawnPossibleMoves color square board
+
+knightValidMoves :: Board -> Color -> Square -> [Move]
+knightValidMoves board color square = filter (not . isCheck color . move board) $ N.possibleMoves board color square 
+
 -- * нельзя ходить под шах
 kingValidMoveSquares :: Color -> Square -> Board -> [Square]
 kingValidMoveSquares color square board = filter (not . isCheck color . moveKing) $ K.moveSquares square
