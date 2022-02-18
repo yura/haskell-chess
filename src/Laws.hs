@@ -87,6 +87,20 @@ kingCaptureThreatSquares :: Color -> Square -> Board -> [Square]
 kingCaptureThreatSquares color square board
   = mapMaybe (findOrStop color board . (:[])) (kingValidMoveSquares color square board)
 
+-- Ничья?
+-- https://en.wikipedia.org/wiki/Draw_(chess)
+-- https://ru.wikipedia.org/wiki/%D0%9D%D0%B8%D1%87%D1%8C%D1%8F_(%D1%88%D0%B0%D1%85%D0%BC%D0%B0%D1%82%D1%8B)
+isDraw :: Color -> Board -> Bool 
+isDraw color board | whites == [kingWhite] && blacks == [kingBlack] = True
+                   | whites == [bishopWhite, kingWhite] && blacks == [kingBlack] = True
+                   | whites == [kingWhite] && blacks == [bishopBlack, kingBlack] = True
+                   | whites == [knightWhite, kingWhite] && blacks == [kingBlack] = True
+                   | whites == [kingWhite] && blacks == [knightBlack, kingBlack] = True
+                   | otherwise = False 
+  where
+    whites = pieces White board
+    blacks = pieces Black board
+
 -- Шах?
 isCheck :: Color -> Board -> Bool
 isCheck color board = kingAt color board `elem` allCheckThreatSquares (opponent color) board
@@ -97,4 +111,4 @@ isStalemate color board = not (isCheck color board) && null (possibleMoves color
 
 -- Мат?
 isMate :: Color -> Board -> Bool
-isMate color board = isCheck color board && null (possibleMoves color board) 
+isMate color board = isCheck color board && null (possibleMoves color board)

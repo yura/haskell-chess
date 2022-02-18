@@ -16,7 +16,7 @@ spec = do
 
   describe "pieces" $ do
     it "возвращает 32 фигуры" $
-      length pieces `shouldBe` 32
+      length squaresAndPieces `shouldBe` 32
 
   describe "whitePieces" $ do
     it "возвращает 16 фигур" $

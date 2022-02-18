@@ -12,7 +12,7 @@ randomMove moves = do
   putStrLn $ show $ length moves
   putStrLn $ show randomIndex
 
-  return $ (moves !! randomIndex)
+  return (moves !! randomIndex)
 
 --makeMove :: (MonadRandom m) => Color -> Board -> [Move] -> m (Board, [Move])
 makeMove :: Color -> Board -> [Move] -> IO (Board, [Move])

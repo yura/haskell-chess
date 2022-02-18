@@ -1,5 +1,6 @@
 module Main where
 
+import           Control.Concurrent (threadDelay)
 import Data.Text as T
 import Text.Parsec
 
@@ -10,24 +11,28 @@ import Display
 import qualified Format.PGN as PGN
 
 import Bot.Random
+import Board
+
+result :: Color -> Board -> Maybe Result 
+result color board | isMate color board      = Just $ if color == White then BlackWon else WhiteWon
+                   | isStalemate color board = Just Stalemate
+                   | isDraw color board      = Just Draw
+                   | otherwise               = Nothing
 
 play
   :: (Color -> Board -> [Move] -> IO (Board, [Move]))
   -> (Color -> Board -> [Move] -> IO (Board, [Move]))
   ->  Color -> Board -> [Move] -> IO (Board, [Move], Result)
 play bot1 bot2 color board moves = do
-  renderBoard board
-
   let bot = if color == White then bot1 else bot2
   (newBoard, newMoves) <- bot color board moves
-  let mResult = if isMate (opponent color) newBoard
-                  then
-                    if color == White then Just WhiteWon else Just BlackWon
-                  else
-                    Nothing
+  renderBoard newBoard
+  --threadDelay 500000
+
+  let mResult = result (opponent color) newBoard
 
   case mResult of
-    Just r  -> return $ (newBoard, newMoves, r)
+    Just r  -> return (newBoard, newMoves, r)
     Nothing -> play bot1 bot2 (opponent color) newBoard newMoves
 
 main :: IO ()
@@ -38,5 +43,6 @@ main = do
   let p2 = Bot.Random.makeMove
 
   result <- play p1 p2 White initialBoard []
+  print result
 
   return ()

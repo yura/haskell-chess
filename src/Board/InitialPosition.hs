@@ -4,10 +4,10 @@ import Board
 import qualified Data.Map as M
 
 initialBoard :: Board
-initialBoard = Board (M.fromList pieces) Nothing
+initialBoard = Board (M.fromList squaresAndPieces) Nothing
 
-pieces :: [(Square, Piece)]
-pieces = whitePieces ++ blackPieces
+squaresAndPieces :: [(Square, Piece)]
+squaresAndPieces = whitePieces ++ blackPieces
 
 whitePieces :: [(Square, Piece)]
 whitePieces = [whiteKing] ++ [whiteQueen] ++ whiteBishops ++ whiteKnights ++ whiteRooks ++ whitePawns

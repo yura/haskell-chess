@@ -35,10 +35,13 @@ pawnBlack   = Piece Pawn Black
 type Square = (Char, Int)
 data Board = Board (M.Map Square Piece) (Maybe Square) deriving (Eq, Show)
 
+squares :: Board -> M.Map Square Piece
+squares (Board ss _) = ss
+
 enPassantTarget :: Board -> Maybe Square
 enPassantTarget (Board _ target) = target
 
-data Result = WhiteWon | BlackWon | Draw deriving (Eq, Show)
+data Result = WhiteWon | BlackWon | Stalemate | Draw deriving (Eq, Show)
 
 data Move
   -- рокировка в сторону ферзя
@@ -115,9 +118,13 @@ kingSquares :: Color -> Board -> [Square]
 kingSquares = pieceTypeSquares King
 
 pieceTypeSquares :: PieceType -> Color -> Board -> [Square]
-pieceTypeSquares pieceType color (Board squares _) 
+pieceTypeSquares pieceType color (Board squares _)
   = foldl (\result (square, Piece pt c) -> if color == c && pt == pieceType then square:result else result) [] $ M.toList squares
 
+--pieces :: Color -> Board -> [(Square, Piece)]
+pieces :: Color -> Board -> [Piece]
+
+pieces color board = map snd $ filter (\(s, Piece _ c) -> c == color) $ M.toList $ squares board
 placePiece :: Square -> Piece -> Board -> Board
 placePiece square piece (Board squares enPassantTarget) = Board (M.insert square piece squares) enPassantTarget
 
@@ -144,6 +151,7 @@ move (Board board _) (Move piece from to)                     = Board (M.delete 
 move (Board board _) (Capture   piece  from to) = Board (M.delete from $ M.insert to piece board) Nothing
 move (Board board _) (Promotion        from to piece)         = Board (M.delete from $ M.insert to piece board) Nothing
 move (Board board _) (CapturePromotion from to piece)         = Board (M.delete from $ M.insert to piece board) Nothing
+move (Board board _) (EnPassantCapture piece from@(fCol, fRow) to@(tCol, tRow)) = Board (M.delete (tCol, fRow) $ M.delete from $ M.insert to piece board) Nothing
 move (Board board _) (QueensideCastling color)
   = Board
   ( M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row)

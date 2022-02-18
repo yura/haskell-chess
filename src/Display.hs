@@ -1,6 +1,7 @@
+{-# LANGUAGE TupleSections #-}
+
 module Display where
 
-import           Control.Concurrent (threadDelay)
 import           Data.Char (chr)
 import qualified Data.Text as T
 import           Board (Board(..), Piece(..), PieceType(..), Color(..), Square, cols, rows, findPiece)
@@ -12,7 +13,6 @@ clearScreen = do
 
 renderBoard :: Board -> IO ()
 renderBoard board = do
-  threadDelay 500000
   clearScreen
   putStrLn $ T.unpack $ exportToDisplay board True
 
@@ -29,15 +29,13 @@ exportToDisplay board renderNames = boardText <> if renderNames then colNames el
     colNames = "\n\n  " <> T.pack cols
 
 rowToDisplay :: Board -> [Square] -> T.Text
-rowToDisplay board row = T.concat $ map (\square -> case findPiece board square of
-  Nothing    -> " "
-  Just piece -> pieceToDisplay piece) row
+rowToDisplay board row = T.concat $ map (maybe " " pieceToDisplay . findPiece board) row
 
 -- |Имена полей в порядке, который удобен для вывода доски на экран
 squaresDisplayOrder :: [[Square]]
 squaresDisplayOrder = map colName $ reverse rows
   where
-    colName row = map (\c -> (c, row)) cols
+    colName row = map (, row) cols
 
 pieceToDisplay :: Piece -> T.Text
 pieceToDisplay (Piece King White)   = "♔"
@@ -52,4 +50,3 @@ pieceToDisplay (Piece Rook Black)   = "♜"
 pieceToDisplay (Piece Bishop Black) = "♝"
 pieceToDisplay (Piece Knight Black) = "♞"
 pieceToDisplay (Piece Pawn Black)   = "♟"
-
