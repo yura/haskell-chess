@@ -17,11 +17,11 @@ import Laws.Pawn (pawnPossibleMoves)
 possibleMoves :: Color -> Board -> [Move]
 possibleMoves color board = pawnMoves ++ knightMoves ++ bishopMoves ++ rookMoves ++ queenMoves ++ kingMoves
   where
-    pawnMoves   = concatMap (pawnValidMoves board color) $ pawnSquares color board
+    pawnMoves   = concatMap (pawnValidMoves board color)   $ pawnSquares color board
     knightMoves = concatMap (knightValidMoves board color) $ knightSquares color board
     bishopMoves = concatMap (bishopValidMoves board color) $ bishopSquares color board
-    rookMoves   = concatMap (rookValidMoves board color) $ rookSquares color board
-    queenMoves = []
+    rookMoves   = concatMap (rookValidMoves board color)   $ rookSquares color board
+    queenMoves  = concatMap (queenValidMoves board color)  $ queenSquares color board
     kingMoves = []
 
 -- Фигуры соперника, которые находятся под угрозой взятия.
@@ -70,6 +70,9 @@ bishopValidMoves board color square = filter (not . isCheck color . move board) 
 
 rookValidMoves :: Board -> Color -> Square -> [Move]
 rookValidMoves board color square = filter (not . isCheck color . move board) $ R.possibleMoves board color square 
+
+queenValidMoves :: Board -> Color -> Square -> [Move]
+queenValidMoves board color square = filter (not . isCheck color . move board) $ Q.possibleMoves board color square 
 
 -- * нельзя ходить под шах
 kingValidMoveSquares :: Color -> Square -> Board -> [Square]

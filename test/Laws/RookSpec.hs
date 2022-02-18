@@ -29,9 +29,6 @@ spec = do
     it "все поля, которые бьёт ладья" $ do
       underAttackSquares initialBoard White ('b', 2) `shouldBe` [('b', 3), ('b', 4), ('b', 5), ('b', 6), ('b', 7)]
 
-    it "возращает пустой список если нет фигур для взятия" $ do
-      underAttackSquares (placePiece ('g', 7) pawnWhite initialBoard) White ('a', 1) `shouldBe` []
-
   describe "captureThreatSquares" $ do
     it "все взятия слона фигур противника" $ do
       captureThreatSquares White ('b', 2) initialBoard `shouldBe` [('b', 7)]
@@ -78,7 +75,6 @@ spec = do
         ]      
  
     it "не может ходить на поля, которые заняты своими фигурами" $ do
-      pending
       let board = placePieces [(('d', 4), rookWhite), (('d', 6), pawnWhite)] emptyBoard
       possibleMoves board White ('d', 4) `shouldBe`
         [ Move rookWhite ('d', 4) ('c', 4)
@@ -92,4 +88,4 @@ spec = do
         , Move rookWhite ('d', 4) ('g', 4)
         , Move rookWhite ('d', 4) ('h', 4)
         , Move rookWhite ('d', 4) ('d', 5)
-        ]   
+        ]

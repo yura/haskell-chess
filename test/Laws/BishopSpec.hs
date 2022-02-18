@@ -84,18 +84,6 @@ spec = do
     it "все поля, которые бьёт слон" $ do
       underAttackSquares initialBoard White ('b', 2) `shouldBe` [('c', 3), ('d', 4), ('e', 5), ('f', 6), ('g', 7), ('a', 3)]
 
-    it "возращает пустой список если нет фигур для взятия" $ do
-      underAttackSquares initialBoard White ('e', 4) `shouldBe`
-        [ ('d', 3)
-        , ('f', 3)
-        , ('f', 5)
-        , ('g', 6)
-        , ('h', 7)
-        , ('d', 5)
-        , ('c', 6)
-        , ('b', 7)
-        ]
-
   describe "captureThreatSquares" $ do
     it "все взятия слона фигур противника" $ do
       captureThreatSquares White ('b', 2) initialBoard `shouldBe` [('g', 7)]
