@@ -30,8 +30,8 @@ library
       Bot.Random
       Display
       Format.FEN
-      Format.PGN
       Format.PGN.Export
+      Format.PGN.Import
       Laws
       Laws.Bishop
       Laws.King
@@ -81,7 +81,7 @@ test-suite haskell-chess-test
       DisplaySpec
       Format.FENSpec
       Format.PGN.ExportSpec
-      Format.PGNSpec
+      Format.PGN.ImportSpec
       Laws.BishopSpec
       Laws.KingSpec
       Laws.KnightSpec

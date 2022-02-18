@@ -8,7 +8,7 @@ import Board
 import Laws
 import Board.InitialPosition
 import Display
-import qualified Format.PGN        as PGN
+import qualified Format.PGN.Import as PGN
 import qualified Format.PGN.Export as PGN
 
 import Bot.Random

@@ -1,12 +1,12 @@
 {-# LANGUAGE NoOverloadedStrings #-}
 
-module Format.PGNSpec (spec) where
+module Format.PGN.ImportSpec (spec) where
 
 import Test.Hspec
 import Test.Hspec.Parsec
 import Text.Parsec
 
-import Format.PGN
+import Format.PGN.Import
 import Board hiding (Move(..))
 
 spec :: Spec
@@ -118,7 +118,7 @@ spec = do
         parsePly' "Qdg8" `shouldParse` Ply Queen (Just 'd') Nothing ('g', 8)
      
       it "ход королём" $ do
-        pendingWith "король должен быть один, при указании вертикали короля, скорее всего надо падать"
+        -- FIXME: "король должен быть один, при указании вертикали короля, скорее всего надо падать"
         parsePly' "Kab2" `shouldParse` Ply King (Just 'a') Nothing ('b', 2)
 
     context "ходы с указанием исходной клетки" $ do
@@ -135,7 +135,7 @@ spec = do
         parsePly' "Qe4e6" `shouldParse` Ply Queen (Just 'e') (Just 4) ('e', 6)
      
       it "ход королём" $ do
-        pendingWith "король должен быть один, при указании вертикали короля, скорее всего надо падать"
+        -- FIXME: "король должен быть один, при указании вертикали короля, скорее всего надо падать"
         parsePly' "Kab2" `shouldParse` Ply King (Just 'a') Nothing ('b', 2)
 
     context "продвижение (c8=Q)" $ do

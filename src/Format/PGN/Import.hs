@@ -1,6 +1,6 @@
 {-# LANGUAGE BlockArguments #-}
 
-module Format.PGN where
+module Format.PGN.Import where
 
 import Data.Char (digitToInt)
 import Text.ParserCombinators.Parsec hiding (spaces)
