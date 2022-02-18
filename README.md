@@ -16,7 +16,6 @@
 
 * Brute-force bot: make best move looking N moves ahead
 * Read FEN -- нужно для решения задач
-* Write PGN
 
 ## FIDE Laws of Chess
 
@@ -56,6 +55,7 @@ Library implementing chess rules.
 * isCheck :: Color -> Board -> Bool
 * isMate :: Color -> Board -> Bool
   * return $ (moves !! randomIndex) -- negative index или index too large
+* Export to PGN
 
 * Read PGN:
   + check +

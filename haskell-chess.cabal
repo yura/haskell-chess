@@ -31,6 +31,7 @@ library
       Display
       Format.FEN
       Format.PGN
+      Format.PGN.Export
       Laws
       Laws.Bishop
       Laws.King
@@ -79,6 +80,7 @@ test-suite haskell-chess-test
       BoardSpec
       DisplaySpec
       Format.FENSpec
+      Format.PGN.ExportSpec
       Format.PGNSpec
       Laws.BishopSpec
       Laws.KingSpec

@@ -187,4 +187,3 @@ parseResult = do
     " 1-0"     -> WhiteWon
     " 0-1"     -> BlackWon
     " 1/2-1/2" -> Draw
-

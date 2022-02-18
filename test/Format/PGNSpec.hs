@@ -6,8 +6,8 @@ import Test.Hspec
 import Test.Hspec.Parsec
 import Text.Parsec
 
-import Board hiding (Move(..))
 import Format.PGN
+import Board hiding (Move(..))
 
 spec :: Spec
 spec = do
@@ -181,4 +181,3 @@ spec = do
 
       it "шах и аннотация ??" $
         parsePlyAnnotated' "Bxf6+??" `shouldParse` PlyAnnotated (Capture Bishop Nothing Nothing ('f', 6)) (Just Check) (Just "??")
-
