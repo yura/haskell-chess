@@ -12,7 +12,6 @@ import qualified Laws.Rook   as R
 import qualified Laws.Queen  as Q
 import qualified Laws.King   as K
 import           Laws.Util
-import Laws.Pawn (pawnPossibleMoves)
 
 possibleMoves :: Color -> Board -> [Move]
 possibleMoves color board = pawnMoves ++ knightMoves ++ bishopMoves ++ rookMoves ++ queenMoves ++ kingMoves
@@ -112,3 +111,9 @@ isStalemate color board = not (isCheck color board) && null (possibleMoves color
 -- Мат?
 isMate :: Color -> Board -> Bool
 isMate color board = isCheck color board && null (possibleMoves color board)
+
+result :: Color -> Board -> Maybe Result 
+result color board | isMate color board      = Just $ if color == White then BlackWon else WhiteWon
+                   | isStalemate color board = Just Stalemate
+                   | isDraw color board      = Just Draw
+                   | otherwise               = Nothing
