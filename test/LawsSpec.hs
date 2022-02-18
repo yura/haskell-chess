@@ -9,6 +9,7 @@ import qualified Data.Map as Map
 import           Board
 import           Board.InitialPosition
 import           Laws
+import Laws (isStalemate)
 
 spec :: Spec
 spec = do
@@ -137,3 +138,29 @@ spec = do
         isCheck Black (placePieces [(('e', 1), rookBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
 
      -- Король не может шаховать
+
+  describe "isStalemate" $ do
+    it "возвращает True, в случае пата https://lichess.org/editor/7k/5K2/6Q1/8/8/8/8/8_w_-_-_0_1" $ do
+      let board = placePieces [(('f', 7), kingWhite), (('g', 6), queenWhite), (('h', 8), kingBlack)] emptyBoard
+      isStalemate Black board `shouldBe` True
+
+    it "возвращает False, в случае мата https://lichess.org/editor/7k/5KQ1/8/8/8/8/8/8_w_-_-_0_1" $ do
+      let board = placePieces [(('f', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
+      isStalemate Black board `shouldBe` False
+
+    it "возвращает False, в случае шаха https://lichess.org/editor/7k/4K1Q1/8/8/8/8/8/8_w_-_-_0_1" $ do
+      let board = placePieces [(('e', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
+      isStalemate Black board `shouldBe` False
+
+  describe "isMate" $ do
+    it "возвращает False, в случае пата https://lichess.org/editor/7k/5K2/6Q1/8/8/8/8/8_w_-_-_0_1" $ do
+      let board = placePieces [(('f', 7), kingWhite), (('g', 6), queenWhite), (('h', 8), kingBlack)] emptyBoard
+      isMate Black board `shouldBe` False
+
+    it "возвращает True, в случае мата https://lichess.org/editor/7k/5KQ1/8/8/8/8/8/8_w_-_-_0_1" $ do
+      let board = placePieces [(('f', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
+      isMate Black board `shouldBe` True
+
+    it "возвращает False, в случае шаха https://lichess.org/editor/7k/4K1Q1/8/8/8/8/8/8_w_-_-_0_1" $ do
+      let board = placePieces [(('e', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
+      isMate Black board `shouldBe` False

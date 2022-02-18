@@ -22,7 +22,7 @@ possibleMoves color board = pawnMoves ++ knightMoves ++ bishopMoves ++ rookMoves
     bishopMoves = concatMap (bishopValidMoves board color) $ bishopSquares color board
     rookMoves   = concatMap (rookValidMoves board color)   $ rookSquares color board
     queenMoves  = concatMap (queenValidMoves board color)  $ queenSquares color board
-    kingMoves = []
+    kingMoves   = concatMap (kingValidMoves board color)   $ kingSquares color board
 
 -- Фигуры соперника, которые находятся под угрозой взятия.
 captureThreatSquares :: Piece -> Square -> Board -> [Square]
@@ -74,6 +74,9 @@ rookValidMoves board color square = filter (not . isCheck color . move board) $ 
 queenValidMoves :: Board -> Color -> Square -> [Move]
 queenValidMoves board color square = filter (not . isCheck color . move board) $ Q.possibleMoves board color square 
 
+kingValidMoves :: Board -> Color -> Square -> [Move]
+kingValidMoves board color square = filter (not . isCheck color . move board) $  K.possibleMoves board color square 
+
 -- * нельзя ходить под шах
 kingValidMoveSquares :: Color -> Square -> Board -> [Square]
 kingValidMoveSquares color square board = filter (not . isCheck color . moveKing) $ K.moveSquares square
@@ -84,8 +87,14 @@ kingCaptureThreatSquares :: Color -> Square -> Board -> [Square]
 kingCaptureThreatSquares color square board
   = mapMaybe (findOrStop color board . (:[])) (kingValidMoveSquares color square board)
 
+-- Шах?
 isCheck :: Color -> Board -> Bool
 isCheck color board = kingAt color board `elem` allCheckThreatSquares (opponent color) board
 
+-- Пат?
+isStalemate :: Color -> Board -> Bool 
+isStalemate color board = not (isCheck color board) && null (possibleMoves color board) 
+
+-- Мат?
 isMate :: Color -> Board -> Bool
-isMate color board = False
+isMate color board = isCheck color board && null (possibleMoves color board) 

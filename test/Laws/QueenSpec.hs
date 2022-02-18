@@ -45,7 +45,7 @@ spec = do
       captureThreatSquares White ('a', 1) initialBoard `shouldBe` []
 
   describe "possibleMoves" $ do
-    it "все возможные ходы ладьи на пустой доске" $ do
+    it "все возможные ходы ферзя на пустой доске" $ do
       let board = placePiece ('d', 4) queenWhite emptyBoard
       possibleMoves board White ('d', 4) `shouldBe`
         [ Move queenWhite ('d', 4) ('c', 3)
