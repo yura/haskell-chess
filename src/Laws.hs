@@ -19,7 +19,7 @@ possibleMoves color board = pawnMoves ++ knightMoves ++ bishopMoves ++ rookMoves
   where
     pawnMoves   = concatMap (pawnValidMoves board color) $ pawnSquares color board
     knightMoves = concatMap (knightValidMoves board color) $ knightSquares color board
-    bishopMoves = []
+    bishopMoves = concatMap (bishopValidMoves board color) $ bishopSquares color board
     rookMoves = []
     queenMoves = []
     kingMoves = []
@@ -64,6 +64,9 @@ pawnValidMoves board color square = filter (not . isCheck color . move board) $ 
 
 knightValidMoves :: Board -> Color -> Square -> [Move]
 knightValidMoves board color square = filter (not . isCheck color . move board) $ N.possibleMoves board color square 
+
+bishopValidMoves :: Board -> Color -> Square -> [Move]
+bishopValidMoves board color square = filter (not . isCheck color . move board) $ B.possibleMoves board color square 
 
 -- * нельзя ходить под шах
 kingValidMoveSquares :: Color -> Square -> Board -> [Square]

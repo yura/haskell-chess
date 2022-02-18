@@ -94,3 +94,41 @@ spec = do
     it "возращает пустой список если нет фигур для взятия" $ do
       captureThreatSquares White ('a', 1) (placePiece ('g', 7) pawnWhite initialBoard) `shouldBe` []
 
+  describe "possibleMoves" $ do
+    it "все возможные ходы коня на пустой доске" $ do
+      let board = placePiece ('d', 4) bishopWhite emptyBoard
+      possibleMoves board White ('d', 4) `shouldBe`
+        [ Move bishopWhite ('d', 4) ('c', 3)
+        , Move bishopWhite ('d', 4) ('b', 2)
+        , Move bishopWhite ('d', 4) ('a', 1)
+        , Move bishopWhite ('d', 4) ('e', 3)
+        , Move bishopWhite ('d', 4) ('f', 2)
+        , Move bishopWhite ('d', 4) ('g', 1)
+        , Move bishopWhite ('d', 4) ('e', 5)
+        , Move bishopWhite ('d', 4) ('f', 6)
+        , Move bishopWhite ('d', 4) ('g', 7)
+        , Move bishopWhite ('d', 4) ('h', 8)
+        , Move bishopWhite ('d', 4) ('c', 5)
+        , Move bishopWhite ('d', 4) ('b', 6)
+        , Move bishopWhite ('d', 4) ('a', 7)
+        ]
+
+    it "взятие фигур соперника" $ do
+      let board = placePieces [(('d', 4), bishopWhite), (('g', 7), pawnBlack)] emptyBoard
+      possibleMoves board White ('d', 4) `shouldBe`
+        [ 
+          Capture bishopWhite ('d', 4) ('g', 7)
+        , Move bishopWhite ('d', 4) ('c', 3)
+        , Move bishopWhite ('d', 4) ('b', 2)
+        , Move bishopWhite ('d', 4) ('a', 1)
+        , Move bishopWhite ('d', 4) ('e', 3)
+        , Move bishopWhite ('d', 4) ('f', 2)
+        , Move bishopWhite ('d', 4) ('g', 1)
+        , Move bishopWhite ('d', 4) ('e', 5)
+        , Move bishopWhite ('d', 4) ('f', 6)
+        , Move bishopWhite ('d', 4) ('c', 5)
+        , Move bishopWhite ('d', 4) ('b', 6)
+        , Move bishopWhite ('d', 4) ('a', 7)
+        ]      
+ 
+    it "не может ходить на поля, которые заняты своими фигурами" pending 
