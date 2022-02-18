@@ -2,9 +2,7 @@
 
 ## TODO
 
-* isCheck :: Color -> Board -> Bool
-* return $ (moves !! randomIndex) -- negative index или index too large
-* isMate :: Color -> Board -> Bool
+* Рокировка
 * isDraw :: Color -> Board -> Bool
   * остались два короля
   * троекратное повторение позиции
@@ -53,6 +51,11 @@ Library implementing chess rules.
 
 
 ## DONE
+
+### 18.02.2022
+* isCheck :: Color -> Board -> Bool
+* isMate :: Color -> Board -> Bool
+  * return $ (moves !! randomIndex) -- negative index или index too large
 
 * Read PGN:
   + check +

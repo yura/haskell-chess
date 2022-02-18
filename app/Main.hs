@@ -27,7 +27,9 @@ play bot1 bot2 color board moves = do
   let bot = if color == White then bot1 else bot2
   (newBoard, newMoves) <- bot color board moves
   renderBoard newBoard
-  --threadDelay 500000
+  print $ Prelude.head newMoves
+
+  threadDelay 500000
 
   let mResult = result (opponent color) newBoard
 
