@@ -69,8 +69,8 @@ spec = do
         let board = placePieces [(('e', 2), pawnWhite), (('d', 3), pawnWhite)] emptyBoard
         whitePawnPossibleMoves ('e', 2) board `shouldBe` [Move pawnWhite ('e', 2) ('e', 3), Move pawnWhite ('e', 2) ('e', 4)]
 
-      it "не ходит, если король после хода оказывается под шахом" $ pending
-      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+      it "не ходит, если король после хода оказывается под шахом" pending
+      it "не ходит через поле, если король после хода оказывается под шахом" pending
 
     context "[пешка не в начальной позиции]" $ do
       it "ходит вперед" $ do
@@ -97,16 +97,14 @@ spec = do
         let board = placePieces [(('e', 4), pawnWhite), (('d', 5), pawnWhite)] emptyBoard
         whitePawnPossibleMoves ('e', 4) board `shouldBe` [Move pawnWhite ('e', 4) ('e', 5)]
 
-      it "не ходит, если король после хода оказывается под шахом" $ pending
-      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+      it "не ходит, если король после хода оказывается под шахом" pending
 
     context "взятие на проходе" $ do
       it "рубит пешку противника на проходе" $ do
         let board = move (placePiece ('e', 5) pawnWhite emptyBoard) (Move pawnBlack ('f', 7) ('f', 5)) 
         whitePawnPossibleMoves ('e', 5) board `shouldBe` [EnPassantCapture pawnWhite ('e', 5) ('f', 6), Move pawnWhite ('e', 5) ('e', 6)]
 
-      it "не ходит, если король после хода оказывается под шахом" $ pending
-      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+      it "не ходит, если король после хода оказывается под шахом" pending
 
     context "[продвижение]" $ do
       it "продвигается до ферзя, ладьи, слона или коня" $ do
@@ -140,8 +138,7 @@ spec = do
           , Promotion ('e', 7) ('e', 8) knightWhite
           ]
 
-      it "не ходит, если король после хода оказывается под шахом" $ pending
-      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+      it "не ходит, если король после хода оказывается под шахом" pending
 
   describe "blackPawnMoveSquares" $ do
     context "[без взятия фигур противника]" $ do
@@ -187,8 +184,8 @@ spec = do
         let board = placePieces [(('b', 7), pawnBlack), (('c', 6), pawnBlack)] emptyBoard
         blackPawnPossibleMoves ('b', 7) board `shouldBe` [Move pawnBlack ('b', 7) ('b', 6), Move pawnBlack ('b', 7) ('b', 5)]
 
-      it "не ходит, если король после хода оказывается под шахом" $ pending
-      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+      it "не ходит, если король после хода оказывается под шахом" pending
+      it "не ходит через поле, если король после хода оказывается под шахом" pending
 
     context "[пешка не в начальной позиции]" $ do
       it "ходит вперед" $ do
@@ -215,16 +212,14 @@ spec = do
         let board = placePieces [(('e', 4), pawnBlack), (('d', 3), pawnBlack)] emptyBoard
         blackPawnPossibleMoves ('e', 4) board `shouldBe` [Move pawnBlack ('e', 4) ('e', 3)]
 
-      it "не ходит, если король после хода оказывается под шахом" $ pending
-      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+      it "не ходит, если король после хода оказывается под шахом" pending
 
     context "взятие на проходе" $ do
       it "рубит пешку противника на проходе" $ do
         let board = move (placePiece ('e', 4) pawnBlack emptyBoard) (Move pawnWhite ('d', 2) ('d', 4)) 
         blackPawnPossibleMoves ('e', 4) board `shouldBe` [EnPassantCapture pawnBlack ('e', 4) ('d', 3), Move pawnBlack ('e', 4) ('e', 3)]
 
-      it "не ходит, если король после хода оказывается под шахом" $ pending
-      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+      it "не ходит, если король после хода оказывается под шахом" pending
 
     context "[продвижение]" $ do
       it "продвигается до ферзя, ладьи, слона или коня" $ do
@@ -258,6 +253,5 @@ spec = do
           , Promotion ('e', 2) ('e', 1) knightBlack
           ]
 
-      it "не ходит, если король после хода оказывается под шахом" $ pending
-      it "не ходит через поле, если король после хода оказывается под шахом" $ pending
+      it "не ходит, если король после хода оказывается под шахом" pending
 

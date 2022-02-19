@@ -117,3 +117,4 @@ result color board | isMate color board      = Just $ if color == White then Bla
                    | isStalemate color board = Just Stalemate
                    | isDraw color board      = Just Draw
                    | otherwise               = Nothing
+
