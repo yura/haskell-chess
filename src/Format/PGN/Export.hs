@@ -11,14 +11,13 @@ exportPieceToPGN (Piece Queen _)  = "Q"
 exportPieceToPGN (Piece Rook _)   = "R"
 exportPieceToPGN (Piece Bishop _) = "B"
 exportPieceToPGN (Piece Knight _) = "N"
-exportPieceToPGN _                    = ""
+exportPieceToPGN _                = ""
 
 exportMoveToPGN :: Move -> String
 exportMoveToPGN (QueensideCastling _)                      = "O-O-O"
 exportMoveToPGN (KingsideCastling _)                       = "O-O"
 exportMoveToPGN (Move piece from to)                       = exportPieceToPGN piece ++ exportSquareToPGN from  ++ exportSquareToPGN to
 exportMoveToPGN (EnPassantCapture piece from to)           = exportSquareToPGN from ++ "x" ++ exportSquareToPGN to
-exportMoveToPGN (Capture piece@(Piece Pawn _) from to) = exportSquareToPGN from ++ "x" ++ exportSquareToPGN to
 exportMoveToPGN (Capture piece from to)                    = exportPieceToPGN piece ++ exportSquareToPGN from ++ "x" ++ exportSquareToPGN to
 exportMoveToPGN (Promotion from to piece)                  = exportSquareToPGN from ++ exportSquareToPGN to ++ "=" ++ exportPieceToPGN piece
 exportMoveToPGN (CapturePromotion from to piece)           = exportSquareToPGN from ++ "x" ++ exportSquareToPGN to ++ "=" ++ exportPieceToPGN piece

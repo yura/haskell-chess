@@ -52,7 +52,7 @@ spec = do
       it "другой фигурой (кроме пешки)" $ do
         exportMoveToPGN (Capture queenWhite ('a', 2) ('b', 3)) `shouldBe` "Qa2xb3"
     
-    context "[превражение]" $ do
+    context "[превращение]" $ do
       it "в ферзя" $
         exportMoveToPGN (Promotion ('b', 7) ('b', 8) queenWhite) `shouldBe` "b7b8=Q"
 
@@ -69,3 +69,4 @@ spec = do
             , Move    pawnBlack ('d', 7) ('d', 5)
             , Capture pawnWhite ('e', 4) ('d', 5)]
       exportMovesToPGN moves `shouldBe` "1. e2e4 d7d5 2. e4xd5"
+
