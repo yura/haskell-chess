@@ -47,6 +47,7 @@ library
       src
   default-extensions:
       OverloadedStrings
+      RecordWildCards
   build-depends:
       MonadRandom
     , base >=4.7 && <5

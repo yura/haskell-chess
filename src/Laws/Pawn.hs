@@ -69,8 +69,8 @@ captures color from@(_, row) board
     squares = captureThreatSquares color from board
 
 enPassantCapture :: Color -> Square -> Board -> [Move]
-enPassantCapture color (col, row) (Board _ (Just enPassantTarget@(targetCol, _)))
-  = [EnPassantCapture (Piece Pawn color) (col, enPassantRow color) enPassantTarget | row == enPassantRow color && (succ targetCol == col || pred targetCol == col)]
+enPassantCapture color (col, row) (Board{enPassantTarget = (Just target@(targetCol, _))})
+  = [EnPassantCapture (Piece Pawn color) (col, enPassantRow color) target | row == enPassantRow color && (succ targetCol == col || pred targetCol == col)]
 enPassantCapture _ _ _ = []
 
 pawnPossibleMoves :: Color -> Square -> Board -> [Move]

@@ -2,9 +2,18 @@ module Board.InitialPosition where
 
 import Board
 import qualified Data.Map as M
+import Format.FEN (whiteQueensideCastling)
 
 initialBoard :: Board
-initialBoard = Board (M.fromList squaresAndPieces) Nothing
+initialBoard
+  = Board
+  { squares = M.fromList squaresAndPieces
+  , enPassantTarget = Nothing
+  , whiteCanCastleKingside = True
+  , whiteCanCastleQueenside = True
+  , blackCanCastleKingside = True
+  , blackCanCastleQueenside = True
+  }
 
 squaresAndPieces :: [(Square, Piece)]
 squaresAndPieces = whitePieces ++ blackPieces

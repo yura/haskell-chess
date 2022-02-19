@@ -30,6 +30,7 @@ library:
   source-dirs: src
   default-extensions:
     - OverloadedStrings
+    - RecordWildCards
 
 executables:
   haskell-chess-exe:

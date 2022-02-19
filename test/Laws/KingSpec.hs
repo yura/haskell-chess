@@ -32,14 +32,6 @@ spec = do
         , ('g', 5), ('h', 4)
         ]
 
-    context "[рокировка]" $ do
-      it "не ходит через клетку вперед, если поле занято своей фигурой" pending
-      it "не ходит через клетку вперед, если поле занято фигурой противника" pending
-      it "не ходит под шах" pending
-      it "не встречается с королём (частный случай шаха)" pending
-      it "не рокируется, если ходил" pending
-      it "не рокируется, если ходила ладья?" pending
-
   describe "underAttackSquares" $ do
     it "все поля, которые бьёт король" $ do
       let board = placePiece ('c', 3) pawnBlack initialBoard
@@ -86,3 +78,31 @@ spec = do
         , Move kingWhite ('d', 4) ('d', 3)
         , Move kingWhite ('d', 4) ('e', 4)
         ]
+
+    context "[рокировка]" $ do
+      context "[короткая]" $ do
+        it "белые рокируются, если нет фигур между королём и ладьёй, король не под шахом, проходит через небитое поле, встаёт не под шах, раньше не ходил ни король, ни ладья" $ do
+          let board = deletePiece ('f', 1) $ deletePiece ('g', 1) initialBoard
+          possibleMoves board White ('e', 1) `shouldBe` [KingsideCastling White, Move kingWhite ('e',1) ('f',1)] 
+
+        it "чёрные рокируются, если нет фигур между королём и ладьёй, король не под шахом, проходит через небитое поле, встаёт не под шах, раньше не ходил ни король, ни ладья" $ do
+          let board = deletePiece ('f', 8) $ deletePiece ('g', 8) initialBoard
+          possibleMoves board Black ('e', 8) `shouldBe` [KingsideCastling Black, Move kingBlack ('e',8) ('f',8)] 
+
+      it "не рокируется, если между королём и ладьёй стоит фигура" $ do
+        possibleMoves initialBoard White ('e', 1) `shouldBe` []
+
+      it "не рокируется, если король не в начальной позиции" $ do
+        let board = movePiece ('e', 1) ('d', 1) kingWhite $ deletePiece ('f', 1) $ deletePiece ('g', 1) initialBoard
+        possibleMoves board White ('d', 1) `shouldBe` [Move kingWhite ('d',1) ('e',1)] 
+
+      it "не рокируется, если ладья не в начальной позиции" $ do
+        let board = movePiece ('h', 1) ('h', 2) rookWhite $ deletePiece ('f', 1) $ deletePiece ('g', 1) initialBoard
+        possibleMoves board White ('e', 1) `shouldBe` [Move kingWhite ('e',1) ('f',1)]
+
+      it "не рокируется, если ходил" pending
+      it "не рокируется, если ходила ладья" pending
+      it "не рокируется, если король под шахом" pending
+      it "не рокируется, если король пройдёт через битое поле" pending
+      it "не рокируется под шах" pending
+      it "ладья может рокироваться через битое поле" pending

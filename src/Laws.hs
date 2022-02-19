@@ -36,7 +36,7 @@ captureThreatSquares (Piece Queen color)  square board = Q.captureThreatSquares 
 captureThreatSquares (Piece King color)   square board = kingCaptureThreatSquares color square board -- K.captureThreatSquares color square board
 
 allCaptureThreatSquares :: Color -> Board -> [Square]
-allCaptureThreatSquares color board@(Board squares enPassantTarget)
+allCaptureThreatSquares color board@(Board{..})
   = nub $ concatMap (\(square, piece) -> captureThreatSquares piece square board) $ Map.toList $ Map.filter (\(Piece _ c) -> c == color) squares
 
 -- Поля, которые находятся под угрозой шаха. Если король
@@ -54,7 +54,7 @@ checkThreatSquares (Piece Queen color)  square board = Q.captureThreatSquares co
 checkThreatSquares (Piece King color)   square _     = K.moveSquares square
 
 allCheckThreatSquares :: Color -> Board -> [Square]
-allCheckThreatSquares color board@(Board squares enPassantTarget)
+allCheckThreatSquares color board@(Board{..})
   = nub $ concatMap (\(square, piece) -> checkThreatSquares piece square board) $ Map.toList $ Map.filter (\(Piece _ c) -> c == color) squares
 
 -- Допустимые ходы в соответствии с правилами:
@@ -90,15 +90,15 @@ kingCaptureThreatSquares color square board
 -- https://en.wikipedia.org/wiki/Draw_(chess)
 -- https://ru.wikipedia.org/wiki/%D0%9D%D0%B8%D1%87%D1%8C%D1%8F_(%D1%88%D0%B0%D1%85%D0%BC%D0%B0%D1%82%D1%8B)
 isDraw :: Color -> Board -> Bool 
-isDraw color board | whites == [kingWhite] && blacks == [kingBlack] = True
-                   | whites == [bishopWhite, kingWhite] && blacks == [kingBlack] = True
-                   | whites == [kingWhite] && blacks == [bishopBlack, kingBlack] = True
-                   | whites == [knightWhite, kingWhite] && blacks == [kingBlack] = True
-                   | whites == [kingWhite] && blacks == [knightBlack, kingBlack] = True
-                   | otherwise = False 
+isDraw color board | white == [kingWhite] && black == [kingBlack] = True
+                   | white == [bishopWhite, kingWhite] && black == [kingBlack] = True
+                   | white == [kingWhite] && black == [bishopBlack, kingBlack] = True
+                   | white == [knightWhite, kingWhite] && black == [kingBlack] = True
+                   | white == [kingWhite] && black == [knightBlack, kingBlack] = True
+                   | otherwise = False
   where
-    whites = pieces White board
-    blacks = pieces Black board
+    white = pieces White board
+    black = pieces Black board
 
 -- Шах?
 isCheck :: Color -> Board -> Bool

@@ -10,9 +10,8 @@ import Board.InitialPosition
 spec :: Spec
 spec = do
   describe "initialBoard" $ do
-    it "возвращает 32 клетки" $ do
-      let (Board squares _) = initialBoard
-      length squares `shouldBe` 32
+    it "возвращает 32 клетки" $
+      length (squares initialBoard) `shouldBe` 32
 
   describe "pieces" $ do
     it "возвращает 32 фигуры" $

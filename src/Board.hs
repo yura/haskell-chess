@@ -33,13 +33,15 @@ pawnBlack :: Piece
 pawnBlack   = Piece Pawn Black
 
 type Square = (Char, Int)
-data Board = Board (M.Map Square Piece) (Maybe Square) deriving (Eq, Show)
-
-squares :: Board -> M.Map Square Piece
-squares (Board ss _) = ss
-
-enPassantTarget :: Board -> Maybe Square
-enPassantTarget (Board _ target) = target
+data Board
+  = Board
+  { squares                 :: M.Map Square Piece
+  , enPassantTarget         :: Maybe Square
+  , whiteCanCastleKingside  :: Bool
+  , whiteCanCastleQueenside :: Bool
+  , blackCanCastleKingside  :: Bool
+  , blackCanCastleQueenside :: Bool
+  } deriving (Eq, Show)
 
 data Result = WhiteWon | BlackWon | Stalemate | Draw deriving (Eq, Show)
 
@@ -66,7 +68,7 @@ rows :: [Int]
 rows = [1..8]
 
 emptyBoard :: Board
-emptyBoard = Board M.empty Nothing
+emptyBoard = Board M.empty Nothing False False False False
 
 opponent :: Color -> Color
 opponent White = Black
@@ -76,7 +78,7 @@ isOnBoard :: Square -> Bool
 isOnBoard (col, row) = col `elem` cols && row `elem` rows
 
 findPiece :: Board -> Square -> Maybe Piece
-findPiece (Board squares _) square = M.lookup square squares
+findPiece Board{..} square = M.lookup square squares
 
 takenBy :: Color -> Board -> Square -> Bool
 takenBy White = takenByWhites
@@ -118,7 +120,7 @@ kingSquares :: Color -> Board -> [Square]
 kingSquares = pieceTypeSquares King
 
 pieceTypeSquares :: PieceType -> Color -> Board -> [Square]
-pieceTypeSquares pieceType color (Board squares _)
+pieceTypeSquares pieceType color Board{..}
   = foldl (\result (square, Piece pt c) -> if color == c && pt == pieceType then square:result else result) [] $ M.toList squares
 
 --pieces :: Color -> Board -> [(Square, Piece)]
@@ -126,10 +128,10 @@ pieces :: Color -> Board -> [Piece]
 
 pieces color board = map snd $ filter (\(s, Piece _ c) -> c == color) $ M.toList $ squares board
 placePiece :: Square -> Piece -> Board -> Board
-placePiece square piece (Board squares enPassantTarget) = Board (M.insert square piece squares) enPassantTarget
+placePiece square piece board@Board{..} = board { squares = M.insert square piece squares }
 
 deletePiece :: Square -> Board -> Board
-deletePiece square (Board squares enPassantTarget) = Board (M.delete square squares) enPassantTarget
+deletePiece square board@Board{..} = board { squares = M.delete square squares }
 
 -- FIXME: может быть первым параметром поставить Piece?
 movePiece :: Square -> Square -> Piece -> Board -> Board
@@ -139,26 +141,82 @@ placePieces :: [(Square, Piece)] -> Board -> Board
 placePieces squaresAndPieces board = foldl (\b (square, piece) -> placePiece square piece b) board squaresAndPieces
 
 pieceAt :: Piece -> Board -> [Square]
-pieceAt (Piece pieceType color) (Board squares _) = map fst $ L.filter (\(square, Piece pt c) -> pt == pieceType && c == color) $ M.toList squares
+pieceAt (Piece pieceType color) Board{..} = map fst $ L.filter (\(square, Piece pt c) -> pt == pieceType && c == color) $ M.toList squares
 
 kingAt :: Color -> Board -> Square
 kingAt color board = head $ pieceAt (Piece King color) board
 
+disableKingsideCastling :: Color -> Board -> Board
+disableKingsideCastling White board = board { whiteCanCastleKingside = False }
+disableKingsideCastling Black board = board { blackCanCastleKingside = False }
+
+disableQueensideCastling :: Color -> Board -> Board
+disableQueensideCastling White board = board { whiteCanCastleQueenside = False }
+disableQueensideCastling Black board = board { blackCanCastleQueenside = False }
+
+disableCastling :: Color -> Board -> Board
+disableCastling c = disableQueensideCastling c . disableKingsideCastling c
+
 move :: Board -> Move -> Board
-move (Board board _) (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4)) = Board (M.delete from $ M.insert to piece board) $ Just (col, 3)
-move (Board board _) (Move piece@(Piece Pawn Black) from@(_, 7) to@(col, 5)) = Board (M.delete from $ M.insert to piece board) $ Just (col, 6)
-move (Board board _) (Move piece from to)                     = Board (M.delete from $ M.insert to piece board) Nothing
-move (Board board _) (Capture   piece  from to) = Board (M.delete from $ M.insert to piece board) Nothing
-move (Board board _) (Promotion        from to piece)         = Board (M.delete from $ M.insert to piece board) Nothing
-move (Board board _) (CapturePromotion from to piece)         = Board (M.delete from $ M.insert to piece board) Nothing
-move (Board board _) (EnPassantCapture piece from@(fCol, fRow) to@(tCol, tRow)) = Board (M.delete (tCol, fRow) $ M.delete from $ M.insert to piece board) Nothing
-move (Board board _) (QueensideCastling color)
-  = Board
-  ( M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row)
-  $ M.insert ('g', row) (Piece King color) $ M.delete ('e', row) board) Nothing
+move board@Board{..} (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4))
+  = board
+  { squares = M.delete from $ M.insert to piece squares
+  , enPassantTarget = Just (col, 3)
+  }
+
+move board@Board{..} (Move piece@(Piece Pawn Black) from@(_, 7) to@(col, 5))
+  = board
+  { squares = M.delete from $ M.insert to piece squares
+  , enPassantTarget = Just (col, 6)
+  }
+
+move board@Board{..} (Move piece@(Piece King color) from to)
+  = disableCastling color
+  $ board { squares = M.delete from $ M.insert to piece squares }
+
+move board@Board{..} (Move piece@(Piece Rook White) from@('h', 1) to)
+  = disableKingsideCastling White
+  $ board { squares = M.delete from $ M.insert to piece squares }
+
+move board@Board{..} (Move piece@(Piece Rook White) from@('a', 1) to)
+  = disableQueensideCastling White
+  $ board { squares = M.delete from $ M.insert to piece squares }
+
+move board@Board{..} (Move piece@(Piece Rook Black) from@('h', 8) to)
+  = disableKingsideCastling Black
+  $ board { squares = M.delete from $ M.insert to piece squares }
+
+move board@Board{..} (Move piece@(Piece Rook Black) from@('a', 8) to)
+  = disableQueensideCastling Black
+  $ board { squares = M.delete from $ M.insert to piece squares }
+
+move board@Board{..} (Move piece from to)
+  = board { squares = M.delete from $ M.insert to piece squares }
+
+move board@Board{..} (Capture   piece  from to)
+  = board { squares = M.delete from $ M.insert to piece squares }
+
+move board@Board{..} (Promotion        from to piece)
+  = board { squares = M.delete from $ M.insert to piece squares }    
+
+move board@Board{..} (CapturePromotion from to piece)
+  = board { squares = M.delete from $ M.insert to piece squares }    
+
+move board@Board{..} (EnPassantCapture piece from@(fCol, fRow) to@(tCol, tRow))
+  = board { squares = M.delete (tCol, fRow) $ M.delete from $ M.insert to piece squares }
+
+move board@Board{..} (QueensideCastling color)
+  = disableCastling color $ board
+  { squares
+      = M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row) 
+      $ M.insert ('g', row) (Piece King color) $ M.delete ('e', row) squares
+  }
   where row = if color == White then 1 else 8
-move (Board board _) (KingsideCastling color)
-  = Board
-  ( M.insert ('d', row) (Piece Rook color) $ M.delete ('a', row)
-  $ M.insert ('c', row) (Piece King color) $ M.delete ('e', row) board) Nothing
+
+move board@Board{..} (KingsideCastling color)
+  = disableCastling color $ board
+  { squares 
+      = M.insert ('d', row) (Piece Rook color) $ M.delete ('a', row)
+      $ M.insert ('c', row) (Piece King color) $ M.delete ('e', row) squares
+  }
   where row = if color == White then 1 else 8
