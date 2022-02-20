@@ -36,7 +36,7 @@ captureThreatSquares (Piece Queen color)  square board = Q.captureThreatSquares 
 captureThreatSquares (Piece King color)   square board = kingCaptureThreatSquares color square board -- K.captureThreatSquares color square board
 
 allCaptureThreatSquares :: Color -> Board -> [Square]
-allCaptureThreatSquares color board@(Board{..})
+allCaptureThreatSquares color board@Board{..}
   = nub $ concatMap (\(square, piece) -> captureThreatSquares piece square board) $ Map.toList $ Map.filter (\(Piece _ c) -> c == color) squares
 
 -- Поля, которые находятся под угрозой шаха. Если король
@@ -46,8 +46,8 @@ checkThreatSquares :: Piece -> Square -> Board -> [Square]
 checkThreatSquares (Piece Pawn color)   square board = P.underAttackSquares board color square
 checkThreatSquares (Piece Knight color) square _     = N.underAttackSquares square
 checkThreatSquares (Piece Bishop color) square board = B.underAttackSquares board color square
-checkThreatSquares (Piece Rook color)   square board = R.captureThreatSquares color square board
-checkThreatSquares (Piece Queen color)  square board = Q.captureThreatSquares color square board
+checkThreatSquares (Piece Rook color)   square board = R.underAttackSquares board color square
+checkThreatSquares (Piece Queen color)  square board = Q.underAttackSquares board color square
 -- Так как короли не могут приближаться друг к другу, то
 -- ситуация, когда один король шахует другого невозможна. 
 -- Иначе будет бесконечный цикл.

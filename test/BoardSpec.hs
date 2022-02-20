@@ -50,12 +50,12 @@ spec = do
 
   describe "placePiece" $ do
     it "ставит фигуру на заданную клетку" $ do
-      let sqs = squares $ placePiece ('d', 4) pawnWhite emptyBoard 
+      let sqs = squares $ placePiece ('d', 4) pawnWhite emptyBoard
       M.lookup ('d', 4) sqs `shouldBe` Just pawnWhite
 
   describe "placePieces" $ do
     it "ставит фигуры на заданные клетки" $ do
-      let sqs = squares $ placePieces [(('a', 2), pawnWhite), (('a', 7), pawnBlack)] emptyBoard 
+      let sqs = squares $ placePieces [(('a', 2), pawnWhite), (('a', 7), pawnBlack)] emptyBoard
       M.lookup ('a', 2) sqs `shouldBe` Just pawnWhite
       M.lookup ('a', 7) sqs `shouldBe` Just pawnBlack
 
@@ -118,6 +118,15 @@ spec = do
       it "поле whiteCanCastleQueenside без изменений" $
         whiteCanCastleQueenside (disableQueensideCastling Black initialBoard) `shouldBe` True
 
+  describe "canCastleKingside" $ do
+    it "возращает True, если можно рокироваться в короткую сторону" $ do
+      canCastleKingside White initialBoard `shouldBe` True
+      canCastleKingside Black initialBoard `shouldBe` True
+
+    it "возращает False, если можно рокироваться в короткую сторону" $ do
+      canCastleKingside White emptyBoard `shouldBe` False
+      canCastleKingside Black emptyBoard `shouldBe` False
+
   describe "disableCastling" $ do
     context "[белые]" $ do
       it "выставляет поле whiteCanCastleKingside в False" $
@@ -151,10 +160,10 @@ spec = do
 
       it "белая пешка с начальной позиции" $ do
         let sqs = Map.delete ('e', 2) $ Map.insert ('e', 4) pawnWhite $ squares initialBoard
-        (move initialBoard $ Move pawnWhite ('e',2) ('e',4)) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Just ('e', 3) })
+        move initialBoard (Move pawnWhite ('e',2) ('e',4)) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Just ('e', 3) })
 
       it "после хода пешкой через поле устанавливается значение enPassantTarget" $ do
-        enPassantTarget (move initialBoard $ Move pawnWhite ('a',2) ('a',4)) `shouldBe` (Just ('a', 3))
+        enPassantTarget (move initialBoard $ Move pawnWhite ('a',2) ('a',4)) `shouldBe` Just ('a', 3)
 
       it "ход королём меняет поля whiteCanCastleKingside и whiteCanCastleQueenside на False" $ do
         whiteCanCastleKingside (move initialBoard $ Move kingWhite ('e', 1) ('e', 2)) `shouldBe` False
@@ -187,7 +196,7 @@ spec = do
 
     context "[чёрные]" $ do
       it "протестировать все возможные ходы" pending
-    
+
       it "ход королём меняет поля blackCanCastleKingside и blackCanCastleQueenside на False" $ do
         blackCanCastleKingside (move initialBoard $ Move kingBlack ('e', 8) ('d', 8)) `shouldBe` False
         blackCanCastleQueenside (move initialBoard $ Move kingBlack ('e', 8) ('d', 8)) `shouldBe` False

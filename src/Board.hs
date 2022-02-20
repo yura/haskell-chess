@@ -146,6 +146,14 @@ pieceAt (Piece pieceType color) Board{..} = map fst $ L.filter (\(square, Piece 
 kingAt :: Color -> Board -> Square
 kingAt color board = head $ pieceAt (Piece King color) board
 
+canCastleKingside :: Color -> Board -> Bool 
+canCastleKingside White board = whiteCanCastleKingside board 
+canCastleKingside Black board = blackCanCastleKingside board
+
+canCastleQueenside :: Color -> Board -> Bool 
+canCastleQueenside White board = whiteCanCastleQueenside board 
+canCastleQueenside Black board = blackCanCastleQueenside board
+
 disableKingsideCastling :: Color -> Board -> Board
 disableKingsideCastling White board = board { whiteCanCastleKingside = False }
 disableKingsideCastling Black board = board { blackCanCastleKingside = False }
@@ -172,51 +180,53 @@ move board@Board{..} (Move piece@(Piece Pawn Black) from@(_, 7) to@(col, 5))
 
 move board@Board{..} (Move piece@(Piece King color) from to)
   = disableCastling color
-  $ board { squares = M.delete from $ M.insert to piece squares }
+  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
 
 move board@Board{..} (Move piece@(Piece Rook White) from@('h', 1) to)
   = disableKingsideCastling White
-  $ board { squares = M.delete from $ M.insert to piece squares }
+  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
 
 move board@Board{..} (Move piece@(Piece Rook White) from@('a', 1) to)
   = disableQueensideCastling White
-  $ board { squares = M.delete from $ M.insert to piece squares }
+  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
 
 move board@Board{..} (Move piece@(Piece Rook Black) from@('h', 8) to)
   = disableKingsideCastling Black
-  $ board { squares = M.delete from $ M.insert to piece squares }
+  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
 
 move board@Board{..} (Move piece@(Piece Rook Black) from@('a', 8) to)
   = disableQueensideCastling Black
-  $ board { squares = M.delete from $ M.insert to piece squares }
+  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
 
 move board@Board{..} (Move piece from to)
-  = board { squares = M.delete from $ M.insert to piece squares }
+  = board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
 
 move board@Board{..} (Capture   piece  from to)
-  = board { squares = M.delete from $ M.insert to piece squares }
+  = board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
 
 move board@Board{..} (Promotion        from to piece)
-  = board { squares = M.delete from $ M.insert to piece squares }    
+  = board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }    
 
 move board@Board{..} (CapturePromotion from to piece)
-  = board { squares = M.delete from $ M.insert to piece squares }    
+  = board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }    
 
 move board@Board{..} (EnPassantCapture piece from@(fCol, fRow) to@(tCol, tRow))
-  = board { squares = M.delete (tCol, fRow) $ M.delete from $ M.insert to piece squares }
+  = board { squares = M.delete (tCol, fRow) $ M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
 
-move board@Board{..} (QueensideCastling color)
+move board@Board{..} (KingsideCastling color)
   = disableCastling color $ board
   { squares
       = M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row) 
       $ M.insert ('g', row) (Piece King color) $ M.delete ('e', row) squares
+  , enPassantTarget = Nothing
   }
   where row = if color == White then 1 else 8
 
-move board@Board{..} (KingsideCastling color)
+move board@Board{..} (QueensideCastling color)
   = disableCastling color $ board
   { squares 
       = M.insert ('d', row) (Piece Rook color) $ M.delete ('a', row)
       $ M.insert ('c', row) (Piece King color) $ M.delete ('e', row) squares
+  , enPassantTarget = Nothing
   }
   where row = if color == White then 1 else 8
