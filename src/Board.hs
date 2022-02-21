@@ -94,6 +94,11 @@ takenByBlacks board square =  case findPiece board square of
   Just (Piece _ Black) -> True
   _                    -> False
 
+takenByPiece :: Piece -> Square -> Board -> Bool 
+takenByPiece piece square board = case findPiece board square of
+  Just p -> p == piece
+  _      -> False 
+
 -- Занято ли поле. Для хода пешкой вперёд, если поле занято,
 -- то ходить вперёд нельзя (неважно какой фигурой занято поле).
 taken :: Board -> Square -> Bool
@@ -165,17 +170,24 @@ disableQueensideCastling Black board = board { blackCanCastleQueenside = False }
 disableCastling :: Color -> Board -> Board
 disableCastling c = disableQueensideCastling c . disableKingsideCastling c
 
+-- Стоят ли пешки соперника для взятие на проходе на данном поле
+pawnsToEnPassantAt :: Square -> Color -> Board -> Bool
+pawnsToEnPassantAt (col, row) color board = takenByPiece pawn (pred col, pawnRow) board || takenByPiece pawn (succ col, pawnRow) board
+  where
+    pawn = Piece Pawn color
+    pawnRow = if color == White then row - 1 else row + 1
+
 move :: Board -> Move -> Board
 move board@Board{..} (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4))
   = board
   { squares = M.delete from $ M.insert to piece squares
-  , enPassantTarget = Just (col, 3)
+  , enPassantTarget = if pawnsToEnPassantAt (col, 3) Black board then Just (col, 3) else Nothing
   }
 
 move board@Board{..} (Move piece@(Piece Pawn Black) from@(_, 7) to@(col, 5))
   = board
   { squares = M.delete from $ M.insert to piece squares
-  , enPassantTarget = Just (col, 6)
+  , enPassantTarget = if pawnsToEnPassantAt (col, 6) White board then Just (col, 6) else Nothing
   }
 
 move board@Board{..} (Move piece@(Piece King color) from to)

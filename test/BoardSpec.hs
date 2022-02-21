@@ -154,16 +154,101 @@ spec = do
       it "поле whiteCanCastleQueenside без изменения" $
         whiteCanCastleQueenside (disableCastling Black initialBoard) `shouldBe` True
 
+  describe "pawnsToEnPassantAt" $ do
+    context "[белые]" $ do
+
+      context "[взятие на a6]" $ do
+        it "возращает Fasle, если на b5 нет белой пешки" $
+          pawnsToEnPassantAt ('a', 6) White initialBoard `shouldBe` False
+
+        it "возращает True если белая пешка стоит на b5" $
+          pawnsToEnPassantAt ('a', 6) White (placePiece ('b', 5) pawnWhite initialBoard) `shouldBe` True
+
+      context "[взятие на e6]" $ do
+        it "возращает Fasle, если на d5 и на f5 нет белых пешек" $
+          pawnsToEnPassantAt ('e', 6) White initialBoard `shouldBe` False
+
+        it "возращает True если белая пешка стоит на d5" $
+          pawnsToEnPassantAt ('e', 6) White (placePiece ('d', 5) pawnWhite initialBoard) `shouldBe` True 
+
+        it "возращает True если белая пешка стоит на f5" $
+          pawnsToEnPassantAt ('e', 6) White (placePiece ('f', 5) pawnWhite initialBoard) `shouldBe` True 
+
+      context "[взятие на h6]" $ do
+        it "возращает Fasle, если на g5 нет белой пешки" $
+          pawnsToEnPassantAt ('h', 6) White initialBoard `shouldBe` False
+
+        it "возращает True если белая пешка стоит на g5" $
+          pawnsToEnPassantAt ('h', 6) White (placePiece ('g', 5) pawnWhite initialBoard) `shouldBe` True 
+
+    context "[чёрные]" $ do
+      context "[взятие на a3]" $ do
+        it "возращает Fasle, если на b4 нет чёрной пешки" $
+          pawnsToEnPassantAt ('a', 3) Black initialBoard `shouldBe` False
+
+        it "возращает True если чёрная пешка стоит на b4" $
+          pawnsToEnPassantAt ('a', 3) Black (placePiece ('b', 4) pawnBlack initialBoard) `shouldBe` True 
+
+      context "[взятие на d3]" $ do
+        it "возращает Fasle, если на c5 и на e5 нет чёрных пешек" $
+          pawnsToEnPassantAt ('d', 3) Black initialBoard `shouldBe` False
+
+        it "возращает True если белая пешка стоит на c4" $
+          pawnsToEnPassantAt ('d', 3) Black (placePiece ('c', 4) pawnBlack initialBoard) `shouldBe` True 
+
+        it "возращает True если белая пешка стоит на e4" $
+          pawnsToEnPassantAt ('d', 3) Black (placePiece ('e', 4) pawnBlack initialBoard) `shouldBe` True 
+
+      context "[взятие на h3]" $ do
+        it "возращает Fasle, если на g4 нет белой пешки" $
+          pawnsToEnPassantAt ('h', 3) Black initialBoard `shouldBe` False
+
+        it "возращает True если белая пешка стоит на g4" $
+          pawnsToEnPassantAt ('h', 3) Black (placePiece ('g', 4) pawnBlack initialBoard) `shouldBe` True 
+
   describe "move" $ do
     context "[белые]" $ do
-      it "протестировать все возможные ходы" pending
+      context "[взятие на проходе]" $ do
+        let board = foldl move initialBoard
+                [ Move pawnWhite ('e', 2) ('e', 4)
+                , Move pawnBlack ('a', 7) ('a', 6)
+                , Move pawnWhite ('e', 4) ('e', 5)
+                , Move pawnBlack ('d', 7) ('d', 5)
+                ]
+
+        it "выставление enPassantTarget после хода через поле" $
+          enPassantTarget board `shouldBe` Just ('d', 6)
+
+        it "обнуляет enPassantTarget после взятия на проходе" $ do
+          let b = move board (EnPassantCapture pawnWhite ('e', 5) ('d', 6))
+          enPassantTarget b `shouldBe` Nothing
+
+        it "обнуляет enPassantTarget после любого хода" $ do
+          let b = move board (Move pawnWhite ('a', 2) ('a', 3))
+          enPassantTarget b `shouldBe` Nothing
+
+        it "обнуляет enPassantTarget после любого взятия" $ do
+          let b = move board (Capture bishopWhite ('f', 1) ('a', 6))
+          enPassantTarget b `shouldBe` Nothing
+
+        it "высталяет enPassantTarget только если есть пешка, которая может сделать взятие на проходе" $ do
+          let b = move board (Move pawnWhite ('a', 2) ('a', 4))
+          enPassantTarget b `shouldBe` Nothing
 
       it "белая пешка с начальной позиции" $ do
         let sqs = Map.delete ('e', 2) $ Map.insert ('e', 4) pawnWhite $ squares initialBoard
-        move initialBoard (Move pawnWhite ('e',2) ('e',4)) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Just ('e', 3) })
+        move initialBoard (Move pawnWhite ('e',2) ('e',4)) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Nothing })
 
-      it "после хода пешкой через поле устанавливается значение enPassantTarget" $ do
-        enPassantTarget (move initialBoard $ Move pawnWhite ('a',2) ('a',4)) `shouldBe` Just ('a', 3)
+      it "после хода пешкой через поле, значение enPassantTarget не устанавливается, если нет пешки противника готовой взять на проходе" $ do
+        enPassantTarget (move initialBoard $ Move pawnWhite ('a',2) ('a',4)) `shouldBe` Nothing
+
+      it "(белые) после хода пешкой через поле устанавливается значение enPassantTarget в случае, если есть пешка противника готовая взять на проходе" $ do
+        let board = placePiece ('b', 4) pawnBlack initialBoard
+        enPassantTarget (move board $ Move pawnWhite ('a',2) ('a',4)) `shouldBe` Just ('a', 3)
+
+      it "(чёрные) после хода пешкой через поле устанавливается значение enPassantTarget в случае, если есть пешка противника готовая взять на проходе" $ do
+        let board = placePiece ('b', 5) pawnWhite initialBoard
+        enPassantTarget (move board $ Move pawnBlack ('c', 7) ('c', 5)) `shouldBe` Just ('c', 6)
 
       it "ход королём меняет поля whiteCanCastleKingside и whiteCanCastleQueenside на False" $ do
         whiteCanCastleKingside (move initialBoard $ Move kingWhite ('e', 1) ('e', 2)) `shouldBe` False

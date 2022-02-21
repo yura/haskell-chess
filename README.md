@@ -2,10 +2,7 @@
 
 ## TODO
 
-* Рокировка
-* isDraw :: Color -> Board -> Bool
-  + остались два короля
-  * троекратное повторение позиции
+* isDraw :: Color -> Board -> Bool https://en.wikipedia.org/wiki/Draw_(chess)
 * Random bot: make random moves but following all chess rules
 * Lichess integration -- получить рейтинг Эло
 * Read PGN: -- нужны все возможные ходы, как их правильно записывать
@@ -49,6 +46,8 @@ Library implementing chess rules.
 
 
 ## DONE
+### 21.02.2022
+* Рокировка https://en.wikipedia.org/wiki/Castling
 
 ### 18.02.2022
 * isCheck :: Color -> Board -> Bool
