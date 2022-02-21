@@ -41,6 +41,10 @@ data Board
   , whiteCanCastleQueenside :: Bool
   , blackCanCastleKingside  :: Bool
   , blackCanCastleQueenside :: Bool
+  -- Счётчик полуходов. Число полуходов, прошедших с последнего хода пешки или
+  -- взятия фигуры. Используется для определения применения "правила 50 ходов"
+  -- (ничья).
+  , halfmoveClock           :: Int
   } deriving (Eq, Show)
 
 data Result = WhiteWon | BlackWon | Stalemate | Draw deriving (Eq, Show)
@@ -68,7 +72,7 @@ rows :: [Int]
 rows = [1..8]
 
 emptyBoard :: Board
-emptyBoard = Board M.empty Nothing False False False False
+emptyBoard = Board M.empty Nothing False False False False 0
 
 opponent :: Color -> Color
 opponent White = Black
@@ -94,10 +98,10 @@ takenByBlacks board square =  case findPiece board square of
   Just (Piece _ Black) -> True
   _                    -> False
 
-takenByPiece :: Piece -> Square -> Board -> Bool 
+takenByPiece :: Piece -> Square -> Board -> Bool
 takenByPiece piece square board = case findPiece board square of
   Just p -> p == piece
-  _      -> False 
+  _      -> False
 
 -- Занято ли поле. Для хода пешкой вперёд, если поле занято,
 -- то ходить вперёд нельзя (неважно какой фигурой занято поле).
@@ -151,12 +155,12 @@ pieceAt (Piece pieceType color) Board{..} = map fst $ L.filter (\(square, Piece 
 kingAt :: Color -> Board -> Square
 kingAt color board = head $ pieceAt (Piece King color) board
 
-canCastleKingside :: Color -> Board -> Bool 
-canCastleKingside White board = whiteCanCastleKingside board 
+canCastleKingside :: Color -> Board -> Bool
+canCastleKingside White board = whiteCanCastleKingside board
 canCastleKingside Black board = blackCanCastleKingside board
 
-canCastleQueenside :: Color -> Board -> Bool 
-canCastleQueenside White board = whiteCanCastleQueenside board 
+canCastleQueenside :: Color -> Board -> Bool
+canCastleQueenside White board = whiteCanCastleQueenside board
 canCastleQueenside Black board = blackCanCastleQueenside board
 
 disableKingsideCastling :: Color -> Board -> Board
@@ -177,68 +181,103 @@ pawnsToEnPassantAt (col, row) color board = takenByPiece pawn (pred col, pawnRow
     pawn = Piece Pawn color
     pawnRow = if color == White then row - 1 else row + 1
 
+
 move :: Board -> Move -> Board
-move board@Board{..} (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4))
+move b@Board{..} = doMove b { enPassantTarget = Nothing }
+
+doMove :: Board -> Move -> Board
+doMove board@Board{..} (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4))
   = board
   { squares = M.delete from $ M.insert to piece squares
   , enPassantTarget = if pawnsToEnPassantAt (col, 3) Black board then Just (col, 3) else Nothing
+  , halfmoveClock = 0
   }
 
-move board@Board{..} (Move piece@(Piece Pawn Black) from@(_, 7) to@(col, 5))
+doMove board@Board{..} (Move piece@(Piece Pawn Black) from@(_, 7) to@(col, 5))
   = board
   { squares = M.delete from $ M.insert to piece squares
   , enPassantTarget = if pawnsToEnPassantAt (col, 6) White board then Just (col, 6) else Nothing
+  , halfmoveClock = 0
   }
 
-move board@Board{..} (Move piece@(Piece King color) from to)
+doMove board@Board{..} (Move piece@(Piece King color) from to)
   = disableCastling color
-  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
+  $ board
+  { squares = M.delete from $ M.insert to piece squares
+  , halfmoveClock = halfmoveClock + 1
+  }
 
-move board@Board{..} (Move piece@(Piece Rook White) from@('h', 1) to)
+doMove board@Board{..} (Move piece@(Piece Rook White) from@('h', 1) to)
   = disableKingsideCastling White
-  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
+  $ board
+  { squares = M.delete from $ M.insert to piece squares
+  , halfmoveClock = halfmoveClock + 1
+  }
 
-move board@Board{..} (Move piece@(Piece Rook White) from@('a', 1) to)
+doMove board@Board{..} (Move piece@(Piece Rook White) from@('a', 1) to)
   = disableQueensideCastling White
-  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
+  $ board { squares = M.delete from $ M.insert to piece squares
+  , halfmoveClock = halfmoveClock + 1
+  }
 
-move board@Board{..} (Move piece@(Piece Rook Black) from@('h', 8) to)
+doMove board@Board{..} (Move piece@(Piece Rook Black) from@('h', 8) to)
   = disableKingsideCastling Black
-  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
+  $ board
+  { squares = M.delete from $ M.insert to piece squares
+  , halfmoveClock = halfmoveClock + 1
+  }
 
-move board@Board{..} (Move piece@(Piece Rook Black) from@('a', 8) to)
+doMove board@Board{..} (Move piece@(Piece Rook Black) from@('a', 8) to)
   = disableQueensideCastling Black
-  $ board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
+  $ board 
+  { squares = M.delete from $ M.insert to piece squares
+  , halfmoveClock = halfmoveClock + 1
+  }
 
-move board@Board{..} (Move piece from to)
-  = board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
+doMove board@Board{..} (Move piece@(Piece pt _) from to)
+  = board
+  { squares = M.delete from $ M.insert to piece squares
+  , halfmoveClock = if pt == Pawn then 0 else halfmoveClock + 1
+  }
 
-move board@Board{..} (Capture   piece  from to)
-  = board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
+doMove board@Board{..} (Capture   piece  from to)
+  = board
+  { squares = M.delete from $ M.insert to piece squares
+  , halfmoveClock = 0
+  }
 
-move board@Board{..} (Promotion        from to piece)
-  = board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }    
+doMove board@Board{..} (Promotion        from to piece)
+  = board
+  { squares = M.delete from $ M.insert to piece squares
+  , halfmoveClock = 0
+  }
 
-move board@Board{..} (CapturePromotion from to piece)
-  = board { squares = M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }    
+doMove board@Board{..} (CapturePromotion from to piece)
+  = board
+  { squares = M.delete from $ M.insert to piece squares
+  , halfmoveClock = 0  
+  }
 
-move board@Board{..} (EnPassantCapture piece from@(fCol, fRow) to@(tCol, tRow))
-  = board { squares = M.delete (tCol, fRow) $ M.delete from $ M.insert to piece squares, enPassantTarget = Nothing }
+doMove board@Board{..} (EnPassantCapture piece from@(fCol, fRow) to@(tCol, tRow))
+  = board
+  { squares = M.delete (tCol, fRow) $ M.delete from $ M.insert to piece squares
+  , halfmoveClock = 0  
+  }
 
-move board@Board{..} (KingsideCastling color)
+doMove board@Board{..} (KingsideCastling color)
   = disableCastling color $ board
   { squares
-      = M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row) 
+      = M.insert ('f', row) (Piece Rook color) $ M.delete ('h', row)
       $ M.insert ('g', row) (Piece King color) $ M.delete ('e', row) squares
-  , enPassantTarget = Nothing
+  , halfmoveClock = halfmoveClock + 1
   }
   where row = if color == White then 1 else 8
 
-move board@Board{..} (QueensideCastling color)
+doMove board@Board{..} (QueensideCastling color)
   = disableCastling color $ board
-  { squares 
+  { squares
       = M.insert ('d', row) (Piece Rook color) $ M.delete ('a', row)
       $ M.insert ('c', row) (Piece King color) $ M.delete ('e', row) squares
-  , enPassantTarget = Nothing
+  , halfmoveClock = halfmoveClock + 1
   }
   where row = if color == White then 1 else 8

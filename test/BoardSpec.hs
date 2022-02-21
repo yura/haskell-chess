@@ -7,12 +7,16 @@ import           Data.List ( nub )
 import qualified Data.Map as Map
 import           Board
 import           Board.InitialPosition
+import Board (Board(halfmoveClock))
 
 spec :: Spec
 spec = do
   describe "emptyBoard" $ do
     it "генерирует пустую доску размером 0 клеток" $
       length (squares emptyBoard) `shouldBe` 0
+
+    it "значение halfmoveClock равно 0" $ do
+      halfmoveClock emptyBoard `shouldBe` 0
 
   describe "takenBy" $ do
     context "[поле не занято ни белыми, ни чёрными]" $ do
@@ -266,6 +270,16 @@ spec = do
       it "ход ферзевой ладьёй не меняет поле whiteCanCastleKingside на False" $
         whiteCanCastleKingside (move initialBoard $ Move rookWhite ('a', 1) ('a', 2)) `shouldBe` True
 
+      context "[halfmoveClock]" $ do
+        it "ход королём увеличивает счётчик полуходов на 1" $ do
+          halfmoveClock (move initialBoard $ Move kingWhite ('e', 1) ('e', 2)) `shouldBe` 1
+
+        it "ход королевской ладьёй увеличивает счётчик полуходов на 1" $
+          halfmoveClock (move initialBoard $ Move rookWhite ('h', 1) ('g', 1)) `shouldBe` 1
+
+        it "ход ферзевой ладьёй увеличивает счётчик полуходов на 1" $
+          halfmoveClock (move initialBoard $ Move rookWhite ('a', 1) ('b', 1)) `shouldBe` 1
+
       context "[рокировка]" $ do
         it "короткая рокировка белых выставляет поле whiteCanCastleKingside в False" $
           whiteCanCastleKingside (move initialBoard $ KingsideCastling White) `shouldBe` False
@@ -278,6 +292,12 @@ spec = do
 
         it "длинная рокировка белых выставляет поле whiteCanCastleQueenside в False" $
           whiteCanCastleQueenside (move initialBoard $ QueensideCastling White) `shouldBe` False
+
+        it "короткая рокировка увеличивает счётчик полуходов на 1" $
+          halfmoveClock (move initialBoard $ KingsideCastling Black) `shouldBe` 1
+
+        it "длинная рокировка увеличивает счётчик полуходов на 1" $
+          halfmoveClock (move initialBoard $ QueensideCastling Black) `shouldBe` 1
 
     context "[чёрные]" $ do
       it "протестировать все возможные ходы" pending
@@ -298,6 +318,16 @@ spec = do
       it "ход ферзевой ладьёй не меняет поле blackCanCastleKingside на False" $
         blackCanCastleKingside (move initialBoard $ Move rookBlack ('a', 8) ('b', 8)) `shouldBe` True
 
+      context "[halfmoveClock]" $ do
+        it "ход королём увеличивает счётчик полуходов на 1" $ do
+          halfmoveClock (move initialBoard $ Move kingBlack ('e', 8) ('e', 7)) `shouldBe` 1
+
+        it "ход королевской ладьёй увеличивает счётчик полуходов на 1" $
+          halfmoveClock (move initialBoard $ Move rookBlack ('h', 8) ('g', 8)) `shouldBe` 1
+
+        it "ход ферзевой ладьёй увеличивает счётчик полуходов на 1" $
+          halfmoveClock (move initialBoard $ Move rookBlack ('a', 8) ('b', 8)) `shouldBe` 1
+
       context "[рокировка]" $ do
         it "короткая рокировка чёрных выставляет поле blackCanCastleKingside в False" $
           blackCanCastleKingside (move initialBoard $ KingsideCastling Black) `shouldBe` False
@@ -310,3 +340,10 @@ spec = do
 
         it "длинная рокировка чёрных выставляет поле blackCanCastleQueenside в False" $
           blackCanCastleQueenside (move initialBoard $ QueensideCastling Black) `shouldBe` False
+
+        it "короткая рокировка увеличивает счётчик полуходов на 1" $
+          halfmoveClock (move initialBoard $ KingsideCastling Black) `shouldBe` 1
+
+        it "длинная рокировка увеличивает счётчик полуходов на 1" $
+          halfmoveClock (move initialBoard $ QueensideCastling Black) `shouldBe` 1
+
