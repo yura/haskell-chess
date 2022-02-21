@@ -4,10 +4,18 @@ import           Data.Char (isDigit, digitToInt)
 import qualified Data.Text as T
 import           Board
 import           Display (squaresDisplayOrder)
+import           Format.PGN.Export (exportSquareToPGN)
 
 -- |Экспортирует доску в формат FEN
 exportToFEN :: Board -> T.Text
-exportToFEN board = T.intercalate " " [position board, nextMove, castlings board, enPassantTargetSquare, halfmoveClock, fullmoveNumber]
+exportToFEN board = T.intercalate " "
+  [ position board
+  , nextMove
+  , castlings board
+  , enPassantTargetSquare board
+  , T.pack $ show $ halfmoveClock board
+  , fullmoveNumber
+  ]
 
 position :: Board -> T.Text
 position board = T.intercalate "/" $ map (rowToFEN board) squaresFENOrder
@@ -52,32 +60,21 @@ castlings board = if T.length result == 0 then "-" else result
     result = whiteKingsideCastling board <> whiteQueensideCastling board <> blackKingsideCastling board <> blackQueensideCastling board
 
 whiteKingsideCastling :: Board -> T.Text
-whiteKingsideCastling board = castling board kingWhite
+whiteKingsideCastling board = if whiteCanCastleKingside board then "K" else ""
 
 whiteQueensideCastling :: Board -> T.Text
-whiteQueensideCastling board = castling board queenWhite
+whiteQueensideCastling board = if whiteCanCastleKingside board then "Q" else ""
 
 blackKingsideCastling :: Board -> T.Text
-blackKingsideCastling board = castling board kingBlack
+blackKingsideCastling board = if blackCanCastleKingside board then "k" else ""
 
 blackQueensideCastling :: Board -> T.Text
-blackQueensideCastling board = castling board queenBlack
+blackQueensideCastling board = if blackCanCastleKingside board then "q" else ""
 
-castling :: Board -> Piece -> T.Text
-castling board piece@(Piece side color) = case findPiece board (col, row) of
-  Just (Piece Rook color) -> case findPiece board ('e', row) of
-                               Just (Piece King color) -> toFEN piece
-                               Nothing                 -> ""
-  _                       -> ""
-  where
-    row = if color == White then 1 else 8
-    col = if side == King then 'h' else 'a'
-
-enPassantTargetSquare :: T.Text
-enPassantTargetSquare = "-"
-
-halfmoveClock :: T.Text
-halfmoveClock = "0"
+enPassantTargetSquare :: Board -> T.Text
+enPassantTargetSquare board = case enPassantTarget board of
+  Just s -> T.pack $ exportSquareToPGN s 
+  _      -> "-"
 
 fullmoveNumber :: T.Text
 fullmoveNumber = "1"

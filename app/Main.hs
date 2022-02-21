@@ -10,6 +10,8 @@ import Board.InitialPosition
 import Display
 import qualified Format.PGN.Import as PGN
 import qualified Format.PGN.Export as PGN
+import           Format.FEN
+
 
 import Bot.Random
 import Bot.Greedy
@@ -23,6 +25,7 @@ play bot1 bot2 color board moves = do
   (newBoard, newMoves) <- bot color board moves
   renderBoard newBoard
   print $ Prelude.head newMoves
+  print $ exportToFEN newBoard
 
   threadDelay 250000
 
