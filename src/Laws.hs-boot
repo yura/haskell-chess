@@ -34,7 +34,7 @@ kingValidMoveSquares :: Color -> Square -> Board -> [Square]
 
 kingCaptureThreatSquares :: Color -> Square -> Board -> [Square]
 
-isDraw :: Color -> Board -> Bool 
+isDeadPosition :: Color -> Board -> Bool 
 
 isCheck :: Color -> Board -> Bool
 

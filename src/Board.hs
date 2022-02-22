@@ -48,7 +48,9 @@ data Board
   , halfmoveClock           :: Int
   } deriving (Eq, Show)
 
-data Result = WhiteWon | BlackWon | Stalemate | Draw deriving (Eq, Show)
+
+data DrawType =  Stalemate | ThreefoldRepetition | FiftyMove | DeadPosition | NotDefined deriving (Eq, Show)
+data Result = WhiteWon | BlackWon | Draw  DrawType deriving (Eq, Show)
 
 data Move
   -- рокировка в сторону ферзя

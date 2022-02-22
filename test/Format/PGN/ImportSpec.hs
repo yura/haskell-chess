@@ -33,7 +33,7 @@ spec = do
       parseResult' " 0-1" `shouldParse` BlackWon
 
     it "возвращает ничью чёрных, если результат записан в виде '1/2-1/2'" $
-      parseResult' " 1/2-1/2" `shouldParse` Draw
+      parseResult' " 1/2-1/2" `shouldParse` Draw NotDefined
 
   describe "parseMove" $ do
     let parseMove' = parse parseMove "PGN"

@@ -87,15 +87,20 @@ kingCaptureThreatSquares color square board
   = mapMaybe (findOrStop color board . (:[])) (kingValidMoveSquares color square board)
 
 -- Ничья?
+
+-- Пат?
+isStalemate :: Color -> Board -> Bool 
+isStalemate color board = not (isCheck color board) && null (possibleMoves color board) 
+
 -- https://en.wikipedia.org/wiki/Draw_(chess)
 -- https://ru.wikipedia.org/wiki/%D0%9D%D0%B8%D1%87%D1%8C%D1%8F_(%D1%88%D0%B0%D1%85%D0%BC%D0%B0%D1%82%D1%8B)
-isDraw :: Color -> Board -> Bool 
-isDraw color board | white == [kingWhite] && black == [kingBlack] = True
-                   | white == [bishopWhite, kingWhite] && black == [kingBlack] = True
-                   | white == [kingWhite] && black == [bishopBlack, kingBlack] = True
-                   | white == [knightWhite, kingWhite] && black == [kingBlack] = True
-                   | white == [kingWhite] && black == [knightBlack, kingBlack] = True
-                   | otherwise = False
+isDeadPosition :: Color -> Board -> Bool 
+isDeadPosition color board | white == [kingWhite] && black == [kingBlack] = True
+                           | white == [bishopWhite, kingWhite] && black == [kingBlack] = True
+                           | white == [kingWhite] && black == [bishopBlack, kingBlack] = True
+                           | white == [knightWhite, kingWhite] && black == [kingBlack] = True
+                           | white == [kingWhite] && black == [knightBlack, kingBlack] = True
+                           | otherwise = False
   where
     white = pieces White board
     black = pieces Black board
@@ -104,17 +109,12 @@ isDraw color board | white == [kingWhite] && black == [kingBlack] = True
 isCheck :: Color -> Board -> Bool
 isCheck color board = kingAt color board `elem` allCheckThreatSquares (opponent color) board
 
--- Пат?
-isStalemate :: Color -> Board -> Bool 
-isStalemate color board = not (isCheck color board) && null (possibleMoves color board) 
-
 -- Мат?
 isMate :: Color -> Board -> Bool
 isMate color board = isCheck color board && null (possibleMoves color board)
 
 result :: Color -> Board -> Maybe Result 
-result color board | isMate color board      = Just $ if color == White then BlackWon else WhiteWon
-                   | isStalemate color board = Just Stalemate
-                   | isDraw color board      = Just Draw
-                   | otherwise               = Nothing
-
+result color board | isMate color board         = Just $ if color == White then BlackWon else WhiteWon
+                   | isStalemate color board    = Just $ Draw Stalemate
+                   | isDeadPosition color board = Just $ Draw DeadPosition
+                   | otherwise                  = Nothing

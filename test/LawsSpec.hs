@@ -9,7 +9,6 @@ import qualified Data.Map as Map
 import           Board
 import           Board.InitialPosition
 import           Laws
-import Laws (isStalemate, isDraw)
 
 spec :: Spec
 spec = do
@@ -139,16 +138,16 @@ spec = do
 
      -- Король не может шаховать
 
-  describe "isDraw" $ do
+  describe "isDeadPosition" $ do
     it "возращает True, если на доске два короля" $ do
       let board = placePieces [(('e', 4), kingWhite), (('a', 8), kingBlack)] emptyBoard
-      isDraw White board `shouldBe` True
-      isDraw Black board `shouldBe` True
+      isDeadPosition White board `shouldBe` True
+      isDeadPosition Black board `shouldBe` True
 
     it "возращает True, если на доске два короля и слон https://lichess.org/editor/8/2b2k2/8/8/6K1/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('g', 4), kingWhite), (('f', 7), kingBlack), (('c', 7), bishopBlack)] emptyBoard
-      isDraw White board `shouldBe` True
-      isDraw Black board `shouldBe` True
+      isDeadPosition White board `shouldBe` True
+      isDeadPosition Black board `shouldBe` True
       
 
 
