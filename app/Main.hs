@@ -29,7 +29,7 @@ play bot1 bot2 color board moves = do
 
   threadDelay 250000
 
-  let mResult = result (opponent color) newBoard
+  let mResult = isOver (opponent color) newBoard
 
   case mResult of
     Just r  -> return (newBoard, newMoves, r)

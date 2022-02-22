@@ -42,4 +42,4 @@ isStalemate :: Color -> Board -> Bool
 
 isMate :: Color -> Board -> Bool
 
-result :: Color -> Board -> Maybe Result 
+isOver :: Color -> Board -> Maybe Result 

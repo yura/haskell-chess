@@ -15,6 +15,7 @@ initialBoard
   , blackCanCastleKingside = True
   , blackCanCastleQueenside = True
   , halfmoveClock = 0
+  , result = Nothing
   }
 
 squaresAndPieces :: [(Square, Piece)]

@@ -86,7 +86,9 @@ kingCaptureThreatSquares :: Color -> Square -> Board -> [Square]
 kingCaptureThreatSquares color square board
   = mapMaybe (findOrStop color board . (:[])) (kingValidMoveSquares color square board)
 
--- Ничья?
+-- Ничья
+
+-- 
 
 -- Пат?
 isStalemate :: Color -> Board -> Bool 
@@ -105,6 +107,12 @@ isDeadPosition color board | white == [kingWhite] && black == [kingBlack] = True
     white = pieces White board
     black = pieces Black board
 
+isFiftyMove :: Board -> Bool
+isFiftyMove Board{..} = halfmoveClock >= 99
+
+isThreefoldRepetition :: Board -> Bool
+isThreefoldRepetition = undefined 
+
 -- Шах?
 isCheck :: Color -> Board -> Bool
 isCheck color board = kingAt color board `elem` allCheckThreatSquares (opponent color) board
@@ -113,8 +121,9 @@ isCheck color board = kingAt color board `elem` allCheckThreatSquares (opponent 
 isMate :: Color -> Board -> Bool
 isMate color board = isCheck color board && null (possibleMoves color board)
 
-result :: Color -> Board -> Maybe Result 
-result color board | isMate color board         = Just $ if color == White then BlackWon else WhiteWon
+isOver :: Color -> Board -> Maybe Result 
+isOver color board | isMate color board         = Just $ if color == White then BlackWon else WhiteWon
                    | isStalemate color board    = Just $ Draw Stalemate
                    | isDeadPosition color board = Just $ Draw DeadPosition
+                   | isFiftyMove board          = Just $ Draw FiftyMove
                    | otherwise                  = Nothing

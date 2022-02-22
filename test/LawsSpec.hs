@@ -148,10 +148,22 @@ spec = do
       let board = placePieces [(('g', 4), kingWhite), (('f', 7), kingBlack), (('c', 7), bishopBlack)] emptyBoard
       isDeadPosition White board `shouldBe` True
       isDeadPosition Black board `shouldBe` True
-      
+  
+  describe "isFiftyMove" $ do
+    it "возвращает False для начальной позиции" $
+      isFiftyMove initialBoard `shouldBe` False
 
+    it "возвращает True если совершено 99 ходов без хода пешкой или взятий" $ do
+      content <- readFile "test/fixtures/draw-50-moves.txt"
+      let moves = read content :: [Move]
+      let board = applyMoves initialBoard moves
+      isFiftyMove board `shouldBe` True
 
-
+    it "возвращает False, если не хватает хода" $ do
+      content <- readFile "test/fixtures/draw-50-moves.txt"
+      let moves = read content :: [Move]
+      let board = applyMoves initialBoard $ init moves
+      isFiftyMove board `shouldBe` False
 
   describe "isStalemate" $ do
     it "возвращает True, в случае пата https://lichess.org/editor/7k/5K2/6Q1/8/8/8/8/8_w_-_-_0_1" $ do

@@ -3,9 +3,9 @@ module Board where
 import qualified Data.List as L
 import qualified Data.Map  as M
 
-data PieceType = King | Queen | Rook | Bishop | Knight | Pawn deriving (Eq, Show)
-data Color = White | Black deriving (Eq, Show)
-data Piece = Piece PieceType Color deriving (Eq, Show)
+data PieceType = King | Queen | Rook | Bishop | Knight | Pawn deriving (Eq, Read, Show)
+data Color = White | Black deriving (Eq, Read, Show)
+data Piece = Piece PieceType Color deriving (Eq, Read, Show)
 
 kingWhite :: Piece
 kingWhite   = Piece King White
@@ -46,11 +46,12 @@ data Board
   -- взятия фигуры. Используется для определения применения "правила 50 ходов"
   -- (ничья).
   , halfmoveClock           :: Int
-  } deriving (Eq, Show)
+  , result                  :: Maybe Result
+  } deriving (Eq, Read, Show)
 
 
-data DrawType =  Stalemate | ThreefoldRepetition | FiftyMove | DeadPosition | NotDefined deriving (Eq, Show)
-data Result = WhiteWon | BlackWon | Draw  DrawType deriving (Eq, Show)
+data DrawType =  Stalemate | ThreefoldRepetition | FiftyMove | DeadPosition | NotDefined deriving (Eq, Read, Show)
+data Result = WhiteWon | BlackWon | Draw  DrawType deriving (Eq, Read, Show)
 
 data Move
   -- рокировка в сторону ферзя
@@ -67,7 +68,7 @@ data Move
   | Promotion               Square Square Piece
   -- взятие с последующим превращением пешки
   | CapturePromotion        Square Square Piece
-  deriving (Eq, Show)
+  deriving (Eq, Read, Show)
 
 cols :: [Char]
 cols = ['a'..'h']
@@ -75,7 +76,7 @@ rows :: [Int]
 rows = [1..8]
 
 emptyBoard :: Board
-emptyBoard = Board M.empty White Nothing False False False False 0
+emptyBoard = Board M.empty White Nothing False False False False 0 Nothing
 
 opponent :: Color -> Color
 opponent White = Black
@@ -194,7 +195,7 @@ moveColor (Promotion _ _ (Piece _ color))        = opponent color
 moveColor (CapturePromotion _ _ (Piece _ color)) = opponent color
 
 move :: Board -> Move -> Board
-move b@Board{..} m = doMove b 
+move b@Board{..} m = doMove b
   { enPassantTarget = Nothing
   , nextMove = moveColor m
   } m
@@ -243,7 +244,7 @@ doMove board@Board{..} (Move piece@(Piece Rook Black) from@('h', 8) to)
 
 doMove board@Board{..} (Move piece@(Piece Rook Black) from@('a', 8) to)
   = disableQueensideCastling Black
-  $ board 
+  $ board
   { squares = M.delete from $ M.insert to piece squares
   , halfmoveClock = halfmoveClock + 1
   }
@@ -269,13 +270,13 @@ doMove board@Board{..} (Promotion        from to piece)
 doMove board@Board{..} (CapturePromotion from to piece)
   = board
   { squares = M.delete from $ M.insert to piece squares
-  , halfmoveClock = 0  
+  , halfmoveClock = 0
   }
 
 doMove board@Board{..} (EnPassantCapture piece from@(fCol, fRow) to@(tCol, tRow))
   = board
   { squares = M.delete (tCol, fRow) $ M.delete from $ M.insert to piece squares
-  , halfmoveClock = 0  
+  , halfmoveClock = 0
   }
 
 doMove board@Board{..} (KingsideCastling color)
@@ -295,3 +296,6 @@ doMove board@Board{..} (QueensideCastling color)
   , halfmoveClock = halfmoveClock + 1
   }
   where row = if color == White then 1 else 8
+
+applyMoves :: Board -> [Move] -> Board
+applyMoves = foldl move
