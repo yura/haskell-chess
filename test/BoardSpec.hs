@@ -241,7 +241,7 @@ spec = do
 
       it "белая пешка с начальной позиции" $ do
         let sqs = Map.delete ('e', 2) $ Map.insert ('e', 4) pawnWhite $ squares initialBoard
-        move initialBoard (Move pawnWhite ('e',2) ('e',4)) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Nothing })
+        move initialBoard (Move pawnWhite ('e',2) ('e',4)) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Nothing, nextMove = Black })
 
       it "после хода пешкой через поле, значение enPassantTarget не устанавливается, если нет пешки противника готовой взять на проходе" $ do
         enPassantTarget (move initialBoard $ Move pawnWhite ('a',2) ('a',4)) `shouldBe` Nothing

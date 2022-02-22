@@ -36,6 +36,7 @@ type Square = (Char, Int)
 data Board
   = Board
   { squares                 :: M.Map Square Piece
+  , nextMove                :: Color
   , enPassantTarget         :: Maybe Square
   , whiteCanCastleKingside  :: Bool
   , whiteCanCastleQueenside :: Bool
@@ -72,7 +73,7 @@ rows :: [Int]
 rows = [1..8]
 
 emptyBoard :: Board
-emptyBoard = Board M.empty Nothing False False False False 0
+emptyBoard = Board M.empty White Nothing False False False False 0
 
 opponent :: Color -> Color
 opponent White = Black
@@ -181,9 +182,20 @@ pawnsToEnPassantAt (col, row) color board = takenByPiece pawn (pred col, pawnRow
     pawn = Piece Pawn color
     pawnRow = if color == White then row - 1 else row + 1
 
+moveColor :: Move -> Color
+moveColor (QueensideCastling color)              = opponent color
+moveColor (KingsideCastling color)               = opponent color
+moveColor (Move (Piece _ color) _ _)             = opponent color
+moveColor (Capture (Piece _ color) _ _)          = opponent color
+moveColor (EnPassantCapture (Piece _ color) _ _) = opponent color
+moveColor (Promotion _ _ (Piece _ color))        = opponent color
+moveColor (CapturePromotion _ _ (Piece _ color)) = opponent color
 
 move :: Board -> Move -> Board
-move b@Board{..} = doMove b { enPassantTarget = Nothing }
+move b@Board{..} m = doMove b 
+  { enPassantTarget = Nothing
+  , nextMove = moveColor m
+  } m
 
 doMove :: Board -> Move -> Board
 doMove board@Board{..} (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4))

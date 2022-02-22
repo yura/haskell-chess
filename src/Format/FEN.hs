@@ -10,7 +10,7 @@ import           Format.PGN.Export (exportSquareToPGN)
 exportToFEN :: Board -> T.Text
 exportToFEN board = T.intercalate " "
   [ position board
-  , nextMove
+  , fenNextMove board
   , castlings board
   , enPassantTargetSquare board
   , T.pack $ show $ halfmoveClock board
@@ -51,8 +51,9 @@ toFEN (Piece Bishop Black) = "b"
 toFEN (Piece Knight Black) = "n"
 toFEN (Piece Pawn Black)   = "p"
 
-nextMove :: T.Text
-nextMove = "w"
+fenNextMove :: Board -> T.Text
+fenNextMove Board{ nextMove = White } = "w"
+fenNextMove Board{ nextMove = Black } = "b"
 
 castlings :: Board -> T.Text
 castlings board = if T.length result == 0 then "-" else result

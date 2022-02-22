@@ -8,6 +8,7 @@ initialBoard :: Board
 initialBoard
   = Board
   { squares = M.fromList squaresAndPieces
+  , nextMove = White
   , enPassantTarget = Nothing
   , whiteCanCastleKingside = True
   , whiteCanCastleQueenside = True
