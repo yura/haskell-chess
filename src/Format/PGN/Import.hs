@@ -2,10 +2,22 @@
 
 module Format.PGN.Import where
 
-import Data.Char (digitToInt)
-import Text.ParserCombinators.Parsec hiding (spaces)
+import           Data.Char (digitToInt)
+import           Text.ParserCombinators.Parsec hiding (spaces)
 
-import Board hiding (Move(..))
+import           Board hiding (Move(..))
+import qualified Board as B (Move(..))
+
+convertToBoard :: Game -> Board
+convertToBoard (Game moves r)
+  = undefined -- map move moves
+
+convertToMove :: Move -> Board -> B.Move
+convertToMove (Move _ color (PlyAnnotated KingsideCastling _ _)) board = B.KingsideCastling color
+convertToMove (Move _ color (PlyAnnotated QueensideCastling _ _)) board = B.QueensideCastling color
+convertToMove (Move _ color (PlyAnnotated (Ply pt (Just fromCol) (Just fromRow) to) _ _)) board = B.Move (Piece pt color) (fromCol, fromRow) to
+--convertToMove (Move _ color (PlyAnnotated (Ply pt (Just fromCol) Nothing to) _ _)) board = B.Move pt (fromCol, ...) to
+--convertToMove (Move _ color (PlyAnnotated (Ply pt Nothing Nothing to) _ _)) board = B.Move pt ... to
 
 data Ply
   -- рокировка в сторону ферзя

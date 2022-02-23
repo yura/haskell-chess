@@ -1,8 +1,8 @@
 module Board.InitialPosition where
 
-import Board
+import           Board
 import qualified Data.Map as M
-import Format.FEN (whiteQueensideCastling)
+import           Format.FEN (whiteQueensideCastling)
 
 initialBoard :: Board
 initialBoard
@@ -15,6 +15,8 @@ initialBoard
   , blackCanCastleKingside = True
   , blackCanCastleQueenside = True
   , halfmoveClock = 0
+  , history = []
+  , fens = M.empty
   , result = Nothing
   }
 

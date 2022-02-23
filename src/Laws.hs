@@ -12,6 +12,7 @@ import qualified Laws.Rook   as R
 import qualified Laws.Queen  as Q
 import qualified Laws.King   as K
 import           Laws.Util
+import Board (DrawType(ThreefoldRepetition))
 
 possibleMoves :: Color -> Board -> [Move]
 possibleMoves color board = pawnMoves ++ knightMoves ++ bishopMoves ++ rookMoves ++ queenMoves ++ kingMoves
@@ -111,7 +112,7 @@ isFiftyMove :: Board -> Bool
 isFiftyMove Board{..} = halfmoveClock >= 99
 
 isThreefoldRepetition :: Board -> Bool
-isThreefoldRepetition = undefined 
+isThreefoldRepetition board = any (\(f, c) -> c >= 3) $ Map.toList $ fens board 
 
 -- Шах?
 isCheck :: Color -> Board -> Bool
@@ -122,8 +123,9 @@ isMate :: Color -> Board -> Bool
 isMate color board = isCheck color board && null (possibleMoves color board)
 
 isOver :: Color -> Board -> Maybe Result 
-isOver color board | isMate color board         = Just $ if color == White then BlackWon else WhiteWon
-                   | isStalemate color board    = Just $ Draw Stalemate
-                   | isDeadPosition color board = Just $ Draw DeadPosition
-                   | isFiftyMove board          = Just $ Draw FiftyMove
-                   | otherwise                  = Nothing
+isOver color board | isMate color board          = Just $ if color == White then BlackWon else WhiteWon
+                   | isStalemate color board     = Just $ Draw Stalemate
+                   | isDeadPosition color board  = Just $ Draw DeadPosition
+                   | isFiftyMove board           = Just $ Draw FiftyMove
+                   | isThreefoldRepetition board = Just $ Draw ThreefoldRepetition
+                   | otherwise                   = Nothing

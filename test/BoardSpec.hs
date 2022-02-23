@@ -173,17 +173,17 @@ spec = do
           pawnsToEnPassantAt ('e', 6) White initialBoard `shouldBe` False
 
         it "возращает True если белая пешка стоит на d5" $
-          pawnsToEnPassantAt ('e', 6) White (placePiece ('d', 5) pawnWhite initialBoard) `shouldBe` True 
+          pawnsToEnPassantAt ('e', 6) White (placePiece ('d', 5) pawnWhite initialBoard) `shouldBe` True
 
         it "возращает True если белая пешка стоит на f5" $
-          pawnsToEnPassantAt ('e', 6) White (placePiece ('f', 5) pawnWhite initialBoard) `shouldBe` True 
+          pawnsToEnPassantAt ('e', 6) White (placePiece ('f', 5) pawnWhite initialBoard) `shouldBe` True
 
       context "[взятие на h6]" $ do
         it "возращает Fasle, если на g5 нет белой пешки" $
           pawnsToEnPassantAt ('h', 6) White initialBoard `shouldBe` False
 
         it "возращает True если белая пешка стоит на g5" $
-          pawnsToEnPassantAt ('h', 6) White (placePiece ('g', 5) pawnWhite initialBoard) `shouldBe` True 
+          pawnsToEnPassantAt ('h', 6) White (placePiece ('g', 5) pawnWhite initialBoard) `shouldBe` True
 
     context "[чёрные]" $ do
       context "[взятие на a3]" $ do
@@ -191,24 +191,24 @@ spec = do
           pawnsToEnPassantAt ('a', 3) Black initialBoard `shouldBe` False
 
         it "возращает True если чёрная пешка стоит на b4" $
-          pawnsToEnPassantAt ('a', 3) Black (placePiece ('b', 4) pawnBlack initialBoard) `shouldBe` True 
+          pawnsToEnPassantAt ('a', 3) Black (placePiece ('b', 4) pawnBlack initialBoard) `shouldBe` True
 
       context "[взятие на d3]" $ do
         it "возращает Fasle, если на c5 и на e5 нет чёрных пешек" $
           pawnsToEnPassantAt ('d', 3) Black initialBoard `shouldBe` False
 
         it "возращает True если белая пешка стоит на c4" $
-          pawnsToEnPassantAt ('d', 3) Black (placePiece ('c', 4) pawnBlack initialBoard) `shouldBe` True 
+          pawnsToEnPassantAt ('d', 3) Black (placePiece ('c', 4) pawnBlack initialBoard) `shouldBe` True
 
         it "возращает True если белая пешка стоит на e4" $
-          pawnsToEnPassantAt ('d', 3) Black (placePiece ('e', 4) pawnBlack initialBoard) `shouldBe` True 
+          pawnsToEnPassantAt ('d', 3) Black (placePiece ('e', 4) pawnBlack initialBoard) `shouldBe` True
 
       context "[взятие на h3]" $ do
         it "возращает Fasle, если на g4 нет белой пешки" $
           pawnsToEnPassantAt ('h', 3) Black initialBoard `shouldBe` False
 
         it "возращает True если белая пешка стоит на g4" $
-          pawnsToEnPassantAt ('h', 3) Black (placePiece ('g', 4) pawnBlack initialBoard) `shouldBe` True 
+          pawnsToEnPassantAt ('h', 3) Black (placePiece ('g', 4) pawnBlack initialBoard) `shouldBe` True
 
   describe "move" $ do
     context "[белые]" $ do
@@ -241,7 +241,7 @@ spec = do
 
       it "белая пешка с начальной позиции" $ do
         let sqs = Map.delete ('e', 2) $ Map.insert ('e', 4) pawnWhite $ squares initialBoard
-        move initialBoard (Move pawnWhite ('e',2) ('e',4)) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Nothing, nextMove = Black })
+        move initialBoard (Move pawnWhite ('e',2) ('e',4)) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Nothing, nextMove = Black, history = [Move (Piece Pawn White) ('e',2) ('e',4)], fens = Map.fromList [("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq -", 1)] })
 
       it "после хода пешкой через поле, значение enPassantTarget не устанавливается, если нет пешки противника готовой взять на проходе" $ do
         enPassantTarget (move initialBoard $ Move pawnWhite ('a',2) ('a',4)) `shouldBe` Nothing
@@ -279,6 +279,19 @@ spec = do
 
         it "ход ферзевой ладьёй увеличивает счётчик полуходов на 1" $
           halfmoveClock (move initialBoard $ Move rookWhite ('a', 1) ('b', 1)) `shouldBe` 1
+
+      context "[fens]" $ do
+        it "повторение позиции увеличивает счётчик на 1" $ do
+          let board = placePieces [(('a', 1), queenWhite), (('b', 1), kingWhite), (('h', 1), kingBlack)] emptyBoard
+          let moves =
+                [ Move kingWhite ('b', 1) ('c', 1) -- 1st
+                , Move kingBlack ('h', 1) ('g', 1)
+                , Move kingWhite ('c', 1) ('b', 1)
+                , Move kingBlack ('g', 1) ('h', 1)
+                , Move kingWhite ('b', 1) ('c', 1) -- 2nd
+                ]
+          -- https://lichess.org/analysis/fromPosition/8/8/8/8/8/8/8/Q1K4k_b_-_-_0_1
+          M.lookup "8/8/8/8/8/8/8/Q1K4k b - -" (fens (applyMoves board moves)) `shouldBe` Just 2
 
       context "[рокировка]" $ do
         it "короткая рокировка белых выставляет поле whiteCanCastleKingside в False" $

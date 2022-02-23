@@ -1,6 +1,6 @@
 module Format.PGN.Export where
 
-import Board
+import {-# SOURCE #-} Board
 
 exportSquareToPGN :: Square -> String
 exportSquareToPGN (col, row) = col : show row

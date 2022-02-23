@@ -165,6 +165,26 @@ spec = do
       let board = applyMoves initialBoard $ init moves
       isFiftyMove board `shouldBe` False
 
+  describe "isThreefoldRepetition" $ do
+    it "возвращает False для начальной позиции" $
+      isThreefoldRepetition initialBoard `shouldBe` False
+
+    it "возвращает True при троекратном повторении позиции" $ do
+      let board = placePieces [(('a', 1), queenWhite), (('b', 1), kingWhite), (('h', 1), kingBlack)] emptyBoard
+      let moves =
+            [ Move kingWhite ('b', 1) ('c', 1) -- 1st
+            , Move kingBlack ('h', 1) ('g', 1)
+            , Move kingWhite ('c', 1) ('b', 1)
+            , Move kingBlack ('g', 1) ('h', 1)
+            , Move kingWhite ('b', 1) ('c', 1) -- 2nd
+            , Move kingBlack ('h', 1) ('g', 1)
+            , Move kingWhite ('c', 1) ('b', 1)
+            , Move kingBlack ('g', 1) ('h', 1)
+            , Move kingWhite ('b', 1) ('c', 1) -- 3rd
+            ]
+                
+      isThreefoldRepetition (applyMoves board moves) `shouldBe` True
+
   describe "isStalemate" $ do
     it "возвращает True, в случае пата https://lichess.org/editor/7k/5K2/6Q1/8/8/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('f', 7), kingWhite), (('g', 6), queenWhite), (('h', 8), kingBlack)] emptyBoard

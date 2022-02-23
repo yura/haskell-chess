@@ -2,6 +2,8 @@ module Board where
 
 import qualified Data.List as L
 import qualified Data.Map  as M
+import qualified Data.Text as T
+import Format.FEN (exportToFENWithoutMoveNumbers)
 
 data PieceType = King | Queen | Rook | Bishop | Knight | Pawn deriving (Eq, Read, Show)
 data Color = White | Black deriving (Eq, Read, Show)
@@ -46,6 +48,8 @@ data Board
   -- взятия фигуры. Используется для определения применения "правила 50 ходов"
   -- (ничья).
   , halfmoveClock           :: Int
+  , history                 :: [Move]
+  , fens                    :: M.Map T.Text Int
   , result                  :: Maybe Result
   } deriving (Eq, Read, Show)
 
@@ -76,7 +80,7 @@ rows :: [Int]
 rows = [1..8]
 
 emptyBoard :: Board
-emptyBoard = Board M.empty White Nothing False False False False 0 Nothing
+emptyBoard = Board M.empty White Nothing False False False False 0 [] M.empty Nothing
 
 opponent :: Color -> Color
 opponent White = Black
@@ -195,10 +199,14 @@ moveColor (Promotion _ _ (Piece _ color))        = opponent color
 moveColor (CapturePromotion _ _ (Piece _ color)) = opponent color
 
 move :: Board -> Move -> Board
-move b@Board{..} m = doMove b
-  { enPassantTarget = Nothing
-  , nextMove = moveColor m
-  } m
+move b@Board{..} m = newBoard { fens = newFens }
+  where
+    newBoard = doMove b
+      { enPassantTarget = Nothing
+      , nextMove        = moveColor m
+      , history         = m : history
+      } m
+    newFens = M.insertWith (+) (exportToFENWithoutMoveNumbers newBoard) 1 fens
 
 doMove :: Board -> Move -> Board
 doMove board@Board{..} (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4))

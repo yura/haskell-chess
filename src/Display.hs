@@ -4,7 +4,7 @@ module Display where
 
 import           Data.Char (chr)
 import qualified Data.Text as T
-import           Board (Board(..), Piece(..), PieceType(..), Color(..), Square, cols, rows, findPiece)
+import {-# SOURCE #-} Board (Board(..), Piece(..), PieceType(..), Color(..), Square, cols, rows, findPiece)
 
 clearScreen :: IO ()
 clearScreen = do

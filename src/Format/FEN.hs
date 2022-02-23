@@ -2,19 +2,24 @@ module Format.FEN where
 
 import           Data.Char (isDigit, digitToInt)
 import qualified Data.Text as T
-import           Board
+import {-# SOURCE #-} Board
 import           Display (squaresDisplayOrder)
 import           Format.PGN.Export (exportSquareToPGN)
 
 -- |Экспортирует доску в формат FEN
 exportToFEN :: Board -> T.Text
-exportToFEN board = T.intercalate " "
+exportToFEN board =  T.intercalate " "
+  [ exportToFENWithoutMoveNumbers board
+  , T.pack $ show $ halfmoveClock board
+  , fullmoveNumber
+  ]
+
+exportToFENWithoutMoveNumbers :: Board -> T.Text
+exportToFENWithoutMoveNumbers board = T.intercalate " "
   [ position board
   , fenNextMove board
   , castlings board
   , enPassantTargetSquare board
-  , T.pack $ show $ halfmoveClock board
-  , fullmoveNumber
   ]
 
 position :: Board -> T.Text
