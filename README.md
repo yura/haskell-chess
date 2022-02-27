@@ -3,6 +3,7 @@
 ## TODO
 
 * isDraw :: Color -> Board -> Bool https://en.wikipedia.org/wiki/Draw_(chess)
+  * king and bishop versus king and bishop with the bishops on the same color
 * Random bot: make random moves but following all chess rules
 * Lichess integration -- получить рейтинг Эло
 * Read PGN: -- нужны все возможные ходы, как их правильно записывать

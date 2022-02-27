@@ -281,7 +281,7 @@ doMove board@Board{..} (CapturePromotion from to piece)
   , halfmoveClock = 0
   }
 
-doMove board@Board{..} (EnPassantCapture piece from@(fCol, fRow) to@(tCol, tRow))
+doMove board@Board{..} (EnPassantCapture piece from@(_, fRow) to@(tCol, _))
   = board
   { squares = M.delete (tCol, fRow) $ M.delete from $ M.insert to piece squares
   , halfmoveClock = 0

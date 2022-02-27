@@ -28,6 +28,7 @@ library
       Board
       Board.InitialPosition
       Bot.Greedy
+      Bot.Minimax
       Bot.Random
       Display
       Format.FEN
@@ -80,6 +81,7 @@ test-suite haskell-chess-test
   other-modules:
       Board.InitialPositionSpec
       BoardSpec
+      Bot.MinimaxSpec
       DisplaySpec
       Format.FENSpec
       Format.PGN.ExportSpec
