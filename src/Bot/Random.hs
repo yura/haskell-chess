@@ -14,8 +14,6 @@ randomMove moves = do
   return (moves !! randomIndex)
 
 --makeMove :: (MonadRandom m) => Color -> Board -> [Move] -> m (Board, [Move])
-makeMove :: Color -> Board -> [Move] -> IO (Board, [Move])
-makeMove color board history = do
-  let moves = possibleMoves color board
-  nextMove <- randomMove moves
-  return (move board nextMove, nextMove:history)
+makeMove :: Board -> IO Board
+makeMove board@Board{..} = do
+  move board <$> randomMove (possibleMoves nextMove board)

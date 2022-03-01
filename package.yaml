@@ -44,6 +44,8 @@ executables:
     - haskell-chess
     default-extensions:
       - OverloadedStrings
+      - RecordWildCards
+
 
 tests:
   haskell-chess-test:

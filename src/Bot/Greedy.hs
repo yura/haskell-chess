@@ -4,15 +4,15 @@ import Board
 import Laws
 import Bot.Random
 
-makeMove :: Color -> Board -> [Move] -> IO (Board, [Move])
-makeMove color board history = do
-  let moves = possibleMoves color board
+makeMove :: Board -> IO Board
+makeMove board@Board{..} = do
+  let moves = possibleMoves nextMove board
   let maxMove = maximum moves
   random <- randomMove moves
 
   return $ case maxMove of
-      Move {} -> (move board random, random:history)
-      _       -> (move board maxMove, maxMove:history)
+      Move {} -> move board random
+      _       -> move board maxMove
 
 instance Ord Move where
   compare (CapturePromotion _ _ (Piece Queen _)) (CapturePromotion _ _ (Piece Queen _)) = EQ
