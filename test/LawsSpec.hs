@@ -201,12 +201,12 @@ spec = do
   describe "isMate" $ do
     it "возвращает False, в случае пата https://lichess.org/editor/7k/5K2/6Q1/8/8/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('f', 7), kingWhite), (('g', 6), queenWhite), (('h', 8), kingBlack)] emptyBoard
-      isMate Black board `shouldBe` False
+      isMate board { nextMove = Black } `shouldBe` False
 
     it "возвращает True, в случае мата https://lichess.org/editor/7k/5KQ1/8/8/8/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('f', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
-      isMate Black board `shouldBe` True
+      isMate board { nextMove = Black } `shouldBe` True
 
     it "возвращает False, в случае шаха https://lichess.org/editor/7k/4K1Q1/8/8/8/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('e', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
-      isMate Black board `shouldBe` False
+      isMate board { nextMove = Black } `shouldBe` False

@@ -39,7 +39,7 @@ eliminateLosingMoves board@Board{..}
     newBoard m = move board m 
 
 findWinningMove :: Board -> [Move] -> Maybe Move
-findWinningMove board@Board{..}  = find (isMate (opponent nextMove) . move board)
+findWinningMove board@Board{..}  = find (isMate . move board)
 
 {-
 def find_two_step_win(game_state, next_player):

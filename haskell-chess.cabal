@@ -31,6 +31,7 @@ library
       Bot.Minimax
       Bot.Random
       Display
+      Evaluation
       Format.FEN
       Format.PGN.Export
       Format.PGN.Import
@@ -84,6 +85,7 @@ test-suite haskell-chess-test
       BoardSpec
       Bot.MinimaxSpec
       DisplaySpec
+      EvaluationSpec
       Format.FENSpec
       Format.PGN.ExportSpec
       Format.PGN.ImportSpec

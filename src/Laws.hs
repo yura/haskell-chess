@@ -119,11 +119,11 @@ isCheck :: Color -> Board -> Bool
 isCheck color board = kingAt color board `elem` allCheckThreatSquares (opponent color) board
 
 -- Мат?
-isMate :: Color -> Board -> Bool
-isMate color board = isCheck color board && null (possibleMoves color board)
+isMate :: Board -> Bool
+isMate board@Board{..} = isCheck nextMove board && null (possibleMoves nextMove board)
 
 isOver :: Color -> Board -> Maybe Result 
-isOver color board | isMate color board          = Just $ if color == White then BlackWon else WhiteWon
+isOver color board | isMate board                = Just $ if color == White then BlackWon else WhiteWon
                    | isStalemate color board     = Just $ Draw Stalemate
                    | isDeadPosition color board  = Just $ Draw DeadPosition
                    | isFiftyMove board           = Just $ Draw FiftyMove

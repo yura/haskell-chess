@@ -40,6 +40,6 @@ isCheck :: Color -> Board -> Bool
 
 isStalemate :: Color -> Board -> Bool 
 
-isMate :: Color -> Board -> Bool
+isMate :: Board -> Bool
 
 isOver :: Color -> Board -> Maybe Result 
