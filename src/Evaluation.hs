@@ -7,6 +7,7 @@ import Laws
 evaluatePosition :: Board -> Int 
 evaluatePosition board@Board{..}
   | isMate board = minBound 
+  | isDraw board = 0 
   | otherwise    = sum $ map (\(_, Piece pt c) -> cost pt * if c == nextMove then 1 else (-1)) $ M.toList squares
 
 cost :: PieceType -> Int 

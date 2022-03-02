@@ -122,6 +122,13 @@ isCheck color board = kingAt color board `elem` allCheckThreatSquares (opponent 
 isMate :: Board -> Bool
 isMate board@Board{..} = isCheck nextMove board && null (possibleMoves nextMove board)
 
+isDraw :: Board -> Bool
+isDraw board@Board{..}
+  =  isStalemate nextMove board
+  || isDeadPosition nextMove board
+  || isFiftyMove board
+  || isThreefoldRepetition board
+
 isOver :: Color -> Board -> Maybe Result 
 isOver color board | isMate board                = Just $ if color == White then BlackWon else WhiteWon
                    | isStalemate color board     = Just $ Draw Stalemate
