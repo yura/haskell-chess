@@ -24,6 +24,7 @@ dependencies:
 - containers
 - MonadRandom
 - parsec      # parsing PGN
+- split       # splitOn for Lists
 - text
 
 library:

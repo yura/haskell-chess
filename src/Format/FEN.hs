@@ -85,5 +85,3 @@ enPassantTargetSquare board = case enPassantTarget board of
 fullmoveNumber :: T.Text
 fullmoveNumber = "1"
 
-importFEN :: T.Text -> Board
-importFEN text = undefined
