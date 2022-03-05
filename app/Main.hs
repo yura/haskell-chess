@@ -10,8 +10,7 @@ import Board.InitialPosition
 import Display
 import qualified Format.PGN.Import as PGN
 import qualified Format.PGN.Export as PGN
-import           Format.FEN
-
+import Format.FEN ( toFEN )
 
 import Bot.Random
 import Bot.Greedy
@@ -26,7 +25,7 @@ play bot1 bot2 board@Board{..} = do
   newBoard <- bot board
   
   renderBoard newBoard
-  print $ exportToFEN newBoard
+  putStrLn $ toFEN newBoard
 
   threadDelay 125000
 

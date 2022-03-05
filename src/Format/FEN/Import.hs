@@ -1,10 +1,10 @@
 module Format.FEN.Import where
 
-import qualified Data.Map as M
+import           Data.Char (chr, ord, digitToInt, intToDigit, isDigit)
 import           Data.List.Split (splitOn)
+import qualified Data.Map as M
 
 import           Board
-import Data.Char (digitToInt, intToDigit, isDigit)
 
 fromFEN :: String -> Board
 fromFEN fen
@@ -29,7 +29,7 @@ parseSquares squares = M.fromList $ concat $ zipWith (`parseRow` 'a') (splitOn "
 
 parseRow :: String -> Char -> Int -> [(Square, Piece)]
 parseRow "" _ _ = []
-parseRow (c:cs) col row | isDigit c = parseRow cs (intToDigit $ digitToInt c + digitToInt col) row
+parseRow (c:cs) col row | isDigit c = parseRow cs (chr $ digitToInt c + ord col) row
                         | otherwise = ((col, row), parsePiece c) : parseRow cs (succ col) row
 
 parsePiece :: Char -> Piece 

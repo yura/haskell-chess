@@ -35,7 +35,7 @@ data Board
   -- (ничья).
   , halfmoveClock           :: Int
   , history                 :: [Move]
-  , fens                    :: M.Map T.Text Int
+  , fens                    :: M.Map String Int
   , result                  :: Maybe Result
   }
 

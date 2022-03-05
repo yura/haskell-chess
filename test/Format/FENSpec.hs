@@ -24,20 +24,20 @@ spec = do
     it "последнее поле должено быть 'h1'" $
       last (last squaresFENOrder) `shouldBe` ('h', 1)
 
-  describe "nextMove" $ do
+  describe "nextMoveFEN" $ do
      it "всегда возращает следующий ход белых" $
-       fenNextMove initialBoard `shouldBe` "w"
+       nextMoveFEN initialBoard `shouldBe` "w"
 
   describe "exportToFEN" $ do
     it "пустая доска даёт пустую позицию" $ do
-      exportToFEN emptyBoard `shouldBe` "8/8/8/8/8/8/8/8 w - - 0 1"
+      toFEN emptyBoard `shouldBe` "8/8/8/8/8/8/8/8 w - - 0 1"
 
     it "начальная позиция" $
-      exportToFEN initialBoard `shouldBe` "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+      toFEN initialBoard `shouldBe` "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
     it "чёрный король на a8, белый - на a1, белая пешка на a2, ход белых" $ do
       let board = placePieces [(('a', 2), Piece Pawn White), (('a', 1), Piece King White), (('a', 8), Piece King Black)] emptyBoard
-      exportToFEN board `shouldBe` "k7/8/8/8/8/8/P7/K7 w - - 0 1"
+      toFEN board `shouldBe` "k7/8/8/8/8/8/P7/K7 w - - 0 1"
 
   describe "incrementLastNumber" $ do
     it "возвращает 1 если строка пустая" $

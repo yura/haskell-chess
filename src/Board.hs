@@ -50,7 +50,7 @@ data Board
   , halfmoveClock           :: Int
   --, moveNumber              :: Int              
   , history                 :: [Move]
-  , fens                    :: M.Map T.Text Int
+  , fens                    :: M.Map String Int
   , result                  :: Maybe Result
   } deriving (Eq, Read, Show)
 
