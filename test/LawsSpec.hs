@@ -9,6 +9,7 @@ import qualified Data.Map as Map
 import           Board
 import           Board.InitialPosition
 import           Laws
+import Fixtures 
 
 spec :: Spec
 spec = do
@@ -206,6 +207,12 @@ spec = do
     it "возвращает True, в случае мата https://lichess.org/editor/7k/5KQ1/8/8/8/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('f', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
       isMate board { nextMove = Black } `shouldBe` True
+
+    it "возвращает True для всех матов чёрным" $ do
+      map isMate blackMated `shouldBe` [True, True]
+
+    it "возвращает True для всех матов белым" $ do
+      map isMate whiteMated `shouldBe` [True, True]
 
     it "возвращает False, в случае шаха https://lichess.org/editor/7k/4K1Q1/8/8/8/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('e', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
