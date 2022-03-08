@@ -1,10 +1,15 @@
 module Bot.Minimax where
 
-import Data.List (find)
+import Data.List (find, maximumBy, minimumBy)
+import Data.Maybe ( isJust )
 import Board
 import Laws
 import Bot.Random
-import Board (opponent)
+import Evaluation
+import Data.Function (on)
+
+import Debug.Trace
+
 
 makeMove :: Board -> IO Board
 makeMove board@Board{..} = do
@@ -12,7 +17,7 @@ makeMove board@Board{..} = do
   let winningMove = findWinningMove board moves
   let twoStepWinningMove = findTwoStepWin board
   let betterMoves = eliminateLosingMoves board
-  
+
   random       <- randomMove moves
 
   case winningMove of
@@ -25,18 +30,32 @@ makeMove board@Board{..} = do
             betterRandom <- randomMove betterMoves
             return $ move board betterRandom
 
+maxValue :: Board -> Int -> (Value, Move)
+-- FIXME: Drop @Board{..} and nextMove 
+maxValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = (evaluatePosition board, head history)
+                               | otherwise = result
+  where
+    result = maximumBy (compare `on` fst) $ map (\m -> (fst (minValue (move board m) (pred depth)), m)) $ possibleMoves nextMove board
+
+minValue :: Board -> Int -> (Value, Move)
+-- FIXME: Drop @Board{..} and nextMove 
+minValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = (evaluatePosition board, head history)
+                               | otherwise = result
+  where
+    result = minimumBy (compare `on` fst) $ map (\m -> (fst (maxValue (move board m) (pred depth)), m)) $ possibleMoves nextMove board
+
 findTwoStepWin :: Board -> Maybe Move
 findTwoStepWin board@Board{..} = find (null . eliminateLosingMoves . move board) moves
   where
     moves = possibleMoves nextMove board
-      
+
 eliminateLosingMoves :: Board -> [Move]
 eliminateLosingMoves board@Board{..}
-  = filter (\m -> null . findWinningMove (newBoard m) 
+  = filter (\m -> null . findWinningMove (newBoard m)
   $ possibleMoves (opponent nextMove) (newBoard m)) moves
   where
     moves = possibleMoves nextMove board
-    newBoard m = move board m 
+    newBoard m = move board m
 
 findWinningMove :: Board -> [Move] -> Maybe Move
 findWinningMove board@Board{..}  = find (isMate . move board)

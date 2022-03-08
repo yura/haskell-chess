@@ -19,9 +19,9 @@ spec = do
       let board = placePiece ('d', 4) queenBlack initialBoard
       evaluatePosition board `shouldBe` -9
 
-    it "в случае мата, возвращает минимальное значение" $ do
+    it "в случае мата чёрным, возвращает минимальное значение" $ do
       let board = placePieces [(('f', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
-      evaluatePosition board { nextMove = Black } `shouldBe` minBound 
+      evaluatePosition board { nextMove = Black } `shouldBe` maxBound 
 
     it "в случае ничьи возращает 0" $ do
       let board = placePieces [(('f', 7), kingWhite), (('a', 2), bishopWhite), (('h', 8), kingBlack)] emptyBoard

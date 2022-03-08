@@ -1,13 +1,39 @@
 module Bot.MinimaxSpec (spec) where
 
 import Test.Hspec
+import Fixtures
 
 import Bot.Minimax
 import Board
+import Board.InitialPosition
 import Laws
 
 spec :: Spec
 spec = do
+  describe "maxValue" $ do
+    context "[начальная позиция]" $ do
+      it "возращает 0 как максимальное возможное значение для хода для  глубины 1" $ do
+        fst (maxValue initialBoard 1) `shouldBe` 0
+
+    context "[мат в один ход]" $ do
+      it "возращает максимально возможное значение как максимальное возможное значение для хода для глубины 1" $ do
+        fst (maxValue blackMatedByQueenIn1 1) `shouldBe` maxBound
+
+    context "[мат в два хода]" $ do
+      it "находит линейный мат в два хода" $ do
+        maxValue ladderMateIn2 3 `shouldBe` (maxBound, Move (Piece Rook White) ('e',1) ('g',1))
+
+    context "[мат в три хода]" $ do
+      it "находит линейный мат в два хода" $ do
+        pendingWith "Slow test"
+        maxValue ladderMateIn3 5 `shouldBe` (maxBound, Move (Piece Rook White) ('d',2) ('f',2))
+
+  describe "minValue" $ do
+    context "[начальная позиция]" $ do
+      it "минимально возмножное значение для хода" $ do
+        pending
+        0 `shouldBe` 0
+
   describe "findWinningMove" $ do
     it "находит мат в один ход" $  do
       let board = placePieces
