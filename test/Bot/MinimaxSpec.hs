@@ -12,21 +12,39 @@ spec :: Spec
 spec = do
   describe "maxValue" $ do
     context "[начальная позиция]" $ do
-      it "возращает 0 как максимальное возможное значение для хода для  глубины 1" $ do
+      it "возращает 0 как максимальное возможное значение для хода для глубины 1" $ do
         fst (maxValue initialBoard 1) `shouldBe` 0
 
-    context "[мат в один ход]" $ do
-      it "возращает максимально возможное значение как максимальное возможное значение для хода для глубины 1" $ do
-        fst (maxValue blackMatedByQueenIn1 1) `shouldBe` maxBound
+      it "возращает 0 как максимальное возможное значение для хода для глубины 2" $ do
+        fst (maxValue initialBoard 1) `shouldBe` 0
 
-    context "[мат в два хода]" $ do
-      it "находит линейный мат в два хода" $ do
-        maxValue ladderMateIn2 3 `shouldBe` (maxBound, Move (Piece Rook White) ('e',1) ('g',1))
+    context "[белые]" $ do
+      context "[мат в один ход]" $ do
+        it "возращает максимально возможное значение как максимальное возможное значение для хода для глубины 1" $ do
+          fst (maxValue blackMatedByQueenIn1 1) `shouldBe` maxBound
 
-    context "[мат в три хода]" $ do
-      it "находит линейный мат в два хода" $ do
-        pendingWith "Slow test"
-        maxValue ladderMateIn3 5 `shouldBe` (maxBound, Move (Piece Rook White) ('d',2) ('f',2))
+      context "[мат в два хода]" $ do
+        it "находит линейный мат в два хода" $ do
+          maxValue whiteLadderMatesIn2 3 `shouldBe` (maxBound, Move (Piece Rook White) ('e',1) ('g',1))
+
+      context "[мат в три хода]" $ do
+        it "находит линейный мат в два хода" $ do
+          pendingWith "Slow test"
+          maxValue whiteLadderMatesIn3 5 `shouldBe` (maxBound, Move (Piece Rook White) ('d',2) ('f',2))
+
+    context "[чёрные]" $ do
+      context "[мат в один ход]" $ do
+        it "возращает максимально возможное значение оценки и ход конём" $ do
+          maxValue whiteMatedByKninghtIn1 1 `shouldBe` (maxBound, Move knightBlack ('a', 3) ('c', 2))
+
+      context "[мат в два хода]" $ do
+        it "находит линейный мат в два хода" $ do
+          maxValue blackLadderMatesIn2 3 `shouldBe` (maxBound, Move (Piece Rook Black) ('e',1) ('g',1))
+
+      context "[мат в три хода]" $ do
+        it "находит линейный мат в два хода" $ do
+          pendingWith "Slow test"
+          maxValue whiteLadderMatesIn3 5 `shouldBe` (maxBound, Move (Piece Rook White) ('d',2) ('f',2))
 
   describe "minValue" $ do
     context "[начальная позиция]" $ do

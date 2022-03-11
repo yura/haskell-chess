@@ -212,7 +212,7 @@ spec = do
       map isMate blackMated `shouldBe` [True, True]
 
     it "возвращает True для всех матов белым" $ do
-      map isMate whiteMated `shouldBe` [True, True]
+      map isMate whiteMated `shouldBe` [True, True, True]
 
     it "возвращает False, в случае шаха https://lichess.org/editor/7k/4K1Q1/8/8/8/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('e', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard

@@ -6,12 +6,14 @@ import Laws
 
 type Value = Int
 
+mateValue :: Int
+mateValue = minBound + 1
+
 evaluatePosition :: Board -> Value 
 evaluatePosition board@Board{..}
-  | isMate board = if nextMove == White then minBound else maxBound 
+  | isMate board = mateValue
   | isDraw board = 0 
-  | otherwise    = sum $ map (\(_, Piece pt c) -> cost pt * if c == White then 1 else (-1)) $ M.toList squares
--- | otherwise    = sum $ map (\(_, Piece pt c) -> cost pt * if c == nextMove then 1 else (-1)) $ M.toList squares
+  | otherwise    = sum $ map (\(_, Piece pt c) -> cost pt * if c == nextMove then 1 else (-1)) $ M.toList squares
 
 cost :: PieceType -> Value 
 cost Pawn    = 1
