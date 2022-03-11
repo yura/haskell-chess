@@ -55,6 +55,7 @@ library
       MonadRandom
     , base >=4.7 && <5
     , containers
+    , parallel
     , parsec
     , split
     , text
@@ -69,12 +70,13 @@ executable haskell-chess-exe
   default-extensions:
       OverloadedStrings
       RecordWildCards
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -eventlog
   build-depends:
       MonadRandom
     , base >=4.7 && <5
     , containers
     , haskell-chess
+    , parallel
     , parsec
     , split
     , text
@@ -114,6 +116,7 @@ test-suite haskell-chess-test
     , haskell-chess
     , hspec
     , hspec-parsec
+    , parallel
     , parsec
     , split
     , text

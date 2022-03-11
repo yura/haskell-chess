@@ -24,6 +24,7 @@ dependencies:
 - containers
 - MonadRandom
 - parsec      # parsing PGN
+- parallel
 - split       # splitOn for Lists
 - text
 
@@ -41,12 +42,13 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    # threadscope
+    - -eventlog
     dependencies:
     - haskell-chess
     default-extensions:
       - OverloadedStrings
       - RecordWildCards
-
 
 tests:
   haskell-chess-test:
