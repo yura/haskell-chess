@@ -84,4 +84,3 @@ whitePawnPossibleMoves = pawnPossibleMoves White
 
 blackPawnPossibleMoves :: Square -> Board -> [Move]
 blackPawnPossibleMoves = pawnPossibleMoves Black
-

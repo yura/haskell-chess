@@ -76,9 +76,12 @@ whiteMatedByKninghtIn1 = fromFEN "4k3/8/8/8/8/n7/PP6/KR6 b - - 0 1"
 whiteLadderMatesIn2 :: Board
 whiteLadderMatesIn2 = fromFEN "7k/K7/8/8/8/8/5R2/4R3 w - - 0 1"
 
+-- * чёрные
+
 -- Линейный мат в два хода
+-- https://lichess.org/editor/8/k5K1/8/8/8/8/5r2/4r3_b_-_-_0_1
 blackLadderMatesIn2 :: Board
-blackLadderMatesIn2 = fromFEN "7K/k7/8/8/8/8/5r2/4r3 b - - 0 1"
+blackLadderMatesIn2 = fromFEN "8/k7/8/6K1/8/8/5r2/4r3 b - - 0 1"
 
 -- Мат в три хода хода
 
@@ -87,4 +90,11 @@ blackLadderMatesIn2 = fromFEN "7K/k7/8/8/8/8/5r2/4r3 b - - 0 1"
 -- Линейный мат в три хода
 -- https://lichess.org/editor/8/K7/5k2/8/8/8/3R4/4R3_w_-_-_0_1
 whiteLadderMatesIn3 :: Board
-whiteLadderMatesIn3 = fromFEN "8/K7/5k2/8/8/8/3R4/4R3 w - - 0 1"
+whiteLadderMatesIn3 = fromFEN "8/K7/8/5k2/8/8/3R4/4R3 w - - 0 1"
+
+-- * чёрные
+
+-- Линейный мат в три хода
+-- https://lichess.org/editor/8/k4K2/8/8/8/8/3r4/4r3_b_-_-_0_1
+blackLadderMatesIn3 :: Board
+blackLadderMatesIn3 = fromFEN "8/k4K2/8/8/8/8/3r4/4r3 b - - 0 1"

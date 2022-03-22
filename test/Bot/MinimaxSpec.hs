@@ -30,6 +30,7 @@ spec = do
       context "[мат в три хода]" $ do
         it "находит линейный мат в два хода" $ do
           pendingWith "Slow test"
+          -- Чёрные "подыгрывают белым, совершая ходы, приводящие к маты [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]"
           maxValue whiteLadderMatesIn3 5 `shouldBe` (maxBound, Move (Piece Rook White) ('d',2) ('f',2))
 
     context "[чёрные]" $ do
@@ -44,7 +45,7 @@ spec = do
       context "[мат в три хода]" $ do
         it "находит линейный мат в два хода" $ do
           pendingWith "Slow test"
-          maxValue whiteLadderMatesIn3 5 `shouldBe` (maxBound, Move (Piece Rook White) ('d',2) ('f',2))
+          maxValue blackLadderMatesIn3 5 `shouldBe` (maxBound, Move (Piece Rook Black) ('d',2) ('f',2))
 
   describe "minValue" $ do
     context "[начальная позиция]" $ do

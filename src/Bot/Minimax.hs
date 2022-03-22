@@ -43,7 +43,7 @@ maxValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = 
 
 minValue :: Board -> Int -> (Value, Move)
 -- FIXME: Drop @Board{..} and nextMove 
-minValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = (evaluatePosition board, head history)
+minValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = traceShow (if evaluatePosition board == -9223372036854775807 then history else []) (evaluatePosition board, head history)
                                | otherwise = result
   where
     result
