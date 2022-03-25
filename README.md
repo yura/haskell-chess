@@ -12,7 +12,6 @@
   * ignore comments {} or ;
 
 * Brute-force bot: make best move looking N moves ahead
-* Read FEN -- нужно для решения задач
 
 ## FIDE Laws of Chess
 
