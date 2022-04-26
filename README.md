@@ -13,6 +13,18 @@
 
 * Brute-force bot: make best move looking N moves ahead
 
+* Openings Book https://www.chessprogramming.org/Opening_Book
+  * Polygon
+    * http://hgm.nubati.net/book_format.html
+    * https://python-chess.readthedocs.io/en/latest/pgn.html
+    * https://github.com/sshivaji/polyglot
+    * https://github.com/mlang/chessIO
+  * https://github.com/lichess-org/chess-openings
+  * https://www.pgnmentor.com/files.html#openings
+  * Descriptions https://en.wikibooks.org/wiki/Chess_Opening_Theory
+  * ECO https://www.chessprogramming.org/ECO http://www.chessarch.com/library/0000_eco/index.shtml
+  * Alternative format https://www.chessprogramming.org/NIC-Key
+
 ## FIDE Laws of Chess
 
 * https://www.fide.com/FIDE/handbook/LawsOfChess.pdf
