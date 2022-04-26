@@ -28,6 +28,7 @@ library
       Board
       Board.InitialPosition
       Bot.Greedy
+      Bot.Human
       Bot.Minimax
       Bot.Random
       Display
