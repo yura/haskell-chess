@@ -15,6 +15,7 @@ initialBoard
   , blackCanCastleKingside = True
   , blackCanCastleQueenside = True
   , halfmoveClock = 0
+  , moveNumber = 1
   , history = []
   , fens = M.empty
   , result = Nothing

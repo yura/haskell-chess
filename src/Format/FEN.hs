@@ -11,7 +11,7 @@ toFEN :: Board -> String
 toFEN board =  unwords
   [ exportToFENWithoutMoveNumbers board
   , show $ halfmoveClock board
-  , fullmoveNumber
+  , fullmoveNumber board
   ]
 
 exportToFENWithoutMoveNumbers :: Board -> String
@@ -82,6 +82,5 @@ enPassantTargetSquare board = case enPassantTarget board of
   Just s -> exportSquareToPGN s
   _      -> "-"
 
-fullmoveNumber :: String
-fullmoveNumber = "1"
-
+fullmoveNumber :: Board -> String
+fullmoveNumber Board{..} = show moveNumber

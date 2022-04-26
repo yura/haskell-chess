@@ -22,12 +22,10 @@ spec = do
       E.toFEN (fromFEN fen) `shouldBe` fen
 
     it "значение не меняется после хода 1... c5" $ do
-      pendingWith "номер хода"
       let fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"
       E.toFEN (fromFEN fen) `shouldBe` fen
 
     it "значение не меняется после хода 2. Nf3" $ do
-      pendingWith "номер хода"
       let fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
       E.toFEN (fromFEN fen) `shouldBe` fen
 

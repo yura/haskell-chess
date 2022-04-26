@@ -34,6 +34,7 @@ data Board
   -- взятия фигуры. Используется для определения применения "правила 50 ходов"
   -- (ничья).
   , halfmoveClock           :: Int
+  , moveNumber              :: Int
   , history                 :: [Move]
   , fens                    :: M.Map String Int
   , result                  :: Maybe Result

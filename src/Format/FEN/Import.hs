@@ -17,6 +17,7 @@ fromFEN fen
   , blackCanCastleKingside = blackKingsideCastling castlings
   , blackCanCastleQueenside = blackQueensideCastling castlings
   , halfmoveClock = read halfmoves
+  , moveNumber = read fullmoves
   , history = []
   , fens = M.empty
   , result = Nothing

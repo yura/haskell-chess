@@ -48,7 +48,7 @@ data Board
   -- взятия фигуры. Используется для определения применения "правила 50 ходов"
   -- (ничья).
   , halfmoveClock           :: Int
-  --, moveNumber              :: Int              
+  , moveNumber              :: Int
   , history                 :: [Move]
   , fens                    :: M.Map String Int
   , result                  :: Maybe Result
@@ -81,7 +81,7 @@ rows :: [Int]
 rows = [1..8]
 
 emptyBoard :: Board
-emptyBoard = Board M.empty White Nothing False False False False 0 [] M.empty Nothing
+emptyBoard = Board M.empty White Nothing False False False False 0 1 [] M.empty Nothing
 
 opponent :: Color -> Color
 opponent White = Black
@@ -204,10 +204,12 @@ move b@Board{..} m = newBoard { fens = newFens }
   where
     newBoard = doMove b
       { enPassantTarget = Nothing
-      , nextMove        = moveColor m
+      , nextMove        = newNextMove
       , history         = m : history
+      , moveNumber      = if newNextMove == White && not (null history) then moveNumber + 1 else moveNumber
       } m
     newFens = M.insertWith (+) (exportToFENWithoutMoveNumbers newBoard) 1 fens
+    newNextMove = moveColor m
 
 doMove :: Board -> Move -> Board
 doMove board@Board{..} (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4))
