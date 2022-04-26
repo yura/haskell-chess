@@ -31,7 +31,7 @@ play bot1 bot2 board@Board{..} = do
 
   threadDelay 125000
 
-  let mResult = isOver (opponent nextMove) newBoard
+  let mResult = isOver newBoard
 
   case mResult of
     Just result  -> return (newBoard, result)

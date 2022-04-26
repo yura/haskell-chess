@@ -92,13 +92,13 @@ kingCaptureThreatSquares color square board
 -- 
 
 -- Пат?
-isStalemate :: Color -> Board -> Bool 
-isStalemate color board = not (isCheck color board) && null (possibleMoves board) 
+isStalemate :: Board -> Bool 
+isStalemate board = not (isCheck (nextMove board) board) && null (possibleMoves board) 
 
 -- https://en.wikipedia.org/wiki/Draw_(chess)
 -- https://ru.wikipedia.org/wiki/%D0%9D%D0%B8%D1%87%D1%8C%D1%8F_(%D1%88%D0%B0%D1%85%D0%BC%D0%B0%D1%82%D1%8B)
-isDeadPosition :: Color -> Board -> Bool 
-isDeadPosition color board | white == [kingWhite] && black == [kingBlack] = True
+isDeadPosition :: Board -> Bool 
+isDeadPosition board | white == [kingWhite] && black == [kingBlack] = True
                            | white == [bishopWhite, kingWhite] && black == [kingBlack] = True
                            | white == [kingWhite] && black == [bishopBlack, kingBlack] = True
                            | white == [knightWhite, kingWhite] && black == [kingBlack] = True
@@ -115,24 +115,26 @@ isThreefoldRepetition :: Board -> Bool
 isThreefoldRepetition board = any (\(f, c) -> c >= 3) $ Map.toList $ fens board 
 
 -- Шах?
+-- Обязательно нужно передавть цвет, для того чтобы проверять не появляется ли шах
+-- после моего хода (в Board nextMove уже будет записан новый цвет)
 isCheck :: Color -> Board -> Bool
 isCheck color board = kingAt color board `elem` allCheckThreatSquares (opponent color) board
 
 -- Мат?
 isMate :: Board -> Bool
-isMate board@Board{..} = isCheck nextMove board && null (possibleMoves board)
+isMate board = isCheck (nextMove board) board && null (possibleMoves board)
 
 isDraw :: Board -> Bool
-isDraw board@Board{..}
-  =  isStalemate nextMove board
-  || isDeadPosition nextMove board
+isDraw board
+  =  isStalemate board
+  || isDeadPosition board
   || isFiftyMove board
   || isThreefoldRepetition board
 
-isOver :: Color -> Board -> Maybe Result 
-isOver color board | isMate board                = Just $ if color == White then BlackWon else WhiteWon
-                   | isStalemate color board     = Just $ Draw Stalemate
-                   | isDeadPosition color board  = Just $ Draw DeadPosition
-                   | isFiftyMove board           = Just $ Draw FiftyMove
-                   | isThreefoldRepetition board = Just $ Draw ThreefoldRepetition
-                   | otherwise                   = Nothing
+isOver :: Board -> Maybe Result 
+isOver board | isMate board                = Just $ if nextMove board == White then BlackWon else WhiteWon
+             | isStalemate board           = Just $ Draw Stalemate
+             | isDeadPosition board        = Just $ Draw DeadPosition
+             | isFiftyMove board           = Just $ Draw FiftyMove
+             | isThreefoldRepetition board = Just $ Draw ThreefoldRepetition
+             | otherwise                   = Nothing

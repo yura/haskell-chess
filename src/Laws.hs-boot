@@ -34,12 +34,12 @@ kingValidMoveSquares :: Color -> Square -> Board -> [Square]
 
 kingCaptureThreatSquares :: Color -> Square -> Board -> [Square]
 
-isDeadPosition :: Color -> Board -> Bool 
+isDeadPosition :: Board -> Bool 
 
 isCheck :: Color -> Board -> Bool
 
-isStalemate :: Color -> Board -> Bool 
+isStalemate :: Board -> Bool 
 
 isMate :: Board -> Bool
 
-isOver :: Color -> Board -> Maybe Result 
+isOver :: Board -> Maybe Result 

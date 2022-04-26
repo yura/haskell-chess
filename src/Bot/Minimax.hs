@@ -31,9 +31,8 @@ makeMove board@Board{..} = do
             return $ move board betterRandom
 
 maxValue :: Board -> Int -> (Value, Move)
--- FIXME: Drop @Board{..} and nextMove 
-maxValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = (evaluatePosition board, head history)
-                               | otherwise = result
+maxValue board depth | isJust (isOver board) || depth == 0 = (evaluatePosition board, head $ history board)
+                     | otherwise = result
   where
     result 
       = maximumBy (compare `on` fst) 
@@ -41,9 +40,8 @@ maxValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = 
       $ possibleMoves board
 
 minValue :: Board -> Int -> (Value, Move)
--- FIXME: Drop @Board{..} and nextMove 
-minValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = (evaluatePosition board, head history)
-                               | otherwise = result
+minValue board depth | isJust (isOver board) || depth == 0 = (evaluatePosition board, head $ history board)
+                     | otherwise = result
   where
     result
       = minimumBy (compare `on` fst)
@@ -61,7 +59,7 @@ eliminateLosingMoves board@Board{..}
   $ possibleMoves (newBoard m)) moves
   where
     moves = possibleMoves board
-    newBoard m = move board m
+    newBoard = move board
 
 findWinningMove :: Board -> [Move] -> Maybe Move
 findWinningMove board@Board{..}  = find (isMate . move board)

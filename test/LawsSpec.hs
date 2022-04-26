@@ -84,71 +84,71 @@ spec = do
   describe "isCheck" $ do
     it "возращает False в начальной позиции" $ do
       isCheck White initialBoard `shouldBe` False
-      isCheck Black initialBoard `shouldBe` False
+      isCheck Black initialBoard { nextMove = Black } `shouldBe` False
 
     context "[пешка]" $ do
       it "возращает False, если пешка не шахует короля" $ do
-        isCheck Black (placePieces [(('e', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+        isCheck Black (placePieces [(('e', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` False
 
       it "возращает True, если пешка шахует короля" $ do
-        isCheck Black (placePieces [(('d', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+        isCheck Black (placePieces [(('d', 7), pawnWhite), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` True
 
     context "[конь]" $ do
       it "возращает True, если конь угрожает королю противника" $ do
-        isCheck Black (placePieces [(('d', 6), knightWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+        isCheck Black (placePieces [(('d', 6), knightWhite), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` True
 
       it "возращает True, если короля 'прикрывает' фигура противника" $ do
-        isCheck Black (placePiece ('d', 6) knightWhite initialBoard) `shouldBe` True
+        isCheck Black (placePiece ('d', 6) knightWhite initialBoard { nextMove = Black }) `shouldBe` True
 
       it "возращает False, если конь может сходить на поле своего же короля" $ do
-        isCheck Black (placePieces [(('d', 6), knightBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+        isCheck Black (placePieces [(('d', 6), knightBlack), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` False
 
     context "[слон]" $ do
       it "возращает True, если слон угрожает королю противника" $ do
-        isCheck Black (placePieces [(('a', 4), bishopWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+        isCheck Black (placePieces [(('a', 4), bishopWhite), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` True
 
       it "возращает False, если короля прикрывает фигура противника" $ do
-        isCheck Black (placePieces [(('a', 4), bishopWhite), (('d', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+        isCheck Black (placePieces [(('a', 4), bishopWhite), (('d', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` False
 
       it "возращает False, если свой слон может сходить на поле короля" $ do
-        isCheck Black (placePieces [(('a', 4), bishopBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+        isCheck Black (placePieces [(('a', 4), bishopBlack), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` False
 
     context "[ладья]" $ do
       it "возращает True, если ладья угрожает королю противника" $ do
-        isCheck Black (placePieces [(('e', 1), rookWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
-        isCheck Black (placePieces [(('a', 8), rookWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+        isCheck Black (placePieces [(('e', 1), rookWhite), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` True
+        isCheck Black (placePieces [(('a', 8), rookWhite), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` True
 
       it "возращает False, если короля прикрывает фигура противника" $ do
-        isCheck Black (placePieces [(('e', 1), rookWhite), (('e', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+        isCheck Black (placePieces [(('e', 1), rookWhite), (('e', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` False
 
       it "возращает False, если своя ладья может сходить на поле короля" $ do
-        isCheck Black (placePieces [(('e', 1), rookBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+        isCheck Black (placePieces [(('e', 1), rookBlack), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` False
 
     context "[ферзь]" $ do
       it "возращает True, если ферзь угрожает королю противника" $ do
-        isCheck Black (placePieces [(('e', 1), queenWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
-        isCheck Black (placePieces [(('a', 8), queenWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
-        isCheck Black (placePieces [(('b', 5), queenWhite), (('e', 8), kingBlack)] emptyBoard) `shouldBe` True
+        isCheck Black (placePieces [(('e', 1), queenWhite), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` True
+        isCheck Black (placePieces [(('a', 8), queenWhite), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` True
+        isCheck Black (placePieces [(('b', 5), queenWhite), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` True
 
       it "возращает False, если короля прикрывает фигура противника" $ do
-        isCheck Black (placePieces [(('e', 1), queenWhite), (('e', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
-        isCheck Black (placePieces [(('b', 5), queenWhite), (('d', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+        isCheck Black (placePieces [(('e', 1), queenWhite), (('e', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` False
+        isCheck Black (placePieces [(('b', 5), queenWhite), (('d', 7), pawnBlack), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` False
 
       it "возращает False, если своя ладья может сходить на поле короля" $ do
-        isCheck Black (placePieces [(('e', 1), rookBlack), (('e', 8), kingBlack)] emptyBoard) `shouldBe` False
+        isCheck Black (placePieces [(('e', 1), rookBlack), (('e', 8), kingBlack)] emptyBoard { nextMove = Black }) `shouldBe` False
 
      -- Король не может шаховать
 
   describe "isDeadPosition" $ do
     it "возращает True, если на доске два короля" $ do
       let board = placePieces [(('e', 4), kingWhite), (('a', 8), kingBlack)] emptyBoard
-      isDeadPosition White board `shouldBe` True
-      isDeadPosition Black board `shouldBe` True
+      isDeadPosition board `shouldBe` True
+      isDeadPosition board `shouldBe` True
 
     it "возращает True, если на доске два короля и слон https://lichess.org/editor/8/2b2k2/8/8/6K1/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('g', 4), kingWhite), (('f', 7), kingBlack), (('c', 7), bishopBlack)] emptyBoard
-      isDeadPosition White board `shouldBe` True
-      isDeadPosition Black board `shouldBe` True
+      isDeadPosition board `shouldBe` True
+      isDeadPosition board `shouldBe` True
   
   describe "isFiftyMove" $ do
     it "возвращает False для начальной позиции" $
@@ -187,28 +187,29 @@ spec = do
       isThreefoldRepetition (applyMoves board moves) `shouldBe` True
 
   describe "isStalemate" $ do
-    it "возвращает True, в случае пата https://lichess.org/editor/7k/5K2/6Q1/8/8/8/8/8_w_-_-_0_1" $ do
+    it "возвращает True, в случае пата https://lichess.org/editor/7k/5K2/6Q1/8/8/8/8/8_b_-_-_0_1" $ do
       let board = placePieces [(('f', 7), kingWhite), (('g', 6), queenWhite), (('h', 8), kingBlack)] emptyBoard  { nextMove = Black }
-      isStalemate Black board `shouldBe` True
+      isStalemate board `shouldBe` True
 
     it "возвращает False, в случае мата https://lichess.org/editor/7k/5KQ1/8/8/8/8/8/8_w_-_-_0_1" $ do
-      let board = placePieces [(('f', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
-      isStalemate Black board `shouldBe` False
+      let board = placePieces [(('f', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard { nextMove = Black }
+      isStalemate board `shouldBe` False
 
     it "возвращает False, в случае шаха https://lichess.org/editor/7k/4K1Q1/8/8/8/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('e', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard { nextMove = Black }
-      isStalemate Black board `shouldBe` False
+      isStalemate board `shouldBe` False
 
   describe "isMate" $ do
     it "возвращает False, в случае пата https://lichess.org/editor/7k/5K2/6Q1/8/8/8/8/8_w_-_-_0_1" $ do
       let board = placePieces [(('f', 7), kingWhite), (('g', 6), queenWhite), (('h', 8), kingBlack)] emptyBoard
       isMate board { nextMove = Black } `shouldBe` False
 
-    it "возвращает True, в случае мата https://lichess.org/editor/7k/5KQ1/8/8/8/8/8/8_w_-_-_0_1" $ do
-      let board = placePieces [(('f', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
-      isMate board { nextMove = Black } `shouldBe` True
+    it "возвращает True, в случае мата https://lichess.org/editor/7k/5KQ1/8/8/8/8/8/8_b_-_-_0_1" $ do
+      let board = placePieces [(('f', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard { nextMove = Black }
+      isMate board  `shouldBe` True
 
     it "возвращает True для всех матов чёрным" $ do
+      print $ head blackMated
       map isMate blackMated `shouldBe` [True, True]
 
     it "возвращает True для всех матов белым" $ do
