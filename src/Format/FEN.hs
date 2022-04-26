@@ -4,7 +4,7 @@ import           Data.Char (isDigit, digitToInt)
 import           Data.List (intercalate)
 import {-# SOURCE #-} Board
 import           Display (squaresDisplayOrder)
-import           Format.PGN.Export (exportSquareToPGN)
+import           Format.PGN.Export (squareToPGN)
 
 -- |Экспортирует доску в формат FEN
 toFEN :: Board -> String
@@ -79,7 +79,7 @@ blackQueensideCastling board = if blackCanCastleKingside board then "q" else ""
 
 enPassantTargetSquare :: Board -> String
 enPassantTargetSquare board = case enPassantTarget board of
-  Just s -> exportSquareToPGN s
+  Just s -> squareToPGN s
   _      -> "-"
 
 fullmoveNumber :: Board -> String

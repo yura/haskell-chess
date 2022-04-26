@@ -24,7 +24,7 @@ parseMove _ _ = Nothing
 
 makeMove :: Board -> IO Board
 makeMove board@Board{..} = do
-  renderBoard board
+  printBoard board
   putStr "Type your move: "
   moveStr <- getLine
 

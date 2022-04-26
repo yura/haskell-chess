@@ -2,30 +2,33 @@ module Format.PGN.Export where
 
 import {-# SOURCE #-} Board
 
-exportSquareToPGN :: Square -> String
-exportSquareToPGN (col, row) = col : show row
+squareToPGN :: Square -> String
+squareToPGN (col, row) = col : show row
 
-exportPieceToPGN :: Piece -> String
-exportPieceToPGN (Piece King _)   = "K"
-exportPieceToPGN (Piece Queen _)  = "Q"
-exportPieceToPGN (Piece Rook _)   = "R"
-exportPieceToPGN (Piece Bishop _) = "B"
-exportPieceToPGN (Piece Knight _) = "N"
-exportPieceToPGN _                = ""
+pieceToPGN :: Piece -> String
+pieceToPGN (Piece King _)   = "K"
+pieceToPGN (Piece Queen _)  = "Q"
+pieceToPGN (Piece Rook _)   = "R"
+pieceToPGN (Piece Bishop _) = "B"
+pieceToPGN (Piece Knight _) = "N"
+pieceToPGN _                = ""
 
-exportMoveToPGN :: Move -> String
-exportMoveToPGN (QueensideCastling _)                      = "O-O-O"
-exportMoveToPGN (KingsideCastling _)                       = "O-O"
-exportMoveToPGN (Move piece from to)                       = exportPieceToPGN piece ++ exportSquareToPGN from  ++ exportSquareToPGN to
-exportMoveToPGN (EnPassantCapture piece from to)           = exportSquareToPGN from ++ "x" ++ exportSquareToPGN to
-exportMoveToPGN (Capture piece from to)                    = exportPieceToPGN piece ++ exportSquareToPGN from ++ "x" ++ exportSquareToPGN to
-exportMoveToPGN (Promotion from to piece)                  = exportSquareToPGN from ++ exportSquareToPGN to ++ "=" ++ exportPieceToPGN piece
-exportMoveToPGN (CapturePromotion from to piece)           = exportSquareToPGN from ++ "x" ++ exportSquareToPGN to ++ "=" ++ exportPieceToPGN piece
+moveToPGN :: Move -> String
+moveToPGN (QueensideCastling _)            = "O-O-O"
+moveToPGN (KingsideCastling _)             = "O-O"
+moveToPGN (Move piece from to)             = pieceToPGN piece ++ squareToPGN from  ++ squareToPGN to
+moveToPGN (EnPassantCapture piece from to) = squareToPGN from ++ "x" ++ squareToPGN to
+moveToPGN (Capture piece from to)          = pieceToPGN piece ++ squareToPGN from ++ "x" ++ squareToPGN to
+moveToPGN (Promotion from to piece)        = squareToPGN from ++ squareToPGN to ++ "=" ++ pieceToPGN piece
+moveToPGN (CapturePromotion from to piece) = squareToPGN from ++ "x" ++ squareToPGN to ++ "=" ++ pieceToPGN piece
 
-exportMovesToPGN :: [Move] -> String
-exportMovesToPGN moves = unwords $ export 1 moves
+movesToPGN :: [Move] -> String
+movesToPGN moves = unwords $ export 1 moves
   where
     export :: Int -> [Move] -> [String]
     export moveNo []       = []
-    export moveNo [w]      = (show moveNo ++ ".") : [exportMoveToPGN w]
-    export moveNo (w:b:ms) = (show moveNo ++ ".") : exportMoveToPGN w : exportMoveToPGN b : export (succ moveNo) ms
+    export moveNo [w]      = (show moveNo ++ ".") : [moveToPGN w]
+    export moveNo (w:b:ms) = (show moveNo ++ ".") : moveToPGN w : moveToPGN b : export (succ moveNo) ms
+
+toPGN :: Board -> String
+toPGN = movesToPGN . reverse . history
