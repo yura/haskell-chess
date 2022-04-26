@@ -1,20 +1,19 @@
 module Bot.Minimax where
 
 import Control.Parallel.Strategies
+import Data.Function (on)
 import Data.List (find, maximumBy, minimumBy)
 import Data.Maybe ( isJust )
 import Board
 import Laws
 import Bot.Random
 import Evaluation
-import Data.Function (on)
 
 import Debug.Trace
 
-
 makeMove :: Board -> IO Board
 makeMove board@Board{..} = do
-  let moves = possibleMoves nextMove board
+  let moves = possibleMoves board
   let winningMove = findWinningMove board moves
   let twoStepWinningMove = findTwoStepWin board
   let betterMoves = eliminateLosingMoves board
@@ -39,29 +38,29 @@ maxValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = 
     result 
       = maximumBy (compare `on` fst) 
       $ map (\m -> ((-1) * fst (minValue (move board m) (pred depth)), m))
-      $ possibleMoves nextMove board
+      $ possibleMoves board
 
 minValue :: Board -> Int -> (Value, Move)
 -- FIXME: Drop @Board{..} and nextMove 
-minValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = traceShow (if evaluatePosition board == -9223372036854775807 then history else []) (evaluatePosition board, head history)
+minValue board@Board{..} depth | isJust (isOver nextMove board) || depth == 0 = (evaluatePosition board, head history)
                                | otherwise = result
   where
     result
       = minimumBy (compare `on` fst)
       $ map (\m -> ((-1) * fst (maxValue (move board m) (pred depth)), m))
-      $ possibleMoves nextMove board
+      $ possibleMoves board
 
 findTwoStepWin :: Board -> Maybe Move
 findTwoStepWin board@Board{..} = find (null . eliminateLosingMoves . move board) moves
   where
-    moves = possibleMoves nextMove board
+    moves = possibleMoves board
 
 eliminateLosingMoves :: Board -> [Move]
 eliminateLosingMoves board@Board{..}
   = filter (\m -> null . findWinningMove (newBoard m)
-  $ possibleMoves (opponent nextMove) (newBoard m)) moves
+  $ possibleMoves (newBoard m)) moves
   where
-    moves = possibleMoves nextMove board
+    moves = possibleMoves board
     newBoard m = move board m
 
 findWinningMove :: Board -> [Move] -> Maybe Move

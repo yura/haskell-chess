@@ -2,7 +2,7 @@ module Laws where
 
 import Board
 
-possibleMoves :: Color -> Board -> [Move]
+possibleMoves :: Board -> [Move]
 
 -- Фигуры соперника, которые находятся под угрозой взятия.
 captureThreatSquares :: Piece -> Square -> Board -> [Square]

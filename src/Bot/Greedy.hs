@@ -6,7 +6,7 @@ import Bot.Random
 
 makeMove :: Board -> IO Board
 makeMove board@Board{..} = do
-  let moves = possibleMoves nextMove board
+  let moves = possibleMoves board
   let maxMove = maximum moves
   random <- randomMove moves
 

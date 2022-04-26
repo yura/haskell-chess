@@ -16,4 +16,4 @@ randomMove moves = do
 --makeMove :: (MonadRandom m) => Color -> Board -> [Move] -> m (Board, [Move])
 makeMove :: Board -> IO Board
 makeMove board@Board{..} = do
-  move board <$> randomMove (possibleMoves nextMove board)
+  move board <$> randomMove (possibleMoves board)

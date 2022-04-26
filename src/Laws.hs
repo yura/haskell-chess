@@ -14,15 +14,15 @@ import qualified Laws.King   as K
 import           Laws.Util
 import Board (DrawType(ThreefoldRepetition))
 
-possibleMoves :: Color -> Board -> [Move]
-possibleMoves color board = pawnMoves ++ knightMoves ++ bishopMoves ++ rookMoves ++ queenMoves ++ kingMoves
+possibleMoves :: Board -> [Move]
+possibleMoves board@Board{..} = pawnMoves ++ knightMoves ++ bishopMoves ++ rookMoves ++ queenMoves ++ kingMoves
   where
-    pawnMoves   = concatMap (pawnValidMoves board color)   $ pawnSquares color board
-    knightMoves = concatMap (knightValidMoves board color) $ knightSquares color board
-    bishopMoves = concatMap (bishopValidMoves board color) $ bishopSquares color board
-    rookMoves   = concatMap (rookValidMoves board color)   $ rookSquares color board
-    queenMoves  = concatMap (queenValidMoves board color)  $ queenSquares color board
-    kingMoves   = concatMap (kingValidMoves board color)   $ kingSquares color board
+    pawnMoves   = concatMap (pawnValidMoves board nextMove)   $ pawnSquares nextMove board
+    knightMoves = concatMap (knightValidMoves board nextMove) $ knightSquares nextMove board
+    bishopMoves = concatMap (bishopValidMoves board nextMove) $ bishopSquares nextMove board
+    rookMoves   = concatMap (rookValidMoves board nextMove)   $ rookSquares nextMove board
+    queenMoves  = concatMap (queenValidMoves board nextMove)  $ queenSquares nextMove board
+    kingMoves   = concatMap (kingValidMoves board nextMove)   $ kingSquares nextMove board
 
 -- Фигуры соперника, которые находятся под угрозой взятия.
 captureThreatSquares :: Piece -> Square -> Board -> [Square]
@@ -93,7 +93,7 @@ kingCaptureThreatSquares color square board
 
 -- Пат?
 isStalemate :: Color -> Board -> Bool 
-isStalemate color board = not (isCheck color board) && null (possibleMoves color board) 
+isStalemate color board = not (isCheck color board) && null (possibleMoves board) 
 
 -- https://en.wikipedia.org/wiki/Draw_(chess)
 -- https://ru.wikipedia.org/wiki/%D0%9D%D0%B8%D1%87%D1%8C%D1%8F_(%D1%88%D0%B0%D1%85%D0%BC%D0%B0%D1%82%D1%8B)
@@ -120,7 +120,7 @@ isCheck color board = kingAt color board `elem` allCheckThreatSquares (opponent 
 
 -- Мат?
 isMate :: Board -> Bool
-isMate board@Board{..} = isCheck nextMove board && null (possibleMoves nextMove board)
+isMate board@Board{..} = isCheck nextMove board && null (possibleMoves board)
 
 isDraw :: Board -> Bool
 isDraw board@Board{..}

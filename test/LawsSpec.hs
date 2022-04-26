@@ -188,7 +188,7 @@ spec = do
 
   describe "isStalemate" $ do
     it "возвращает True, в случае пата https://lichess.org/editor/7k/5K2/6Q1/8/8/8/8/8_w_-_-_0_1" $ do
-      let board = placePieces [(('f', 7), kingWhite), (('g', 6), queenWhite), (('h', 8), kingBlack)] emptyBoard
+      let board = placePieces [(('f', 7), kingWhite), (('g', 6), queenWhite), (('h', 8), kingBlack)] emptyBoard  { nextMove = Black }
       isStalemate Black board `shouldBe` True
 
     it "возвращает False, в случае мата https://lichess.org/editor/7k/5KQ1/8/8/8/8/8/8_w_-_-_0_1" $ do
@@ -196,7 +196,7 @@ spec = do
       isStalemate Black board `shouldBe` False
 
     it "возвращает False, в случае шаха https://lichess.org/editor/7k/4K1Q1/8/8/8/8/8/8_w_-_-_0_1" $ do
-      let board = placePieces [(('e', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard
+      let board = placePieces [(('e', 7), kingWhite), (('g', 7), queenWhite), (('h', 8), kingBlack)] emptyBoard { nextMove = Black }
       isStalemate Black board `shouldBe` False
 
   describe "isMate" $ do

@@ -30,7 +30,8 @@ spec = do
       context "[мат в три хода]" $ do
         it "находит линейный мат в два хода" $ do
           pendingWith "Slow test"
-          -- Чёрные "подыгрывают белым, совершая ходы, приводящие к маты [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]"
+          -- Чёрные подыгрывают белым, совершая ходы, приводящие к мату [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]"
+          -- [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]
           maxValue whiteLadderMatesIn3 5 `shouldBe` (maxBound, Move (Piece Rook White) ('d',2) ('f',2))
 
     context "[чёрные]" $ do
@@ -61,24 +62,24 @@ spec = do
             , (('h', 7), pawnBlack)
             , (('g', 7), pawnBlack)
             , (('g', 1), kingWhite)] emptyBoard
-      let moves = possibleMoves White board
+      let moves = possibleMoves board
       findWinningMove board moves `shouldBe` Just (Move rookWhite ('f', 1) ('f', 8))
 
     it "находит мат за чёрных" $  do
       let board = placePieces
             [ (('f', 3), kingBlack)
             , (('b', 3), queenBlack)
-            , (('f', 1), kingWhite)] emptyBoard
-      let moves = possibleMoves Black board
-      findWinningMove (board { nextMove = Black }) moves `shouldBe` Just (Move queenBlack ('b', 3) ('d', 1))
+            , (('f', 1), kingWhite)] emptyBoard { nextMove = Black }
+      let moves = possibleMoves board
+      findWinningMove board moves `shouldBe` Just (Move queenBlack ('b', 3) ('d', 1))
 
     it "возращает Nothing, если нет мата в один ход" $  do
       let board = placePieces
             [ (('f', 8), kingBlack)
             , (('b', 3), queenBlack)
-            , (('f', 6), kingWhite)] emptyBoard
-      let moves = possibleMoves Black board
-      findWinningMove (board { nextMove = Black }) moves `shouldBe` Nothing
+            , (('f', 6), kingWhite)] emptyBoard { nextMove = Black }
+      let moves = possibleMoves board
+      findWinningMove board moves `shouldBe` Nothing
 
   describe "eliminateLosingMoves" $ do
     it "находит ход, спасающий от мата в один ход" $  do
