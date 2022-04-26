@@ -8,8 +8,8 @@ import Laws
 randomMove :: [Move] -> IO Move
 randomMove moves = do
   randomIndex <- getRandomR (0, length moves - 1)
-  print moves
-  print (moves !! randomIndex)
+  -- print moves
+  -- print (moves !! randomIndex)
 
   return (moves !! randomIndex)
 

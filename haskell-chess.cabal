@@ -30,6 +30,7 @@ library
       Bot.Greedy
       Bot.Human
       Bot.Minimax
+      Bot.Preminimax
       Bot.Random
       Display
       Evaluation
@@ -90,6 +91,7 @@ test-suite haskell-chess-test
       Board.InitialPositionSpec
       BoardSpec
       Bot.MinimaxSpec
+      Bot.PreminimaxSpec
       DisplaySpec
       EvaluationSpec
       Fixtures

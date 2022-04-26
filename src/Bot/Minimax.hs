@@ -1,8 +1,9 @@
 module Bot.Minimax where
 
 import Control.Parallel.Strategies
-import Data.Function (on)
-import Data.List (find, maximumBy, minimumBy)
+import Data.Bifunctor ( second )
+import Data.Function ( on )
+import Data.List ( find, maximumBy, minimumBy, sortOn )
 import Data.Maybe ( isJust )
 import Board
 import Laws
@@ -10,32 +11,20 @@ import Bot.Random
 import Evaluation
 
 import Debug.Trace
+import Display (moveToDisplay)
 
 makeMove :: Board -> IO Board
 makeMove board@Board{..} = do
-  let moves = possibleMoves board
-  let winningMove = findWinningMove board moves
-  let twoStepWinningMove = findTwoStepWin board
-  let betterMoves = eliminateLosingMoves board
-
-  random       <- randomMove moves
-
-  case winningMove of
-      Just m ->  return $ move board m
-      _      -> case twoStepWinningMove of
-        Just m2 -> return $ move board m2
-        _       -> case betterMoves of
-          [] -> return $ move board random
-          _  -> do
-            betterRandom <- randomMove betterMoves
-            return $ move board betterRandom
+  let (_, m) = maxValue board 3
+  return $ move board m
 
 maxValue :: Board -> Int -> (Value, Move)
 maxValue board depth | isJust (isOver board) || depth == 0 = (evaluatePosition board, head $ history board)
                      | otherwise = result
   where
-    result 
-      = maximumBy (compare `on` fst) 
+    -- result = last $ traceShow ((if null (history board) then "" else show (moveToDisplay (head (history board)))) ++ " max: " ++ show (map (second moveToDisplay) results)) results
+    result = last results
+    results = sortOn fst
       $ map (\m -> ((-1) * fst (minValue (move board m) (pred depth)), m))
       $ possibleMoves board
 
@@ -43,51 +32,8 @@ minValue :: Board -> Int -> (Value, Move)
 minValue board depth | isJust (isOver board) || depth == 0 = (evaluatePosition board, head $ history board)
                      | otherwise = result
   where
-    result
-      = minimumBy (compare `on` fst)
+    -- result = last $ traceShow ((if null (history board) then "" else show (moveToDisplay (head (history board)))) ++ " min: " ++ show (map (second moveToDisplay) results)) results
+    result = last results
+    results = sortOn fst
       $ map (\m -> ((-1) * fst (maxValue (move board m) (pred depth)), m))
       $ possibleMoves board
-
-findTwoStepWin :: Board -> Maybe Move
-findTwoStepWin board@Board{..} = find (null . eliminateLosingMoves . move board) moves
-  where
-    moves = possibleMoves board
-
-eliminateLosingMoves :: Board -> [Move]
-eliminateLosingMoves board@Board{..}
-  = filter (\m -> null . findWinningMove (newBoard m)
-  $ possibleMoves (newBoard m)) moves
-  where
-    moves = possibleMoves board
-    newBoard = move board
-
-findWinningMove :: Board -> [Move] -> Maybe Move
-findWinningMove board@Board{..}  = find (isMate . move board)
-
-{-
-def find_two_step_win(game_state, next_player):
-  opponent = next_player.other()
-  for candidate_move in game_state.legal_moves(next_player):        #1
-    next_state = game_state.apply_move(candidate_move)              #2
-    good_responses = eliminate_losing_moves(next_state, opponent)   #3
-    if not good_responses:                                          #3
-      return candidate_move                                         #3
-  return None 
-
-def eliminate_losing_moves(game_state, next_player):
-  opponent = next_player.other()
-  possible_moves = []
-  for candidate_move in game_state.legal_moves(next_player):
-    next_state = game_state.apply_move(candidate_move)
-    opponent_winning_move = find_winning_move(next_state, opponent)
-    if opponent_winning_move is None:
-      possible_moves.append(candidate_move)
-  return possible_moves
- 
-def find_winning_move(game_state, next_player):
-  for candidate_move in game_state.legal_moves(next_player):
-    next_state = game_state.apply_move(candidate_move)
-    if next_state.is_over() and next_state.winner == next_player:
-      return candidate_move
-  return None
--}
