@@ -15,8 +15,10 @@ import Display (moveToDisplay)
 
 makeMove :: Board -> IO Board
 makeMove board@Board{..} = do
-  let (_, m) = maxValue board 3
-  return $ move board m
+  let (v1, m1) = maxValue board 1
+  let (v3, m3) = maxValue board 3
+
+  return $ if v1 == abs mateValue then move board m1 else move board m3
 
 maxValue :: Board -> Int -> (Value, Move)
 maxValue board depth | isJust (isOver board) || depth == 0 = (evaluatePosition board, head $ history board)

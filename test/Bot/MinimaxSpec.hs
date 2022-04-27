@@ -6,6 +6,7 @@ import Fixtures
 import Bot.Minimax
 import Board
 import Board.InitialPosition
+import Format.FEN.Import ( fromFEN )
 import Laws
 
 spec :: Spec
@@ -33,6 +34,11 @@ spec = do
           -- Чёрные подыгрывают белым, совершая ходы, приводящие к мату [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]"
           -- [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]
           maxValue whiteLadderMatesIn3 5 `shouldBe` (maxBound, Move (Piece Rook White) ('d',2) ('f',2))
+
+      context "[мат один ход (github issue #1)]" $ do
+        it "ход 49" $ do
+          let board = fromFEN "8/7K/1Q6/8/k7/2p5/PPPP1PPP/1RB3NR w - - 0 49"
+          maxValue board 3 `shouldBe` (maxBound, Move (Piece Pawn White) ('b', 2) ('b', 3))
 
     context "[чёрные]" $ do
       context "[мат в один ход]" $ do
