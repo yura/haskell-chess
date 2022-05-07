@@ -27,6 +27,7 @@ library
   exposed-modules:
       Board
       Board.InitialPosition
+      Bot.AlphaBeta
       Bot.Greedy
       Bot.Human
       Bot.Minimax
@@ -90,6 +91,7 @@ test-suite haskell-chess-test
   other-modules:
       Board.InitialPositionSpec
       BoardSpec
+      Bot.AlphaBetaSpec
       Bot.MinimaxSpec
       Bot.PreminimaxSpec
       DisplaySpec
