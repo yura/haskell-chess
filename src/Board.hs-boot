@@ -3,7 +3,7 @@ module Board where
 import qualified Data.Map as M
 import qualified Data.Text as T
 
-data PieceType = King | Queen | Rook | Bishop | Knight | Pawn
+data PieceType = Pawn | Knight | Bishop | Rook | Queen | King
 data Color = White | Black
 data Piece = Piece PieceType Color
 
@@ -44,12 +44,12 @@ data DrawType =  Stalemate | ThreefoldRepetition | FiftyMove | DeadPosition | No
 data Result = WhiteWon | BlackWon | Draw  DrawType
 
 data Move
+  = Move              Piece Square Square
   -- рокировка в сторону ферзя
-  = QueensideCastling Color
+  | QueensideCastling Color
   -- рокировка в сторону короля
   | KingsideCastling  Color
   -- обычнй ход
-  | Move              Piece Square Square
   -- взятие
   | Capture           Piece Square Square
   -- взятие на проходе

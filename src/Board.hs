@@ -5,9 +5,9 @@ import qualified Data.Map  as M
 import qualified Data.Text as T
 import Format.FEN (exportToFENWithoutMoveNumbers)
 
-data PieceType = King | Queen | Rook | Bishop | Knight | Pawn deriving (Eq, Read, Show)
-data Color = White | Black deriving (Eq, Read, Show)
-data Piece = Piece PieceType Color deriving (Eq, Read, Show)
+data PieceType = Pawn | Knight | Bishop | Rook | Queen | King deriving (Eq, Ord, Read, Show)
+data Color = White | Black deriving (Eq, Ord, Read, Show)
+data Piece = Piece PieceType Color deriving (Eq, Ord, Read, Show)
 
 kingWhite :: Piece
 kingWhite   = Piece King White
@@ -59,12 +59,12 @@ data DrawType =  Stalemate | ThreefoldRepetition | FiftyMove | DeadPosition | No
 data Result = WhiteWon | BlackWon | Draw  DrawType deriving (Eq, Read, Show)
 
 data Move
+  = Move             Piece Square Square
   -- рокировка в сторону ферзя
-  = QueensideCastling Color
+  | QueensideCastling Color
   -- рокировка в сторону короля
   | KingsideCastling  Color
   -- обычнй ход
-  | Move              Piece Square Square
   -- взятие
   | Capture           Piece Square Square
   -- взятие на проходе
@@ -73,7 +73,7 @@ data Move
   | Promotion               Square Square Piece
   -- взятие с последующим превращением пешки
   | CapturePromotion        Square Square Piece
-  deriving (Eq, Read, Show)
+  deriving (Eq, Ord, Read, Show)
 
 cols :: [Char]
 cols = ['a'..'h']
