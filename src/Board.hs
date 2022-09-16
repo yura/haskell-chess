@@ -88,7 +88,8 @@ opponent White = Black
 opponent _ = White
 
 isOnBoard :: Square -> Bool
-isOnBoard (col, row) = col `elem` cols && row `elem` rows
+--isOnBoard (col, row) = col `elem` cols && row `elem` rows
+isOnBoard (col, row) = col >= 'a' && col <= 'h' && row >= 1 && row <= 8
 
 findPiece :: Board -> Square -> Maybe Piece
 findPiece Board{..} square = M.lookup square squares
