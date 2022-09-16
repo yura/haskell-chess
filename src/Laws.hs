@@ -3,6 +3,7 @@ module Laws where
 import           Data.List (nub)
 import qualified Data.Map as Map
 import           Data.Maybe (mapMaybe)
+import qualified Data.Vector as V
 
 import           Board
 import qualified Laws.Pawn   as P
@@ -15,14 +16,20 @@ import           Laws.Util
 import Board (DrawType(ThreefoldRepetition))
 
 possibleMoves :: Board -> [Move]
-possibleMoves board@Board{..} = pawnMoves ++ knightMoves ++ bishopMoves ++ rookMoves ++ queenMoves ++ kingMoves
+possibleMoves board@Board{..} = V.ifoldl (movesOfPiecesByColor nextMove) [] squares
   where
-    pawnMoves   = concatMap (pawnValidMoves board nextMove)   $ pawnSquares nextMove board
-    knightMoves = concatMap (knightValidMoves board nextMove) $ knightSquares nextMove board
-    bishopMoves = concatMap (bishopValidMoves board nextMove) $ bishopSquares nextMove board
-    rookMoves   = concatMap (rookValidMoves board nextMove)   $ rookSquares nextMove board
-    queenMoves  = concatMap (queenValidMoves board nextMove)  $ queenSquares nextMove board
-    kingMoves   = concatMap (kingValidMoves board nextMove)   $ kingSquares nextMove board
+    movesOfPiecesByColor :: Color -> [Move] -> Int -> Maybe Piece -> [Move]
+    movesOfPiecesByColor _     result _     Nothing = result
+    movesOfPiecesByColor color result i (Just p@(Piece pt c)) | c == color = (piecePossibleMoves i p board) ++ result
+                                                              | otherwise  = result
+
+piecePossibleMoves :: Int -> Piece -> Board -> [Move]
+piecePossibleMoves index p@(Piece Pawn c) b = pawnValidMoves b c (indexToSquare index)
+piecePossibleMoves index p@(Piece Knight c) b = knightValidMoves b c (indexToSquare index)
+piecePossibleMoves index p@(Piece Bishop c) b = bishopValidMoves b c (indexToSquare index)
+piecePossibleMoves index p@(Piece Rook c) b = rookValidMoves b c (indexToSquare index)
+piecePossibleMoves index p@(Piece Queen c) b = queenValidMoves b c (indexToSquare index)
+piecePossibleMoves index p@(Piece King c) b = kingValidMoves b c (indexToSquare index)
 
 -- Фигуры соперника, которые находятся под угрозой взятия.
 captureThreatSquares :: Piece -> Square -> Board -> [Square]
@@ -38,7 +45,11 @@ captureThreatSquares (Piece King color)   square board = kingCaptureThreatSquare
 
 allCaptureThreatSquares :: Color -> Board -> [Square]
 allCaptureThreatSquares color board@Board{..}
-  = nub $ concatMap (\(square, piece) -> captureThreatSquares piece square board) $ Map.toList $ Map.filter (\(Piece _ c) -> c == color) squares
+  = nub $ V.ifoldl threatsByColor [] squares
+  where
+    threatsByColor result _     Nothing = result
+    threatsByColor result index (Just p@(Piece _ c)) | c == color = result ++ captureThreatSquares p (indexToSquare index) board
+                                                     | otherwise  = result
 
 -- Поля, которые находятся под угрозой шаха. Если король
 -- соперника находится на одном из этих полей, то ему шах
@@ -56,7 +67,7 @@ checkThreatSquares (Piece King color)   square _     = K.moveSquares square
 
 allCheckThreatSquares :: Color -> Board -> [Square]
 allCheckThreatSquares color board@(Board{..})
-  = nub $ concatMap (\(square, piece) -> checkThreatSquares piece square board) $ Map.toList $ Map.filter (\(Piece _ c) -> c == color) squares
+  = nub $ concatMap (\(square, piece) -> checkThreatSquares piece square board) $ pieces color board
 
 -- Допустимые ходы в соответствии с правилами:
 pawnValidMoves :: Board -> Color -> Square -> [Move]
@@ -99,14 +110,14 @@ isStalemate board = not (isCheck (nextMove board) board) && null (possibleMoves 
 -- https://ru.wikipedia.org/wiki/%D0%9D%D0%B8%D1%87%D1%8C%D1%8F_(%D1%88%D0%B0%D1%85%D0%BC%D0%B0%D1%82%D1%8B)
 isDeadPosition :: Board -> Bool 
 isDeadPosition board | white == [kingWhite] && black == [kingBlack] = True
-                           | white == [bishopWhite, kingWhite] && black == [kingBlack] = True
-                           | white == [kingWhite] && black == [bishopBlack, kingBlack] = True
-                           | white == [knightWhite, kingWhite] && black == [kingBlack] = True
-                           | white == [kingWhite] && black == [knightBlack, kingBlack] = True
-                           | otherwise = False
+                     | white == [bishopWhite, kingWhite] && black == [kingBlack] = True
+                     | white == [kingWhite] && black == [bishopBlack, kingBlack] = True
+                     | white == [knightWhite, kingWhite] && black == [kingBlack] = True
+                     | white == [kingWhite] && black == [knightBlack, kingBlack] = True
+                     | otherwise = False
   where
-    white = pieces White board
-    black = pieces Black board
+    white = map snd $ pieces White board
+    black = map snd $ pieces Black board
 
 isFiftyMove :: Board -> Bool
 isFiftyMove Board{..} = halfmoveClock >= 99

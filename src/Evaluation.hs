@@ -1,6 +1,6 @@
 module Evaluation where
 
-import qualified Data.Map as M
+import qualified Data.Vector as V
 import Board
 import Laws
 
@@ -13,7 +13,12 @@ evaluatePosition :: Board -> Value
 evaluatePosition board@Board{..}
   | isMate board = mateValue
   | isDraw board = 0 
-  | otherwise    = sum $ map (\(_, Piece pt c) -> cost pt * if c == nextMove then 1 else (-1)) $ M.toList squares
+  | otherwise    = V.ifoldl calculateCost 0 squares
+
+  where
+    calculateCost :: Int -> Int -> Maybe Piece -> Int
+    calculateCost result _ Nothing = result
+    calculateCost result _ (Just (Piece pt c)) = result + cost pt * if c == nextMove then 1 else (-1)
 
 cost :: PieceType -> Value 
 cost Pawn    = 1

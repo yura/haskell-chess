@@ -27,6 +27,7 @@ dependencies:
 - parallel
 - split       # splitOn for Lists
 - text
+- vector
 
 library:
   source-dirs: src

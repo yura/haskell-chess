@@ -2,12 +2,13 @@ module Board.InitialPosition where
 
 import           Board
 import qualified Data.Map as M
+import qualified Data.Vector as V
 import           Format.FEN (whiteQueensideCastling)
 
 initialBoard :: Board
 initialBoard
   = Board
-  { squares = M.fromList squaresAndPieces
+  { squares = squaresAndPieces
   , nextMove = White
   , enPassantTarget = Nothing
   , whiteCanCastleKingside = True
@@ -21,68 +22,20 @@ initialBoard
   , result = Nothing
   }
 
-squaresAndPieces :: [(Square, Piece)]
-squaresAndPieces = whitePieces ++ blackPieces
+squaresAndPieces :: V.Vector (Maybe Piece)
+squaresAndPieces = V.concat [ whitePieces, whitePawns, blanks, blackPawns, blackPieces]
 
-whitePieces :: [(Square, Piece)]
-whitePieces = [whiteKing] ++ [whiteQueen] ++ whiteBishops ++ whiteKnights ++ whiteRooks ++ whitePawns
+whitePieces :: V.Vector (Maybe Piece)
+whitePieces = V.fromList $ map Just [ rookWhite, knightWhite, bishopWhite, queenWhite, kingWhite, bishopWhite, knightWhite, rookWhite ]
 
-blackPieces :: [(Square, Piece)]
-blackPieces = [blackKing] ++ [blackQueen] ++ blackBishops ++ blackKnights ++ blackRooks ++ blackPawns
+whitePawns :: V.Vector (Maybe Piece)
+whitePawns = V.replicate 8 (Just pawnWhite)
 
-pieceCols :: PieceType -> [Char]
-pieceCols Pawn   = cols
-pieceCols Rook   = ['a', 'h']
-pieceCols Knight = ['b', 'g']
-pieceCols Bishop = ['c', 'f']
-pieceCols Queen  = ['d']
-pieceCols King   = ['e']
+blackPieces :: V.Vector (Maybe Piece)
+blackPieces = V.fromList $ map Just [ rookBlack, knightBlack, bishopBlack, queenBlack, kingBlack, bishopBlack, knightBlack, rookBlack ]
 
-pieceRow :: PieceType -> Color -> Int
-pieceRow Pawn White = 2
-pieceRow Pawn _     = 7
-pieceRow _    White = 1
-pieceRow _    _     = 8
+blackPawns :: V.Vector (Maybe Piece)
+blackPawns = V.replicate 8 (Just pawnBlack)
 
-whitePawns :: [(Square, Piece)]
-whitePawns = initialSquaresFor Pawn White
-
-blackPawns :: [(Square, Piece)]
-blackPawns = initialSquaresFor Pawn Black
-
-whiteRooks :: [(Square, Piece)]
-whiteRooks = initialSquaresFor Rook White
-
-blackRooks :: [(Square, Piece)]
-blackRooks = initialSquaresFor Rook Black
-
-whiteKnights :: [(Square, Piece)]
-whiteKnights = initialSquaresFor Knight White
-
-blackKnights :: [(Square, Piece)]
-blackKnights = initialSquaresFor Knight Black
-
-whiteBishops :: [(Square, Piece)]
-whiteBishops = initialSquaresFor Bishop White
-
-blackBishops :: [(Square, Piece)]
-blackBishops = initialSquaresFor Bishop Black
-
-whiteQueen :: (Square, Piece)
-whiteQueen = head $ initialSquaresFor Queen White
-
-blackQueen :: (Square, Piece)
-blackQueen = head $ initialSquaresFor Queen Black
-
-whiteKing :: (Square, Piece)
-whiteKing = head $ initialSquaresFor King White
-
-blackKing :: (Square, Piece)
-blackKing = head $ initialSquaresFor King Black
-
-initialSquaresFor :: PieceType -> Color -> [(Square, Piece)]
-initialSquaresFor pieceType pieceColor = [((colName, row), piece) | colName <- pieceCols pieceType ]
-  where
-    row = pieceRow pieceType pieceColor
-    piece = Piece pieceType pieceColor
-
+blanks :: V.Vector (Maybe Piece)
+blanks = V.replicate 32 Nothing

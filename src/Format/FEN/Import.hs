@@ -3,6 +3,7 @@ module Format.FEN.Import where
 import           Data.Char (chr, ord, digitToInt, intToDigit, isDigit)
 import           Data.List.Split (splitOn)
 import qualified Data.Map as M
+import qualified Data.Vector as V
 
 import           Board
 
@@ -25,13 +26,13 @@ fromFEN fen
   where
     [squares, color, castlings, enPassant, halfmoves, fullmoves] = words fen
 
-parseSquares :: String -> M.Map Square Piece
-parseSquares squares = M.fromList $ concat $ zipWith (`parseRow` 'a') (splitOn "/" squares) (reverse rows)
+parseSquares :: String -> V.Vector (Maybe Piece)
+parseSquares squares = V.concat $ map (parseRow) $ reverse (splitOn "/" squares)
 
-parseRow :: String -> Char -> Int -> [(Square, Piece)]
-parseRow "" _ _ = []
-parseRow (c:cs) col row | isDigit c = parseRow cs (chr $ digitToInt c + ord col) row
-                        | otherwise = ((col, row), parsePiece c) : parseRow cs (succ col) row
+parseRow :: String -> V.Vector (Maybe Piece)
+parseRow "" = V.empty
+parseRow (c:cs) | isDigit c = V.replicate (digitToInt c) Nothing V.++ parseRow cs
+                | otherwise = Just (parsePiece c) `V.cons` parseRow cs
 
 parsePiece :: Char -> Piece 
 parsePiece 'K' = kingWhite
