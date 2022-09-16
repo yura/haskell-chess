@@ -7,11 +7,13 @@ import Laws.Pawn (moves)
 
 -- Ходы и возможные взятия конём
 
-knightMoveShifts :: [(Int, Int)]
-knightMoveShifts = [(-2, -1), (-1, -2), (1, -2), (2, -1), (2, 1), (1, 2), (-1, 2), (-2, 1)]
+knightMoveShifts :: [(Char -> Char, Int -> Int)]
+-- knightMoveShifts = [(-2, -1), (-1, -2), (1, -2), (2, -1), (2, 1), (1, 2), (-1, 2), (-2, 1)]
+knightMoveShifts = [(pred . pred, pred), (pred, pred . pred), (succ, pred . pred), (succ . succ, pred), (succ . succ, succ), (succ, succ . succ), (pred, succ . succ), (pred . pred, succ)]
 
 knightMoves :: Square -> [Square]
-knightMoves (col, row) = filter isOnBoard $ map (\(c', r') -> (chr (ord col + c'), row + r')) knightMoveShifts
+-- knightMoves (col, row) = filter isOnBoard $ map (\(c', r') -> (chr (ord col + c'), row + r')) knightMoveShifts
+knightMoves (col, row) = filter isOnBoard $ map (\(cF, rF) -> (cF col, rF row)) knightMoveShifts
 
 -- Конь бьёт или прикрывает все поля в соответстии с возможными ходами
 underAttackSquares :: Square -> [Square]
