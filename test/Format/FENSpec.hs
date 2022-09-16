@@ -43,17 +43,3 @@ spec = do
       let board = placePieces [(('a', 2), Piece Pawn White), (('a', 1), Piece King White), (('a', 8), Piece King Black)] emptyBoard
       toFEN board `shouldBe` "k7/8/8/8/8/8/P7/K7 w - - 0 1"
 
-  describe "incrementLastNumber" $ do
-    it "возвращает 1 если строка пустая" $
-      incrementLastNumberOrAdd1 "" `shouldBe` "1"
-
-    it "добавляет 1 если строка оканчивается на букву" $
-      incrementLastNumberOrAdd1 "k" `shouldBe` "k1"
-
-    it "увеличивает последнее число на 1" $
-      incrementLastNumberOrAdd1 "hello7" `shouldBe` "hello8"
-
-  describe "incrementLastNumber" $ do
-    it "увеличивает последнее число на 1" $
-      incrementLastNumber "hello1" `shouldBe` "hello2"
-

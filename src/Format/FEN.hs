@@ -30,17 +30,12 @@ squaresFENOrder :: [[Square]]
 squaresFENOrder = squaresDisplayOrder
 
 rowToFEN :: Board -> [Square] -> String
-rowToFEN board row = foldl (\result square -> case findPiece board square of
-  Nothing    -> incrementLastNumberOrAdd1 result
-  Just piece -> result <> pieceFEN piece) "" row
-
-incrementLastNumberOrAdd1 "" = "1"
-incrementLastNumberOrAdd1 result = if isDigit $ last result then incrementLastNumber result else result <> "1"
-
-incrementLastNumber result = firstPart <> lastPart
+rowToFEN board row = if counter == 0 then result else result <> show counter 
   where
-    firstPart = init result
-    lastPart = show $ succ $ digitToInt (last result)
+  (result, counter) = helper
+  helper = foldl (\(r, c) s -> case findPiece board s of
+    Nothing    -> (r, c + 1)
+    Just piece -> (r <> (if c > 0 then show c else "") <> pieceFEN piece, 0)) ("", 0) row
 
 pieceFEN :: Piece -> String
 pieceFEN (Piece King White)   = "K"
