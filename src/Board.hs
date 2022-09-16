@@ -1,10 +1,10 @@
 module Board where
 
+import           Control.Lens
 import           Data.Char ( chr, ord )
 import qualified Data.List as L
 import qualified Data.Map as M
 import qualified Data.Text as T
-import qualified Data.Vector as V
 import Format.FEN (exportToFENWithoutMoveNumbers)
 
 data PieceType = Pawn | Knight | Bishop | Rook | Queen | King deriving (Eq, Ord, Read, Show)
@@ -39,7 +39,7 @@ pawnBlack   = Piece Pawn Black
 type Square = (Char, Int)
 data Board
   = Board
-  { squares                 :: V.Vector (Maybe Piece)
+  { squares                 :: [Maybe Piece]
   , nextMove                :: Color
   , enPassantTarget         :: Maybe Square
   , whiteCanCastleKingside  :: Bool
@@ -83,7 +83,7 @@ rows :: [Int]
 rows = [1..8]
 
 emptyBoard :: Board
-emptyBoard = Board (V.replicate 64 Nothing) White Nothing False False False False 0 1 [] M.empty Nothing
+emptyBoard = Board (replicate 64 Nothing) White Nothing False False False False 0 1 [] M.empty Nothing
 
 opponent :: Color -> Color
 opponent White = Black
@@ -94,7 +94,7 @@ isOnBoard :: Square -> Bool
 isOnBoard (col, row) = col >= 'a' && col <= 'h' && row >= 1 && row <= 8 
 
 findPiece :: Board -> Square -> Maybe Piece
-findPiece Board{..} square = squares V.! (squareToIndex square)
+findPiece Board{..} square = squares !! (squareToIndex square)
 
 squareToIndex :: Square -> Int
 squareToIndex (col, row) = (row - 1) * 8 + (ord col - 97)
@@ -130,45 +130,44 @@ taken board square = case findPiece board square of
   Just _  -> True
   Nothing -> False
 
-pawnSquares :: Color -> Board -> V.Vector Int
+pawnSquares :: Color -> Board -> [Int]
 pawnSquares = pieceTypeSquares Pawn
 
-knightSquares :: Color -> Board -> V.Vector Int
+knightSquares :: Color -> Board -> [Int]
 knightSquares = pieceTypeSquares Knight
 
-bishopSquares :: Color -> Board -> V.Vector Int
+bishopSquares :: Color -> Board -> [Int]
 bishopSquares = pieceTypeSquares Bishop
 
-rookSquares :: Color -> Board -> V.Vector Int
+rookSquares :: Color -> Board -> [Int]
 rookSquares = pieceTypeSquares Rook
 
-queenSquares :: Color -> Board -> V.Vector Int
+queenSquares :: Color -> Board -> [Int]
 queenSquares = pieceTypeSquares Queen
 
-kingSquares :: Color -> Board -> V.Vector Int
+kingSquares :: Color -> Board -> [Int]
 kingSquares = pieceTypeSquares King
 
-pieceTypeSquares :: PieceType -> Color -> Board -> V.Vector Int
+pieceTypeSquares :: PieceType -> Color -> Board -> [Int]
 pieceTypeSquares pieceType color Board{..}
-  = V.elemIndices (Just $ Piece pieceType color) squares
-  -- V.findIndices (\(Piece pt c) -> color == c && pt == pieceType) squares
+  = L.elemIndices (Just $ Piece pieceType color) squares
   
 pieces :: Color -> Board -> [(Square, Piece)]
-pieces color Board{..} = V.ifoldl (filterByColor color) [] squares
+pieces color Board{..} = foldl (filterByColor color) [] $ zip [0..] squares
 
-filterByColor :: Color -> [(Square, Piece)] -> Int -> Maybe Piece -> [(Square, Piece)]
-filterByColor _     result _     Nothing              = result
-filterByColor color result index (Just p@(Piece _ c)) | c == color = (indexToSquare index, p) : result
-                                                      | otherwise  = result
+filterByColor :: Color -> [(Square, Piece)] -> (Int, Maybe Piece) -> [(Square, Piece)]
+filterByColor _     result (_, Nothing)                = result
+filterByColor color result (index, Just p@(Piece _ c)) | c == color = (indexToSquare index, p) : result
+                                                       | otherwise  = result
 
-insertAt :: Int -> Piece -> V.Vector (Maybe Piece) -> V.Vector (Maybe Piece)
-insertAt index piece squares = squares V.// [ (index, Just piece) ]
+insertAt :: Int -> Piece -> [Maybe Piece] -> [Maybe Piece]
+insertAt index piece squares = squares & element index .~ Just piece
 
 placePiece :: Square -> Piece -> Board -> Board
 placePiece square piece board@Board{..} = board { squares = insertAt (squareToIndex square) piece squares }
 
-deleteAt :: Int -> V.Vector (Maybe Piece) -> V.Vector (Maybe Piece)
-deleteAt index squares = squares V.// [ (index, Nothing) ] 
+deleteAt :: Int -> [Maybe Piece] -> [Maybe Piece]
+deleteAt index squares = squares & element index .~ Nothing
 
 deletePiece :: Square -> Board -> Board
 deletePiece square board@Board{..} = board { squares = deleteAt (squareToIndex square) squares }
@@ -181,12 +180,12 @@ placePieces :: [(Square, Piece)] -> Board -> Board
 placePieces squaresAndPieces board = foldl (\b (square, piece) -> placePiece square piece b) board squaresAndPieces
 
 pieceAt :: Piece -> Board -> [Square]
-pieceAt piece Board{..} = V.ifoldl (filterPiece piece) [] squares
+pieceAt piece Board{..} = foldl (filterPiece piece) [] $ zip [0..] squares 
   where
-    --filterPiece :: Piece -> [Square] -> Int -> Maybe Piece -> Square
-    filterPiece _                       result _     Nothing             = result
-    filterPiece (Piece pieceType color) result index (Just (Piece pt c)) | pt == pieceType && c == color = indexToSquare index : result
-                                                                         | otherwise = result
+    --filterPiece :: Piece -> [Square] -> (Int, Maybe Piece) -> [Square]
+    filterPiece _                       result (_, Nothing)               = result
+    filterPiece (Piece pieceType color) result (index, Just (Piece pt c)) | pt == pieceType && c == color = indexToSquare index : result
+                                                                          | otherwise = result
 
 kingAt :: Color -> Board -> Square
 kingAt color board = head $ pieceAt (Piece King color) board

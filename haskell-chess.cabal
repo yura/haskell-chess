@@ -58,11 +58,11 @@ library
       MonadRandom
     , base >=4.7 && <5
     , containers
+    , lens
     , parallel
     , parsec
     , split
     , text
-    , vector
   default-language: Haskell2010
 
 executable haskell-chess-exe
@@ -80,11 +80,11 @@ executable haskell-chess-exe
     , base >=4.7 && <5
     , containers
     , haskell-chess
+    , lens
     , parallel
     , parsec
     , split
     , text
-    , vector
   default-language: Haskell2010
 
 test-suite haskell-chess-test
@@ -123,9 +123,9 @@ test-suite haskell-chess-test
     , haskell-chess
     , hspec
     , hspec-parsec
+    , lens
     , parallel
     , parsec
     , split
     , text
-    , vector
   default-language: Haskell2010

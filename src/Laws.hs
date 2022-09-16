@@ -3,7 +3,6 @@ module Laws where
 import           Data.List (nub)
 import qualified Data.Map as Map
 import           Data.Maybe (mapMaybe)
-import qualified Data.Vector as V
 
 import           Board
 import qualified Laws.Pawn   as P
@@ -16,12 +15,12 @@ import           Laws.Util
 import Board (DrawType(ThreefoldRepetition))
 
 possibleMoves :: Board -> [Move]
-possibleMoves board@Board{..} = V.ifoldl (movesOfPiecesByColor nextMove) [] squares
+possibleMoves board@Board{..} = foldl (movesOfPiecesByColor nextMove) [] $ zip [0..] squares
   where
-    movesOfPiecesByColor :: Color -> [Move] -> Int -> Maybe Piece -> [Move]
-    movesOfPiecesByColor _     result _     Nothing = result
-    movesOfPiecesByColor color result i (Just p@(Piece pt c)) | c == color = (piecePossibleMoves i p board) ++ result
-                                                              | otherwise  = result
+    movesOfPiecesByColor :: Color -> [Move] -> (Int, Maybe Piece) -> [Move]
+    movesOfPiecesByColor _     result (_, Nothing)             = result
+    movesOfPiecesByColor color result (i, Just p@(Piece pt c)) | c == color = (piecePossibleMoves i p board) ++ result
+                                                               | otherwise  = result
 
 piecePossibleMoves :: Int -> Piece -> Board -> [Move]
 piecePossibleMoves index p@(Piece Pawn c) b = pawnValidMoves b c (indexToSquare index)
@@ -45,11 +44,11 @@ captureThreatSquares (Piece King color)   square board = kingCaptureThreatSquare
 
 allCaptureThreatSquares :: Color -> Board -> [Square]
 allCaptureThreatSquares color board@Board{..}
-  = nub $ V.ifoldl threatsByColor [] squares
+  = nub $ foldl threatsByColor [] $ zip [0..] squares
   where
-    threatsByColor result _     Nothing = result
-    threatsByColor result index (Just p@(Piece _ c)) | c == color = result ++ captureThreatSquares p (indexToSquare index) board
-                                                     | otherwise  = result
+    threatsByColor result (_, Nothing)                = result
+    threatsByColor result (index, Just p@(Piece _ c)) | c == color = result ++ captureThreatSquares p (indexToSquare index) board
+                                                      | otherwise  = result
 
 -- Поля, которые находятся под угрозой шаха. Если король
 -- соперника находится на одном из этих полей, то ему шах

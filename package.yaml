@@ -22,12 +22,12 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 - containers
+- lens
 - MonadRandom
 - parsec      # parsing PGN
 - parallel
 - split       # splitOn for Lists
 - text
-- vector
 
 library:
   source-dirs: src

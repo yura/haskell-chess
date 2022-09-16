@@ -2,7 +2,6 @@ module Board where
 
 import qualified Data.Map as M
 import qualified Data.Text as T
-import qualified Data.Vector as V
 
 data PieceType = Pawn | Knight | Bishop | Rook | Queen | King
 data Color = White | Black
@@ -24,7 +23,7 @@ pawnBlack :: Piece
 type Square = (Char, Int)
 data Board
   = Board
-  { squares                 :: V.Vector (Maybe Piece)
+  { squares                 :: [Maybe Piece]
   , nextMove                :: Color
   , enPassantTarget         :: Maybe Square
   , whiteCanCastleKingside  :: Bool
@@ -83,19 +82,19 @@ takenByPiece :: Piece -> Square -> Board -> Bool
 -- то ходить вперёд нельзя (неважно какой фигурой занято поле).
 taken :: Board -> Square -> Bool
 
-pawnSquares :: Color -> Board -> V.Vector Int
+pawnSquares :: Color -> Board -> [Int]
 
-knightSquares :: Color -> Board -> V.Vector Int
+knightSquares :: Color -> Board -> [Int]
 
-bishopSquares :: Color -> Board -> V.Vector Int
+bishopSquares :: Color -> Board -> [Int]
 
-rookSquares :: Color -> Board -> V.Vector Int
+rookSquares :: Color -> Board -> [Int]
 
-queenSquares :: Color -> Board -> V.Vector Int
+queenSquares :: Color -> Board -> [Int]
 
-kingSquares :: Color -> Board -> V.Vector Int
+kingSquares :: Color -> Board -> [Int]
 
-pieceTypeSquares :: PieceType -> Color -> Board -> V.Vector Int
+pieceTypeSquares :: PieceType -> Color -> Board -> [Int]
 
 pieces :: Color -> Board -> [(Square, Piece)]
 
