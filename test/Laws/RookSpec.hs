@@ -10,82 +10,82 @@ spec :: Spec
 spec = do
   describe "rookMoves" $ do
     it "все ходы ладьи, если ладья находится в центре" $ do
-      rookMoves ('d', 4) `shouldBe`
+      rookMoves (read "d4") `shouldBe`
         [
-          ('c', 4), ('b', 4), ('a', 4)
-        , ('d', 3), ('d', 2), ('d', 1)
-        , ('e', 4), ('f', 4), ('g', 4), ('h', 4)
-        , ('d', 5), ('d', 6), ('d', 7), ('d', 8)
+          (read "c4"), (read "b4"), (read "a4")
+        , (read "d3"), (read "d2"), (read "d1")
+        , (read "e4"), (read "f4"), (read "g4"), (read "h4")
+        , (read "d5"), (read "d6"), (read "d7"), (read "d8")
         ]
 
   describe "captureThreatSquares" $ do
     it "все угрозы ладьёй фигурам противника" $ do
-      captureThreatSquares White ('b', 2) initialBoard `shouldBe` [('b', 7)]
+      captureThreatSquares White (read "b2") initialBoard `shouldBe` [(read "b7")]
 
     it "возращает пустой список если нет фигур, которым угрожает ладья" $ do
-      captureThreatSquares White ('a', 1) initialBoard `shouldBe` []
+      captureThreatSquares White (read "a1") initialBoard `shouldBe` []
 
   describe "underAttackSquares" $ do
     it "все поля, которые бьёт ладья" $ do
-      underAttackSquares initialBoard White ('b', 2) `shouldBe` [('b', 3), ('b', 4), ('b', 5), ('b', 6), ('b', 7)]
+      underAttackSquares initialBoard White (read "b2") `shouldBe` [(read "b3"), (read "b4"), (read "b5"), (read "b6"), (read "b7")]
 
   describe "captureThreatSquares" $ do
     it "все взятия слона фигур противника" $ do
-      captureThreatSquares White ('b', 2) initialBoard `shouldBe` [('b', 7)]
+      captureThreatSquares White (read "b2") initialBoard `shouldBe` [(read "b7")]
 
     it "возращает пустой список если нет фигур для взятия" $ do
-      captureThreatSquares White ('a', 1) (placePiece ('g', 7) pawnWhite initialBoard) `shouldBe` []
+      captureThreatSquares White (read "a1") (placePiece (read "g7") pawnWhite initialBoard) `shouldBe` []
 
   describe "possibleMoves" $ do
     it "все возможные ходы ладьи на пустой доске" $ do
-      let board = placePiece ('d', 4) rookWhite emptyBoard
-      possibleMoves board White ('d', 4) `shouldBe`
-        [ Move rookWhite ('d', 4) ('c', 4)
-        , Move rookWhite ('d', 4) ('b', 4)
-        , Move rookWhite ('d', 4) ('a', 4)
-        , Move rookWhite ('d', 4) ('d', 3)
-        , Move rookWhite ('d', 4) ('d', 2)
-        , Move rookWhite ('d', 4) ('d', 1)
-        , Move rookWhite ('d', 4) ('e', 4)
-        , Move rookWhite ('d', 4) ('f', 4)
-        , Move rookWhite ('d', 4) ('g', 4)
-        , Move rookWhite ('d', 4) ('h', 4)
-        , Move rookWhite ('d', 4) ('d', 5)
-        , Move rookWhite ('d', 4) ('d', 6)
-        , Move rookWhite ('d', 4) ('d', 7)
-        , Move rookWhite ('d', 4) ('d', 8)
+      let board = placePiece (read "d4") rookWhite emptyBoard
+      possibleMoves board White (read "d4") `shouldBe`
+        [ Move rookWhite (read "d4") (read "c4")
+        , Move rookWhite (read "d4") (read "b4")
+        , Move rookWhite (read "d4") (read "a4")
+        , Move rookWhite (read "d4") (read "d3")
+        , Move rookWhite (read "d4") (read "d2")
+        , Move rookWhite (read "d4") (read "d1")
+        , Move rookWhite (read "d4") (read "e4")
+        , Move rookWhite (read "d4") (read "f4")
+        , Move rookWhite (read "d4") (read "g4")
+        , Move rookWhite (read "d4") (read "h4")
+        , Move rookWhite (read "d4") (read "d5")
+        , Move rookWhite (read "d4") (read "d6")
+        , Move rookWhite (read "d4") (read "d7")
+        , Move rookWhite (read "d4") (read "d8")
         ]
 
     it "взятие фигур соперника" $ do
-      let board = placePieces [(('d', 4), rookWhite), (('d', 6), pawnBlack)] emptyBoard
-      possibleMoves board White ('d', 4) `shouldBe`
+      let board = placePieces [((read "d4"), rookWhite), ((read "d6"), pawnBlack)] emptyBoard
+      possibleMoves board White (read "d4") `shouldBe`
         [ 
-          Capture rookWhite ('d', 4) ('d', 6)
-        , Move rookWhite ('d', 4) ('c', 4)
-        , Move rookWhite ('d', 4) ('b', 4)
-        , Move rookWhite ('d', 4) ('a', 4)
-        , Move rookWhite ('d', 4) ('d', 3)
-        , Move rookWhite ('d', 4) ('d', 2)
-        , Move rookWhite ('d', 4) ('d', 1)
-        , Move rookWhite ('d', 4) ('e', 4)
-        , Move rookWhite ('d', 4) ('f', 4)
-        , Move rookWhite ('d', 4) ('g', 4)
-        , Move rookWhite ('d', 4) ('h', 4)
-        , Move rookWhite ('d', 4) ('d', 5)
+          Capture rookWhite (read "d4") (read "d6")
+        , Move rookWhite (read "d4") (read "c4")
+        , Move rookWhite (read "d4") (read "b4")
+        , Move rookWhite (read "d4") (read "a4")
+        , Move rookWhite (read "d4") (read "d3")
+        , Move rookWhite (read "d4") (read "d2")
+        , Move rookWhite (read "d4") (read "d1")
+        , Move rookWhite (read "d4") (read "e4")
+        , Move rookWhite (read "d4") (read "f4")
+        , Move rookWhite (read "d4") (read "g4")
+        , Move rookWhite (read "d4") (read "h4")
+        , Move rookWhite (read "d4") (read "d5")
         ]      
  
     it "не может ходить на поля, которые заняты своими фигурами" $ do
-      let board = placePieces [(('d', 4), rookWhite), (('d', 6), pawnWhite)] emptyBoard
-      possibleMoves board White ('d', 4) `shouldBe`
-        [ Move rookWhite ('d', 4) ('c', 4)
-        , Move rookWhite ('d', 4) ('b', 4)
-        , Move rookWhite ('d', 4) ('a', 4)
-        , Move rookWhite ('d', 4) ('d', 3)
-        , Move rookWhite ('d', 4) ('d', 2)
-        , Move rookWhite ('d', 4) ('d', 1)
-        , Move rookWhite ('d', 4) ('e', 4)
-        , Move rookWhite ('d', 4) ('f', 4)
-        , Move rookWhite ('d', 4) ('g', 4)
-        , Move rookWhite ('d', 4) ('h', 4)
-        , Move rookWhite ('d', 4) ('d', 5)
+      let board = placePieces [((read "d4"), rookWhite), ((read "d6"), pawnWhite)] emptyBoard
+      possibleMoves board White (read "d4") `shouldBe`
+        [ Move rookWhite (read "d4") (read "c4")
+        , Move rookWhite (read "d4") (read "b4")
+        , Move rookWhite (read "d4") (read "a4")
+        , Move rookWhite (read "d4") (read "d3")
+        , Move rookWhite (read "d4") (read "d2")
+        , Move rookWhite (read "d4") (read "d1")
+        , Move rookWhite (read "d4") (read "e4")
+        , Move rookWhite (read "d4") (read "f4")
+        , Move rookWhite (read "d4") (read "g4")
+        , Move rookWhite (read "d4") (read "h4")
+        , Move rookWhite (read "d4") (read "d5")
         ]

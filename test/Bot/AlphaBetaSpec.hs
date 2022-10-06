@@ -27,33 +27,33 @@ spec = do
 
       context "[мат в два хода]" $ do
         it "находит линейный мат в два хода" $ do
-          maxValue whiteLadderMatesIn2 mateValue (-mateValue) 3 `shouldBe` (maxBound, Move (Piece Rook White) ('e',1) ('g',1))
+          maxValue whiteLadderMatesIn2 mateValue (-mateValue) 3 `shouldBe` (maxBound, Move (Piece Rook White) (read "e1") (read "g1"))
 
       context "[мат в три хода]" $ do
         it "находит линейный мат в два хода" $ do
           pendingWith "Slow test"
-          -- Чёрные подыгрывают белым, совершая ходы, приводящие к мату [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]"
-          -- [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]
-          maxValue whiteLadderMatesIn3 mateValue (-mateValue) 5 `shouldBe` (maxBound, Move (Piece Rook White) ('d',2) ('f',2))
+          -- Чёрные подыгрывают белым, совершая ходы, приводящие к мату [Move (Piece Rook White) (read "d1") (read "h1"),Move (Piece King Black) (read "g4") (read "h5"),Move (Piece Rook White) (read "d2") (read "g2"),Move (Piece King Black) (read "f5") (read "g4"),Move (Piece Rook White) (read "e1") (read "d1")]"
+          -- [Move (Piece Rook White) (read "d1") (read "h1"),Move (Piece King Black) (read "g4") (read "h5"),Move (Piece Rook White) (read "d2") (read "g2"),Move (Piece King Black) (read "f5") (read "g4"),Move (Piece Rook White) (read "e1") (read "d1")]
+          maxValue whiteLadderMatesIn3 mateValue (-mateValue) 5 `shouldBe` (maxBound, Move (Piece Rook White) (read "d2") (read "f2"))
 
       context "[мат один ход (github issue #1)]" $ do
         it "ход 49" $ do
           let board = fromFEN "8/7K/1Q6/8/k7/2p5/PPPP1PPP/1RB3NR w - - 0 49"
-          maxValue board mateValue (-mateValue) 3 `shouldBe` (maxBound, Move (Piece Pawn White) ('b', 2) ('b', 3))
+          maxValue board mateValue (-mateValue) 3 `shouldBe` (maxBound, Move (Piece Pawn White) (read "b2") (read "b3"))
 
     context "[чёрные]" $ do
       context "[мат в один ход]" $ do
         it "возращает максимально возможное значение оценки и ход конём" $ do
-          maxValue whiteMatedByKninghtIn1 mateValue (-mateValue) 1 `shouldBe` (maxBound, Move knightBlack ('a', 3) ('c', 2))
+          maxValue whiteMatedByKninghtIn1 mateValue (-mateValue) 1 `shouldBe` (maxBound, Move knightBlack (read "a3") (read "c2"))
 
       context "[мат в два хода]" $ do
         it "находит линейный мат в два хода" $ do
-          maxValue blackLadderMatesIn2 mateValue (-mateValue) 3 `shouldBe` (maxBound, Move (Piece Rook Black) ('e',1) ('g',1))
+          maxValue blackLadderMatesIn2 mateValue (-mateValue) 3 `shouldBe` (maxBound, Move (Piece Rook Black) (read "e1") (read "g1"))
 
       context "[мат в три хода]" $ do
         it "находит линейный мат в два хода" $ do
           pendingWith "Slow test"
-          maxValue blackLadderMatesIn3 mateValue (-mateValue) 5 `shouldBe` (maxBound, Move (Piece Rook Black) ('d',2) ('f',2))
+          maxValue blackLadderMatesIn3 mateValue (-mateValue) 5 `shouldBe` (maxBound, Move (Piece Rook Black) (read "d2") (read "f2"))
 
   describe "minValue" $ do
     context "[начальная позиция]" $ do

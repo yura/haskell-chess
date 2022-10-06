@@ -13,16 +13,16 @@ piece :: Color -> Piece
 piece = Piece pieceType
 
 w :: Square -> [Square]
-w (col, row) = map (, row) [pred col, pred (pred col)..head cols]
+w square@(Square s) =  map (\i -> Square $ s - i) $ take (squareFile square) $ [1, 2..]
 
 s :: Square -> [Square]
-s (col, row) = map (col, ) [pred row, pred (pred row)..head rows]
+s square@(Square s) =  map (\i -> Square $ s - i) $ take (squareRank square) $ [8, 16..]
 
 e :: Square -> [Square]
-e (col, row) = map (, row) [succ col..last cols]
+e square@(Square s) =  map (\i -> Square $ s + i) $ take (lastFile - squareFile square) $ [1, 2..]
 
 n :: Square -> [Square]
-n (col, row) = map (col, ) [succ row..last rows]
+n square@(Square s) =  map (\i -> Square $ s + i) $ take (lastRank - squareRank square) $ [8, 16..]
 
 rookMovesGrouped :: Square -> [[Square]]
 rookMovesGrouped square = filter (not . null) $ map (\f -> f square) [w, s, e, n]

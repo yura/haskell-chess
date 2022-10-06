@@ -2,22 +2,84 @@
 
 module Format.PGN.Import where
 
-import           Data.Char (digitToInt)
+import Debug.Trace
+
+import           Data.Char ( digitToInt, ord )
+import           Data.Maybe ( fromJust, isJust )
 import           Text.ParserCombinators.Parsec hiding (spaces)
 
-import           Board hiding (Move(..))
-import qualified Board as B (Move(..))
+import           Board hiding (Move(..), Square(..))
+import qualified Board as B (Move(..), Square(..))
+import           Board.InitialPosition ( initialBoard )
+import           Laws
 
-convertToBoard :: Game -> Board
-convertToBoard (Game moves r)
-  = undefined -- map move moves
+toBoard :: String -> Board
+toBoard pgn = result
+  where
+    game = parse parseGame "PGN" pgn
+    result = case game of
+      Right (Game moves _) -> foldl (\b m -> move b (convertToMove m b)) initialBoard moves
+      Left a               -> error $ "Ошибка чтения файла PGN" <> show a
 
+type Square = (Char, Int)
+
+toSquare :: Square -> B.Square
+toSquare (c, r) = B.Square $ (r - 1) * 8 + (ord c - 97)
+
+-- Доска нужна для решения неоднозначных ситуаций, когда поле откуда ходила фигура не задано.
+-- В этом случае необходимо искать, с какого поля был сделан ход.
 convertToMove :: Move -> Board -> B.Move
-convertToMove (Move _ color (PlyAnnotated KingsideCastling _ _)) board = B.KingsideCastling color
-convertToMove (Move _ color (PlyAnnotated QueensideCastling _ _)) board = B.QueensideCastling color
-convertToMove (Move _ color (PlyAnnotated (Ply pt (Just fromCol) (Just fromRow) to) _ _)) board = B.Move (Piece pt color) (fromCol, fromRow) to
---convertToMove (Move _ color (PlyAnnotated (Ply pt (Just fromCol) Nothing to) _ _)) board = B.Move pt (fromCol, ...) to
---convertToMove (Move _ color (PlyAnnotated (Ply pt Nothing Nothing to) _ _)) board = B.Move pt ... to
+convertToMove m b
+  = case m of
+      (Move _ color (PlyAnnotated KingsideCastling _ _)) ->
+        B.KingsideCastling color
+      (Move _ color (PlyAnnotated QueensideCastling _ _)) ->
+        B.QueensideCastling color
+      (Move _ color (PlyAnnotated (Ply pt (Just fromCol) (Just fromRow) to) _ _)) ->
+        B.Move (Piece pt color) (toSquare (fromCol, fromRow)) (toSquare to)
+      (Move _ color (PlyAnnotated (Ply pt (Just file) Nothing to) _ _)) ->
+        B.Move (Piece pt color) (findValidFromSquareByFromFileAndTo (Piece pt color) file (toSquare to) b) (toSquare to)
+      (Move _ color (PlyAnnotated (Ply pt Nothing Nothing to) _ _)) ->
+        B.Move (Piece pt color) (findValidFromSquare (Piece pt color) (toSquare to) b) (toSquare to)
+      (Move _ color (PlyAnnotated (Capture pt Nothing Nothing to) _ _)) ->
+        B.Capture (Piece pt color) (findValidFromSquare (Piece pt color) (toSquare to) b) (toSquare to)
+      (Move _ color (PlyAnnotated (Capture pt (Just file) Nothing to) _ _)) ->
+        B.Capture (Piece pt color) (findValidFromSquareByFromFileAndTo (Piece pt color) file (toSquare to) b) (toSquare to)
+      (Move _ color (PlyAnnotated (Promotion to pt) _ _)) ->
+        B.Promotion (findValidFromSquare (Piece pt color) (toSquare to) b) (toSquare to) (Piece pt color)
+      (Move _ color (PlyAnnotated (CapturePromotion file to pt) _ _)) ->
+        B.CapturePromotion (findValidFromSquare (Piece pt color) (toSquare to) b) (toSquare to) (Piece pt color)
+      _ -> error $ "Странный ход: " <> show m
+
+-- Поиск возможного исходного поля для фигуры
+findValidFromSquare :: Piece -> B.Square -> Board -> B.Square
+findValidFromSquare piece to board = head $ findAllValidFromSquare piece to board
+
+findValidFromSquareByFromFileAndTo :: Piece -> Char -> B.Square -> Board -> B.Square
+findValidFromSquareByFromFileAndTo piece file to board
+  = head $ filterByFile file $ findAllValidFromSquare piece to board
+
+findAllValidFromSquare :: Piece -> B.Square -> Board -> [B.Square]
+findAllValidFromSquare piece to board
+  = map fromJust
+  $ filter isJust
+  $ map (fromSquareByPieceTo piece to) $ possibleMoves board 
+  where
+    fromSquareByPieceTo :: Piece -> B.Square -> B.Move -> Maybe B.Square
+    fromSquareByPieceTo piece to (B.Move p f t) = if piece == p && to == t then Just f else Nothing
+    fromSquareByPieceTo piece to (B.Move p f t) = if piece == p && to == t then Just f else Nothing
+    fromSquareByPieceTo piece to (B.Capture p f t) = if piece == p && to == t then Just f else Nothing
+    fromSquareByPieceTo piece to (B.EnPassantCapture p f t) = if piece == p && to == t then Just f else Nothing
+-- не знаю что для них?
+--  | Promotion               Square Square Piece
+--  | CapturePromotion        Square Square Piece
+    fromSquareByPieceTo _ _ _ = Nothing
+
+filterByFile :: Char -> [B.Square] -> [B.Square]
+filterByFile file = filter (\s -> squareFile s == toCol file)
+
+toCol :: Char -> Int
+toCol file = (ord file - 97) `mod` 8
 
 data Ply
   -- рокировка в сторону ферзя
@@ -63,6 +125,10 @@ parseGame = do
   moves     <- manyTill (spaces >> parseMove) (lookAhead parseResult)
   --spaces
   result    <- parseResult
+  --optional spaces
+
+  optional $ string "\n"
+
   eof
 
   return $ Game (concat $ firstMove:moves) result
@@ -71,7 +137,7 @@ parseMove :: Parser [Move]
 parseMove = do
   number  <- many1 digit
   dots    <- try (string "...") <|> string "."
-  spaces
+  optional spaces
   ply     <- parsePlyAnnotated
   ply'    <- optionMaybe $ try (spaces >> parsePlyAnnotated)
 

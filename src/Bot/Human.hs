@@ -13,12 +13,12 @@ parseMove :: Board -> String -> Maybe Move
 
 parseMove Board{..} "O-O-O" = Just $ QueensideCastling nextMove
 parseMove Board{..} "O-O" = Just $ KingsideCastling nextMove
-parseMove Board{..} [fromCol, fromRow, 'x', toCol, toRow, '=', piece] = Just $ CapturePromotion (fromCol, digitToInt fromRow) (toCol, digitToInt toRow) (Piece (PGN.pieceType piece) nextMove)
-parseMove Board{..} [fromCol, fromRow, toCol, toRow, '=', piece] = Just $ Promotion (fromCol, digitToInt fromRow) (toCol, digitToInt toRow) (Piece (PGN.pieceType piece) nextMove)
-parseMove Board{..} [piece, fromCol, fromRow, 'x', toCol, toRow] = Just $ Capture (Piece (PGN.pieceType piece) nextMove) (fromCol, digitToInt fromRow) (toCol, digitToInt toRow)
-parseMove Board{..} [fromCol, fromRow, 'x', toCol, toRow] = Just $ Capture (Piece Pawn nextMove) (fromCol, digitToInt fromRow) (toCol, digitToInt toRow)
-parseMove Board{..} [piece, fromCol, fromRow, toCol, toRow] = Just $ Move (Piece (PGN.pieceType piece) nextMove) (fromCol, digitToInt fromRow) (toCol, digitToInt toRow)
-parseMove Board{..} [fromCol, fromRow, toCol, toRow] = Just $ Move (Piece Pawn nextMove) (fromCol, digitToInt fromRow) (toCol, digitToInt toRow)
+parseMove Board{..} [fromCol, fromRow, 'x', toCol, toRow, '=', piece] = Just $ CapturePromotion (PGN.toSquare (fromCol, digitToInt fromRow)) (PGN.toSquare (toCol, digitToInt toRow)) (Piece (PGN.pieceType piece) nextMove)
+parseMove Board{..} [fromCol, fromRow, toCol, toRow, '=', piece] = Just $ Promotion (PGN.toSquare (fromCol, digitToInt fromRow)) (PGN.toSquare (toCol, digitToInt toRow)) (Piece (PGN.pieceType piece) nextMove)
+parseMove Board{..} [piece, fromCol, fromRow, 'x', toCol, toRow] = Just $ Capture (Piece (PGN.pieceType piece) nextMove) (PGN.toSquare (fromCol, digitToInt fromRow)) (PGN.toSquare (toCol, digitToInt toRow))
+parseMove Board{..} [fromCol, fromRow, 'x', toCol, toRow] = Just $ Capture (Piece Pawn nextMove) (PGN.toSquare (fromCol, digitToInt fromRow)) (PGN.toSquare (toCol, digitToInt toRow))
+parseMove Board{..} [piece, fromCol, fromRow, toCol, toRow] = Just $ Move (Piece (PGN.pieceType piece) nextMove) (PGN.toSquare (fromCol, digitToInt fromRow)) (PGN.toSquare (toCol, digitToInt toRow))
+parseMove Board{..} [fromCol, fromRow, toCol, toRow] = Just $ Move (Piece Pawn nextMove) (PGN.toSquare (fromCol, digitToInt fromRow)) (PGN.toSquare (toCol, digitToInt toRow))
 --  | EnPassantCapture  Piece Square Square
 parseMove _ _ = Nothing
 

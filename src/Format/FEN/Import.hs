@@ -26,7 +26,7 @@ fromFEN fen
     [squares, color, castlings, enPassant, halfmoves, fullmoves] = words fen
 
 parseSquares :: String -> [Maybe Piece]
-parseSquares squares = concatMap (parseRow) $ reverse (splitOn "/" squares)
+parseSquares squares = concatMap parseRow $ reverse (splitOn "/" squares)
 
 parseRow :: String -> [Maybe Piece]
 parseRow "" = []
@@ -50,9 +50,12 @@ parsePiece 'p' = pawnBlack
 parseNextMove :: String -> Color 
 parseNextMove color = if color == "w" then White else Black
 
-parseEnPassangeTarget :: String -> Maybe Square 
+parseEnPassangeTarget :: String -> Maybe (Square, Square)
 parseEnPassangeTarget "-" = Nothing
-parseEnPassangeTarget (c:r:[]) = Just (c, digitToInt r)
+parseEnPassangeTarget s = Just $ (target, to target)
+  where
+    target = read s :: Square
+    to (Square s) = Square $ if s > 24 then s - 8 else s + 8
 
 whiteKingsideCastling, whiteQueensideCastling, blackKingsideCastling, blackQueensideCastling :: String -> Bool
 whiteKingsideCastling = elem 'K'

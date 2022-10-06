@@ -5,16 +5,33 @@ import           Board
 import           Laws.Util
 
 sw :: Square -> [Square]
-sw (col, row) = zip [pred col, pred (pred col)..head cols] [pred row, pred (pred row)..head rows]
+sw (Square s)
+  = takeWhile (\square -> squareFile square < lastFile  && squareRank square >= firstRank)
+  $ map nextSquare [9, 18..]
+  where
+    nextSquare :: Int -> Square
+    nextSquare i = Square $ s - i
 
 se :: Square -> [Square]
-se (col, row) = zip [succ col..last cols] [pred row, pred (pred row)..head rows]
+se (Square s)
+  = takeWhile (\square -> squareFile square /= firstFile && squareRank square >= firstRank)
+  $ map nextSquare [7, 14..]
+  where
+    nextSquare i = Square $ s - i
 
 ne :: Square -> [Square]
-ne (col, row) = zip [succ col.. last cols] [succ row..last rows]
+ne (Square s)
+  = takeWhile (\square -> squareFile square /= firstFile && squareRank square <= lastRank)
+  $ map nextSquare [9, 18..]
+  where
+    nextSquare i = Square $ s + i
 
 nw :: Square -> [Square]
-nw (col, row) = zip [pred col, pred (pred col)..head cols] [succ row..last rows]
+nw (Square s)
+  = takeWhile (\square -> squareFile square < lastFile && squareRank square <= lastRank)
+  $ map nextSquare [7, 14..]
+  where
+    nextSquare i = Square $ s + i
 
 bishopMovesGrouped :: Square -> [[Square]]
 bishopMovesGrouped square = filter (not . null) $ map (\f -> f square) [sw, se, ne, nw]

@@ -12,134 +12,130 @@ spec :: Spec
 spec = do
   describe "sw" $ do
     it "возращает все имена из центра в начало по главной диагонали" $
-      sw ('d', 4) `shouldBe` [('c', 3), ('b', 2), ('a', 1)]
+      sw (read "d4") `shouldBe` [(read "c3"), (read "b2"), (read "a1")]
 
     it "возращает пустой список из 'a2'" $
-      sw ('a', 2) `shouldBe` []
+      sw (read "a2") `shouldBe` []
 
     it "возращает пустой список из 'b1'" $
-      sw ('b', 1) `shouldBe` []
+      sw (read "b1") `shouldBe` []
 
     it "возращает 'a7' из 'b8'" $
-      sw ('b', 8) `shouldBe` [('a', 7)]
+      sw (read "b8") `shouldBe` [(read "a7")]
 
     it "возращает главную диагональ из 'h8'" $
-      sw ('h', 8) `shouldBe` [('g', 7), ('f', 6), ('e', 5), ('d', 4), ('c', 3), ('b', 2), ('a', 1)]
+      sw (read "h8") `shouldBe` [(read "g7"), (read "f6"), (read "e5"), (read "d4"), (read "c3"), (read "b2"), (read "a1")]
 
-    it "возращает пустой список из 'a1..a8' и 'a1..h1'" $ do
-      let names = [(r, 1) | r <- ['a'..'h']] ++ [('a', c) | c <- [1..8]]
-      let result = map sw names
-      nub result `shouldBe` [[]]
+    it "возращает пустой список из 'a1..a8' и 'b1..h1'" $ do
+      let ss = map Square $ [0, 8..56] ++ [1..7]
+      nub (map sw ss) `shouldBe` [[]]
 
   describe "se" $ do
     it "возращает все имена из центра в начало по главной диагонали" $
-      se ('d', 4) `shouldBe` [('e', 3), ('f', 2), ('g', 1)]
+      se (read "d4") `shouldBe` [(read "e3"), (read "f2"), (read "g1")]
 
     it "возращает 'b1' из 'a2'" $
-      se ('a', 2) `shouldBe` [('b', 1)]
+      se (read "a2") `shouldBe` [(read "b1")]
 
     it "возращает пустой список из 'b1'" $
-      se ('b', 1) `shouldBe` []
+      se (read "b1") `shouldBe` []
 
     it "возращает всю диагональ из 'b8'" $
-      se ('b', 8) `shouldBe` [('c', 7), ('d', 6), ('e', 5), ('f', 4), ('g', 3), ('h', 2)]
+      se (read "b8") `shouldBe` [(read "c7"), (read "d6"), (read "e5"), (read "f4"), (read "g3"), (read "h2")]
 
     it "возращает пустой список из 'h8'" $
-      se ('h', 8) `shouldBe` []
+      se (read "h8") `shouldBe` []
 
     it "возращает пустой список из 'a1..h1' и 'h1..h8'" $ do
-      let names = [(r, 1) | r <- ['a'..'h']] ++ [('h', c) | c <- [1..8]]
-      let result = map se names
-      nub result `shouldBe` [[]]
+      let ss = map Square $ [0..7] ++ [15, 23..63]
+      nub (map se ss) `shouldBe` [[]]
 
   describe "ne" $ do
     it "возращает все имена из центра в конец по главной диагонали" $
-      ne ('d', 4) `shouldBe` [('e', 5), ('f', 6), ('g', 7), ('h', 8)]
+      ne (read "d4") `shouldBe` [(read "e5"), (read "f6"), (read "g7"), (read "h8")]
 
     it "возращает всю диагональ из 'a2'" $
-      ne ('a', 2) `shouldBe` [('b', 3), ('c', 4), ('d', 5), ('e', 6), ('f', 7), ('g', 8)]
+      ne (read "a2") `shouldBe` [(read "b3"), (read "c4"), (read "d5"), (read "e6"), (read "f7"), (read "g8")]
 
     it "возращает пустой список из 'a8..h8' и 'h1..h8'" $ do
-      let names = [(r, 8) | r <- ['a'..'h']] ++ [('h', c) | c <- [1..8]]
-      let result = map ne names
-      nub result `shouldBe` [[]]
+      let ss = map Square $ [56..63] ++ [7,15..63]
+      nub (map ne ss) `shouldBe` [[]]
 
   describe "nw" $ do
     it "возращает все имена из центра в конец по главной диагонали" $
-      nw ('d', 4) `shouldBe` [('c', 5), ('b', 6), ('a', 7)]
+      nw (read "d4") `shouldBe` [(read "c5"), (read "b6"), (read "a7")]
 
     it "возращает всю диагональ из 'h4'" $
-      nw ('h', 4) `shouldBe` [('g', 5), ('f', 6), ('e', 7), ('d', 8)]
+      nw (read "h4") `shouldBe` [(read "g5"), (read "f6"), (read "e7"), (read "d8")]
 
-    it "возращает пустой список из 'a8..h8' и 'h1..h8'" $ do
-      let names = [(r, 8) | r <- ['a'..'h']] ++ [('a', c) | c <- [1..8]]
-      let result = map nw names
-      nub result `shouldBe` [[]]
+    it "возращает пустой список из 'a8..h8' и 'a1..a8'" $ do
+      let ss = map Square $ [56..63] ++ [0,8..56]
+      nub (map nw ss) `shouldBe` [[]]
 
   describe "bishopMoves" $ do
     it "все ходы слона, если слон находится в центре" $ do
-      bishopMoves ('d', 4) `shouldBe` [ ('c', 3), ('b', 2), ('a', 1), ('e', 3), ('f', 2), ('g', 1), ('e', 5), ('f', 6), ('g', 7), ('h', 8), ('c', 5), ('b', 6), ('a', 7) ]
+      bishopMoves (read "d4") `shouldBe` [ (read "c3"), (read "b2"), (read "a1"), (read "e3"), (read "f2"), (read "g1"), (read "e5"), (read "f6"), (read "g7"), (read "h8"), (read "c5"), (read "b6"), (read "a7") ]
 
   describe "underAttackSquares" $ do
     it "все поля, которые бьёт слон" $ do
-      underAttackSquares initialBoard White ('b', 2) `shouldBe` [('c', 3), ('d', 4), ('e', 5), ('f', 6), ('g', 7), ('a', 3)]
+      underAttackSquares initialBoard White (read "b2") `shouldBe` [(read "c3"), (read "d4"), (read "e5"), (read "f6"), (read "g7"), (read "a3")]
 
   describe "captureThreatSquares" $ do
     it "все взятия слона фигур противника" $ do
-      captureThreatSquares White ('b', 2) initialBoard `shouldBe` [('g', 7)]
+      captureThreatSquares White (read "b2") initialBoard `shouldBe` [(read "g7")]
 
     it "возращает пустой список если нет фигур для взятия" $ do
-      captureThreatSquares White ('a', 1) (placePiece ('g', 7) pawnWhite initialBoard) `shouldBe` []
+      captureThreatSquares White (read "a1") (placePiece (read "g7") pawnWhite initialBoard) `shouldBe` []
 
   describe "possibleMoves" $ do
     it "все возможные ходы слона на пустой доске" $ do
-      let board = placePiece ('d', 4) bishopWhite emptyBoard
-      possibleMoves board White ('d', 4) `shouldBe`
-        [ Move bishopWhite ('d', 4) ('c', 3)
-        , Move bishopWhite ('d', 4) ('b', 2)
-        , Move bishopWhite ('d', 4) ('a', 1)
-        , Move bishopWhite ('d', 4) ('e', 3)
-        , Move bishopWhite ('d', 4) ('f', 2)
-        , Move bishopWhite ('d', 4) ('g', 1)
-        , Move bishopWhite ('d', 4) ('e', 5)
-        , Move bishopWhite ('d', 4) ('f', 6)
-        , Move bishopWhite ('d', 4) ('g', 7)
-        , Move bishopWhite ('d', 4) ('h', 8)
-        , Move bishopWhite ('d', 4) ('c', 5)
-        , Move bishopWhite ('d', 4) ('b', 6)
-        , Move bishopWhite ('d', 4) ('a', 7)
+      let board = placePiece (read "d4") bishopWhite emptyBoard
+      possibleMoves board White (read "d4") `shouldBe`
+        [ Move bishopWhite (read "d4") (read "c3")
+        , Move bishopWhite (read "d4") (read "b2")
+        , Move bishopWhite (read "d4") (read "a1")
+        , Move bishopWhite (read "d4") (read "e3")
+        , Move bishopWhite (read "d4") (read "f2")
+        , Move bishopWhite (read "d4") (read "g1")
+        , Move bishopWhite (read "d4") (read "e5")
+        , Move bishopWhite (read "d4") (read "f6")
+        , Move bishopWhite (read "d4") (read "g7")
+        , Move bishopWhite (read "d4") (read "h8")
+        , Move bishopWhite (read "d4") (read "c5")
+        , Move bishopWhite (read "d4") (read "b6")
+        , Move bishopWhite (read "d4") (read "a7")
         ]
 
     it "взятие фигур соперника" $ do
-      let board = placePieces [(('d', 4), bishopWhite), (('g', 7), pawnBlack)] emptyBoard
-      possibleMoves board White ('d', 4) `shouldBe`
+      let board = placePieces [((read "d4"), bishopWhite), ((read "g7"), pawnBlack)] emptyBoard
+      possibleMoves board White (read "d4") `shouldBe`
         [ 
-          Capture bishopWhite ('d', 4) ('g', 7)
-        , Move bishopWhite ('d', 4) ('c', 3)
-        , Move bishopWhite ('d', 4) ('b', 2)
-        , Move bishopWhite ('d', 4) ('a', 1)
-        , Move bishopWhite ('d', 4) ('e', 3)
-        , Move bishopWhite ('d', 4) ('f', 2)
-        , Move bishopWhite ('d', 4) ('g', 1)
-        , Move bishopWhite ('d', 4) ('e', 5)
-        , Move bishopWhite ('d', 4) ('f', 6)
-        , Move bishopWhite ('d', 4) ('c', 5)
-        , Move bishopWhite ('d', 4) ('b', 6)
-        , Move bishopWhite ('d', 4) ('a', 7)
+          Capture bishopWhite (read "d4") (read "g7")
+        , Move bishopWhite (read "d4") (read "c3")
+        , Move bishopWhite (read "d4") (read "b2")
+        , Move bishopWhite (read "d4") (read "a1")
+        , Move bishopWhite (read "d4") (read "e3")
+        , Move bishopWhite (read "d4") (read "f2")
+        , Move bishopWhite (read "d4") (read "g1")
+        , Move bishopWhite (read "d4") (read "e5")
+        , Move bishopWhite (read "d4") (read "f6")
+        , Move bishopWhite (read "d4") (read "c5")
+        , Move bishopWhite (read "d4") (read "b6")
+        , Move bishopWhite (read "d4") (read "a7")
         ]      
  
     it "не может ходить на поля, которые заняты своими фигурами" $ do
-      let board = placePieces [(('d', 4), bishopWhite), (('g', 7), pawnWhite)] emptyBoard
-      possibleMoves board White ('d', 4) `shouldBe`
-        [ Move bishopWhite ('d', 4) ('c', 3)
-        , Move bishopWhite ('d', 4) ('b', 2)
-        , Move bishopWhite ('d', 4) ('a', 1)
-        , Move bishopWhite ('d', 4) ('e', 3)
-        , Move bishopWhite ('d', 4) ('f', 2)
-        , Move bishopWhite ('d', 4) ('g', 1)
-        , Move bishopWhite ('d', 4) ('e', 5)
-        , Move bishopWhite ('d', 4) ('f', 6)
-        , Move bishopWhite ('d', 4) ('c', 5)
-        , Move bishopWhite ('d', 4) ('b', 6)
-        , Move bishopWhite ('d', 4) ('a', 7)
+      let board = placePieces [((read "d4"), bishopWhite), ((read "g7"), pawnWhite)] emptyBoard
+      possibleMoves board White (read "d4") `shouldBe`
+        [ Move bishopWhite (read "d4") (read "c3")
+        , Move bishopWhite (read "d4") (read "b2")
+        , Move bishopWhite (read "d4") (read "a1")
+        , Move bishopWhite (read "d4") (read "e3")
+        , Move bishopWhite (read "d4") (read "f2")
+        , Move bishopWhite (read "d4") (read "g1")
+        , Move bishopWhite (read "d4") (read "e5")
+        , Move bishopWhite (read "d4") (read "f6")
+        , Move bishopWhite (read "d4") (read "c5")
+        , Move bishopWhite (read "d4") (read "b6")
+        , Move bishopWhite (read "d4") (read "a7")
         ]        

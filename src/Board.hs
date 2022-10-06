@@ -1,11 +1,16 @@
 module Board where
 
+import Debug.Trace
+
 import           Control.Lens
-import           Data.Char ( chr, ord )
+import           Data.Char ( chr, digitToInt, ord )
 import qualified Data.List as L
 import qualified Data.Map as M
+import           Data.Maybe ( fromJust )
 import qualified Data.Text as T
-import Format.FEN (exportToFENWithoutMoveNumbers)
+import           Text.Read
+
+import           Format.FEN ( exportToFENWithoutMoveNumbers )
 
 data PieceType = Pawn | Knight | Bishop | Rook | Queen | King deriving (Eq, Ord, Read, Show)
 data Color = White | Black deriving (Eq, Ord, Read, Show)
@@ -36,12 +41,24 @@ knightBlack = Piece Knight Black
 pawnBlack :: Piece
 pawnBlack   = Piece Pawn Black
 
-type Square = (Char, Int)
+newtype Square = Square Int deriving (Eq, Ord)
+
+instance Read Square where
+  --readPrec = do
+  --  file <- readPrec
+  --  rank <- readPrec
+  --  return $ traceShow (file, rank) $ Square $ (digitToInt rank - 1) * 8 + (ord file - 97)
+  readsPrec _ (col:row:xs) = [(Square $ (digitToInt row - 1) * 8 + (ord col - 97), xs)]
+  readsPrec _ _ = []
+
+instance Show Square where
+  show square = (chr $ squareFile square + 97) : show (squareRank square + 1)
+
 data Board
   = Board
   { squares                 :: [Maybe Piece]
   , nextMove                :: Color
-  , enPassantTarget         :: Maybe Square
+  , enPassantTarget         :: Maybe (Square, Square)
   , whiteCanCastleKingside  :: Bool
   , whiteCanCastleQueenside :: Bool
   , blackCanCastleKingside  :: Bool
@@ -82,6 +99,24 @@ cols = ['a'..'h']
 rows :: [Int]
 rows = [1..8]
 
+squareFile :: Square -> Int
+squareFile (Square s) = s `mod` 8
+
+squareRank :: Square -> Int
+squareRank (Square s) = s `div` 8
+
+firstFile :: Int
+firstFile = 0
+
+lastFile :: Int
+lastFile = 7
+
+firstRank :: Int
+firstRank = 0
+
+lastRank :: Int
+lastRank = 7
+
 emptyBoard :: Board
 emptyBoard = Board (replicate 64 Nothing) White Nothing False False False False 0 1 [] M.empty Nothing
 
@@ -90,87 +125,69 @@ opponent White = Black
 opponent _ = White
 
 isOnBoard :: Square -> Bool
---isOnBoard (col, row) = col `elem` cols && row `elem` rows
-isOnBoard (col, row) = col >= 'a' && col <= 'h' && row >= 1 && row <= 8 
+isOnBoard (Square s) = s >= 0 && s < 64
 
 findPiece :: Board -> Square -> Maybe Piece
-findPiece Board{..} square = squares !! (squareToIndex square)
-
-squareToIndex :: Square -> Int
-squareToIndex (col, row) = (row - 1) * 8 + (ord col - 97)
-
-indexToSquare :: Int -> Square
-indexToSquare index = (chr $ c + 97, r + 1)
-  where
-    (r, c) = index `divMod` 8
+findPiece Board{..} (Square s) = squares !! s
 
 takenBy :: Color -> Board -> Square -> Bool
-takenBy White = takenByWhites
-takenBy Black = takenByBlacks
-
-takenByWhites :: Board -> Square -> Bool
-takenByWhites board square = case findPiece board square of
-  Just (Piece _ White) -> True
-  _                    -> False
-
-takenByBlacks :: Board -> Square -> Bool
-takenByBlacks board square =  case findPiece board square of
-  Just (Piece _ Black) -> True
-  _                    -> False
+takenBy color Board{..} (Square s) = case squares !! s of
+  Just (Piece _ c) -> color == c
+  Nothing          -> False
 
 takenByPiece :: Piece -> Square -> Board -> Bool
-takenByPiece piece square board = case findPiece board square of
+takenByPiece piece (Square s) Board{..} = case squares !! s of
   Just p -> p == piece
   _      -> False
 
 -- Занято ли поле. Для хода пешкой вперёд, если поле занято,
 -- то ходить вперёд нельзя (неважно какой фигурой занято поле).
 taken :: Board -> Square -> Bool
-taken board square = case findPiece board square of
+taken Board{..} (Square s) = case (squares !! s) of
   Just _  -> True
   Nothing -> False
 
-pawnSquares :: Color -> Board -> [Int]
+pawnSquares :: Color -> Board -> [Square]
 pawnSquares = pieceTypeSquares Pawn
 
-knightSquares :: Color -> Board -> [Int]
+knightSquares :: Color -> Board -> [Square]
 knightSquares = pieceTypeSquares Knight
 
-bishopSquares :: Color -> Board -> [Int]
+bishopSquares :: Color -> Board -> [Square]
 bishopSquares = pieceTypeSquares Bishop
 
-rookSquares :: Color -> Board -> [Int]
+rookSquares :: Color -> Board -> [Square]
 rookSquares = pieceTypeSquares Rook
 
-queenSquares :: Color -> Board -> [Int]
+queenSquares :: Color -> Board -> [Square]
 queenSquares = pieceTypeSquares Queen
 
-kingSquares :: Color -> Board -> [Int]
+kingSquares :: Color -> Board -> [Square]
 kingSquares = pieceTypeSquares King
 
-pieceTypeSquares :: PieceType -> Color -> Board -> [Int]
+pieceTypeSquares :: PieceType -> Color -> Board -> [Square]
 pieceTypeSquares pieceType color Board{..}
-  = L.elemIndices (Just $ Piece pieceType color) squares
+  = map Square $ L.elemIndices (Just $ Piece pieceType color) squares
   
 pieces :: Color -> Board -> [(Square, Piece)]
 pieces color Board{..} = foldl (filterByColor color) [] $ zip [0..] squares
 
 filterByColor :: Color -> [(Square, Piece)] -> (Int, Maybe Piece) -> [(Square, Piece)]
 filterByColor _     result (_, Nothing)                = result
-filterByColor color result (index, Just p@(Piece _ c)) | c == color = (indexToSquare index, p) : result
-                                                       | otherwise  = result
+filterByColor color result (s, Just p@(Piece _ c)) | c == color = (Square s, p) : result
+                                                   | otherwise  = result
 
-insertAt :: Int -> Piece -> [Maybe Piece] -> [Maybe Piece]
-insertAt index piece squares = squares & element index .~ Just piece
+insertAt :: Square -> Piece -> [Maybe Piece] -> [Maybe Piece]
+insertAt (Square s) piece squares = squares & element s .~ Just piece
+
+deleteAt :: Square -> [Maybe Piece] -> [Maybe Piece]
+deleteAt (Square s) squares = squares & element s .~ Nothing
 
 placePiece :: Square -> Piece -> Board -> Board
-placePiece square piece board@Board{..} = board { squares = insertAt (squareToIndex square) piece squares }
-
-deleteAt :: Int -> [Maybe Piece] -> [Maybe Piece]
-deleteAt index squares = squares & element index .~ Nothing
+placePiece square piece board@Board{..} = board { squares = insertAt square piece squares }
 
 deletePiece :: Square -> Board -> Board
-deletePiece square board@Board{..} = board { squares = deleteAt (squareToIndex square) squares }
+deletePiece square board@Board{..} = board { squares = deleteAt square squares }
 
 -- FIXME: может быть первым параметром поставить Piece?
 movePiece :: Square -> Square -> Piece -> Board -> Board
@@ -184,8 +201,8 @@ pieceAt piece Board{..} = foldl (filterPiece piece) [] $ zip [0..] squares
   where
     --filterPiece :: Piece -> [Square] -> (Int, Maybe Piece) -> [Square]
     filterPiece _                       result (_, Nothing)               = result
-    filterPiece (Piece pieceType color) result (index, Just (Piece pt c)) | pt == pieceType && c == color = indexToSquare index : result
-                                                                          | otherwise = result
+    filterPiece (Piece pieceType color) result (s, Just (Piece pt c)) | pt == pieceType && c == color = Square s : result
+                                                                               | otherwise = result
 
 kingAt :: Color -> Board -> Square
 kingAt color board = head $ pieceAt (Piece King color) board
@@ -209,12 +226,34 @@ disableQueensideCastling Black board = board { blackCanCastleQueenside = False }
 disableCastling :: Color -> Board -> Board
 disableCastling c = disableQueensideCastling c . disableKingsideCastling c
 
--- Стоят ли пешки соперника для взятие на проходе на данном поле
-pawnsToEnPassantAt :: Square -> Color -> Board -> Bool
-pawnsToEnPassantAt (col, row) color board = takenByPiece pawn (pred col, pawnRow) board || takenByPiece pawn (succ col, pawnRow) board
+increaseHalfmoveClock :: Board -> Board
+increaseHalfmoveClock board@Board{..} = board { halfmoveClock = halfmoveClock + 1 }
+
+zeroHalfmoveClock :: Board -> Board
+zeroHalfmoveClock board@Board{..} = board { halfmoveClock = 0 }
+
+setEnPassantIfCan :: Square -> Square -> Board -> Board
+setEnPassantIfCan from@(Square f) to@(Square t) board
+  = if twoSquareMove && pawnsToEnPassantAt target board
+    then board { enPassantTarget = Just (target, to) }
+    else board
   where
-    pawn = Piece Pawn color
-    pawnRow = if color == White then row - 1 else row + 1
+    twoSquareMove = abs (f - t) > 8
+    target = Square $ if f < 16 then f + 8 else f - 8
+
+-- Стоят ли пешки соперника для взятие на проходе на данном поле
+-- См. раздел правил https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation#cite_note-8
+pawnsToEnPassantAt :: Square -> Board -> Bool
+pawnsToEnPassantAt target@(Square t) board
+  | file == firstFile = findPiece board nextFileSquare == Just opponentPawn
+  | file == lastFile  = findPiece board prevFileSquare == Just opponentPawn
+  | otherwise         = findPiece board nextFileSquare == Just opponentPawn || findPiece board prevFileSquare == Just opponentPawn
+  where
+    opponentColor = if t < 24 then Black else White
+    file = squareFile target
+    nextFileSquare = Square $ t + if opponentColor == White then (-7) else 9
+    prevFileSquare = Square $ t + if opponentColor == White then (-9) else 7
+    opponentPawn = Piece Pawn opponentColor
 
 moveColor :: Move -> Color
 moveColor (QueensideCastling color)              = opponent color
@@ -238,101 +277,75 @@ move b@Board{..} m = newBoard { fens = newFens }
     newNextMove = moveColor m
 
 doMove :: Board -> Move -> Board
-doMove board@Board{..} (Move piece@(Piece Pawn White) from@(_, 2) to@(col, 4))
-  = board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , enPassantTarget = if pawnsToEnPassantAt (col, 3) Black board then Just (col, 3) else Nothing
-  , halfmoveClock = 0
-  }
+doMove board (Move piece@(Piece Pawn _) from to)
+  = zeroHalfmoveClock
+  $ setEnPassantIfCan from to 
+  $ movePiece from to piece board
 
-doMove board@Board{..} (Move piece@(Piece Pawn Black) from@(_, 7) to@(col, 5))
-  = board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , enPassantTarget = if pawnsToEnPassantAt (col, 6) White board then Just (col, 6) else Nothing
-  , halfmoveClock = 0
-  }
+doMove board (Move piece@(Piece King color) from to)
+  = increaseHalfmoveClock 
+  $ disableCastling color 
+  $ movePiece from to piece board
 
-doMove board@Board{..} (Move piece@(Piece King color) from to)
-  = disableCastling color
-  $ board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = halfmoveClock + 1
-  }
+doMove board@Board{..} (Move piece@(Piece Rook White) from@(Square f) to)
+  = increaseHalfmoveClock
+  $ (if f == 0 then disableQueensideCastling White else id)
+  $ (if f == 7 then disableKingsideCastling White else id)
+  $ movePiece from to piece board
 
-doMove board@Board{..} (Move piece@(Piece Rook White) from@('h', 1) to)
-  = disableKingsideCastling White
-  $ board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = halfmoveClock + 1
-  }
+doMove board@Board{..} (Move piece@(Piece Rook Black) from@(Square f) to)
+  = increaseHalfmoveClock
+  $ (if f == 56 then disableQueensideCastling Black else id)
+  $ (if f == 63 then disableKingsideCastling Black else id)
+  $ movePiece from to piece board
 
-doMove board@Board{..} (Move piece@(Piece Rook White) from@('a', 1) to)
-  = disableQueensideCastling White
-  $ board { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = halfmoveClock + 1
-  }
+doMove board (Move piece from to)
+  = increaseHalfmoveClock $ movePiece from to piece board
 
-doMove board@Board{..} (Move piece@(Piece Rook Black) from@('h', 8) to)
-  = disableKingsideCastling Black
-  $ board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = halfmoveClock + 1
-  }
+doMove board (Capture piece  from to)
+  = zeroHalfmoveClock
+  $ movePiece from to piece board
 
-doMove board@Board{..} (Move piece@(Piece Rook Black) from@('a', 8) to)
-  = disableQueensideCastling Black
-  $ board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = halfmoveClock + 1
-  }
+doMove board (Promotion from to piece)
+  = zeroHalfmoveClock
+  $ movePiece from to piece board
 
-doMove board@Board{..} (Move piece@(Piece pt _) from to)
-  = board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = if pt == Pawn then 0 else halfmoveClock + 1
-  }
+doMove board (CapturePromotion from to piece)
+  = zeroHalfmoveClock
+  $ movePiece from to piece board
 
-doMove board@Board{..} (Capture   piece  from to)
-  = board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = 0
-  }
+doMove board@Board{..} (EnPassantCapture piece from to)
+  = zeroHalfmoveClock
+  $ deletePiece epTo
+  $ movePiece from epTarget piece board
+  where
+    (epTarget, epTo) = fromJust $ enPassantTarget
 
-doMove board@Board{..} (Promotion        from to piece)
-  = board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = 0
-  }
+doMove board (KingsideCastling color)
+  = increaseHalfmoveClock
+  $ disableCastling color
+  $ movePiece rookSquare rookSquareAfterCastling rook
+  $ movePiece kingSquare kingSquareAfterCastling king board
+  where
+    king = Piece King color
+    rook = Piece Rook color
+    kingSquare = Square $ if color == White then 4 else 60
+    rookSquare = Square $ if color == White then 7 else 63
+    kingSquareAfterCastling = Square $ if color == White then 6 else 62
+    rookSquareAfterCastling = Square $ if color == White then 5 else 61
 
-doMove board@Board{..} (CapturePromotion from to piece)
-  = board
-  { squares = deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = 0
-  }
-
-doMove board@Board{..} (EnPassantCapture piece from@(_, fRow) to@(tCol, _))
-  = board
-  { squares = deleteAt (squareToIndex (tCol, fRow)) $ deleteAt (squareToIndex from) $ insertAt (squareToIndex to) piece squares
-  , halfmoveClock = 0
-  }
-
-doMove board@Board{..} (KingsideCastling color)
-  = disableCastling color $ board
-  { squares
-      = insertAt (squareToIndex ('f', row)) (Piece Rook color) $ deleteAt (squareToIndex ('h', row))
-      $ insertAt (squareToIndex ('g', row)) (Piece King color) $ deleteAt (squareToIndex ('e', row)) squares
-  , halfmoveClock = halfmoveClock + 1
-  }
-  where row = if color == White then 1 else 8
-
-doMove board@Board{..} (QueensideCastling color)
-  = disableCastling color $ board
-  { squares
-      = insertAt (squareToIndex ('d', row)) (Piece Rook color) $ deleteAt (squareToIndex ('a', row))
-      $ insertAt (squareToIndex ('c', row)) (Piece King color) $ deleteAt (squareToIndex ('e', row)) squares
-  , halfmoveClock = halfmoveClock + 1
-  }
-  where row = if color == White then 1 else 8
+doMove board (QueensideCastling color)
+  = increaseHalfmoveClock
+  $ disableCastling color
+  $ movePiece rookSquare rookSquareAfterCastling rook
+  $ movePiece kingSquare kingSquareAfterCastling king board
+  where
+    king = Piece King color
+    rook = Piece Rook color
+    kingSquare = Square $ if color == White then 4 else 60
+    rookSquare = Square $ if color == White then 0 else 56
+    kingSquareAfterCastling = Square $ if color == White then 2 else 58
+    rookSquareAfterCastling = Square $ if color == White then 3 else 59
 
 applyMoves :: Board -> [Move] -> Board
 applyMoves = foldl move

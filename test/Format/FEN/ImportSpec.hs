@@ -38,30 +38,31 @@ spec = do
 
   describe "parseRow" $ do
     it "возращает пустую фигуру" $ do
-      parseRow "8" 'b' 7 `shouldBe` []
+      parseRow "8" `shouldBe` replicate 8 Nothing
 
     it "возращает фигуры для начальной позиции" $ do
-      parseRow "prnbqk" 'a' 5 `shouldBe`
-          [ (('a', 5), pawnBlack)
-          , (('b', 5), rookBlack)
-          , (('c', 5), knightBlack)
-          , (('d', 5), bishopBlack)
-          , (('e', 5), queenBlack)
-          , (('f', 5), kingBlack)
+      parseRow "prnbqk" `shouldBe`
+          [ Just pawnBlack
+          , Just rookBlack
+          , Just knightBlack
+          , Just bishopBlack
+          , Just queenBlack
+          , Just kingBlack
           ]
 
     it "возращает фигуры для начальной позиции" $ do
-      parseRow "4P3" 'a' 4 `shouldBe` [ (('e', 4), pawnWhite) ]
+      parseRow "4P3" `shouldBe` [ Nothing, Nothing, Nothing, Nothing, Just pawnWhite, Nothing, Nothing, Nothing ]
 
     it "отрабатывает без ошибки RNBQKB1R" $ do
       --parseRow "Q" 'a' 4 `shouldBe`
-      parseRow "RNBQKB1R" 'a' 1 `shouldBe`
+      parseRow "RNBQKB1R" `shouldBe`
 
-        [ (('a', 1), rookWhite)
-        , (('b', 1), knightWhite)
-        , (('c', 1), bishopWhite)
-        , (('d', 1), queenWhite)
-        , (('e', 1), kingWhite)
-        , (('f', 1), bishopWhite)
-        , (('h', 1), rookWhite)
+        [ Just rookWhite
+        , Just knightWhite
+        , Just bishopWhite
+        , Just queenWhite
+        , Just kingWhite
+        , Just bishopWhite
+        , Nothing
+        , Just rookWhite
         ]

@@ -1,9 +1,11 @@
 module Format.PGN.Export where
 
+import Data.Char ( chr )
+
 import {-# SOURCE #-} Board
 
 squareToPGN :: Square -> String
-squareToPGN (col, row) = col : show row
+squareToPGN square = show square
 
 pieceToPGN :: Piece -> String
 pieceToPGN (Piece King _)   = "K"

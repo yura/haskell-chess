@@ -1,6 +1,8 @@
 module Laws where
 
-import           Data.List (nub)
+import Debug.Trace
+
+import           Data.List ( nub, sort )
 import qualified Data.Map as Map
 import           Data.Maybe (mapMaybe)
 
@@ -19,16 +21,16 @@ possibleMoves board@Board{..} = foldl (movesOfPiecesByColor nextMove) [] $ zip [
   where
     movesOfPiecesByColor :: Color -> [Move] -> (Int, Maybe Piece) -> [Move]
     movesOfPiecesByColor _     result (_, Nothing)             = result
-    movesOfPiecesByColor color result (i, Just p@(Piece pt c)) | c == color = (piecePossibleMoves i p board) ++ result
+    movesOfPiecesByColor color result (s, Just p@(Piece pt c)) | c == color = (piecePossibleMoves (Square s) p board) ++ result
                                                                | otherwise  = result
 
-piecePossibleMoves :: Int -> Piece -> Board -> [Move]
-piecePossibleMoves index p@(Piece Pawn c) b = pawnValidMoves b c (indexToSquare index)
-piecePossibleMoves index p@(Piece Knight c) b = knightValidMoves b c (indexToSquare index)
-piecePossibleMoves index p@(Piece Bishop c) b = bishopValidMoves b c (indexToSquare index)
-piecePossibleMoves index p@(Piece Rook c) b = rookValidMoves b c (indexToSquare index)
-piecePossibleMoves index p@(Piece Queen c) b = queenValidMoves b c (indexToSquare index)
-piecePossibleMoves index p@(Piece King c) b = kingValidMoves b c (indexToSquare index)
+piecePossibleMoves :: Square -> Piece -> Board -> [Move]
+piecePossibleMoves square p@(Piece Pawn c) b = pawnValidMoves b c square
+piecePossibleMoves square p@(Piece Knight c) b = knightValidMoves b c square
+piecePossibleMoves square p@(Piece Bishop c) b = bishopValidMoves b c square
+piecePossibleMoves square p@(Piece Rook c) b = rookValidMoves b c square
+piecePossibleMoves square p@(Piece Queen c) b = queenValidMoves b c square
+piecePossibleMoves square p@(Piece King c) b = kingValidMoves b c square
 
 -- Фигуры соперника, которые находятся под угрозой взятия.
 captureThreatSquares :: Piece -> Square -> Board -> [Square]
@@ -47,8 +49,8 @@ allCaptureThreatSquares color board@Board{..}
   = nub $ foldl threatsByColor [] $ zip [0..] squares
   where
     threatsByColor result (_, Nothing)                = result
-    threatsByColor result (index, Just p@(Piece _ c)) | c == color = result ++ captureThreatSquares p (indexToSquare index) board
-                                                      | otherwise  = result
+    threatsByColor result (s, Just p@(Piece _ c)) | c == color = result ++ captureThreatSquares p (Square s) board
+                                                  | otherwise  = result
 
 -- Поля, которые находятся под угрозой шаха. Если король
 -- соперника находится на одном из этих полей, то ему шах
@@ -115,8 +117,8 @@ isDeadPosition board | white == [kingWhite] && black == [kingBlack] = True
                      | white == [kingWhite] && black == [knightBlack, kingBlack] = True
                      | otherwise = False
   where
-    white = map snd $ pieces White board
-    black = map snd $ pieces Black board
+    white = sort $ map snd $ pieces White board
+    black = sort $ map snd $ pieces Black board
 
 isFiftyMove :: Board -> Bool
 isFiftyMove Board{..} = halfmoveClock >= 99

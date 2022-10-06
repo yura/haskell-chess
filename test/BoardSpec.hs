@@ -7,66 +7,133 @@ import           Data.List ( nub )
 import qualified Data.Map as Map
 import           Board
 import           Board.InitialPosition
-import Board (Board(halfmoveClock))
+import qualified Format.PGN.Import as PGN
 
 spec :: Spec
 spec = do
   describe "emptyBoard" $ do
-    it "генерирует пустую доску размером 0 клеток" $
-      length (squares emptyBoard) `shouldBe` 0
+    it "генерирует пустую доску размером 64 клеток" $ do
+      length (squares emptyBoard) `shouldBe` 64
+      nub (squares emptyBoard) `shouldBe` [Nothing]
 
-    it "значение halfmoveClock равно 0" $ do
+    it "значение halfmoveClock равно 0" $
       halfmoveClock emptyBoard `shouldBe` 0
+
+  describe "squareFile" $ do
+    it "возвращает 0 для колонки 'a'" $ do
+      let ss = map Square $ take 8 [0, 8..]
+      nub (map squareFile ss) `shouldBe` [0]
+
+    it "возвращает 1 для колонки 'b'" $ do
+      let ss = map Square $ take 8 [1, 9..]
+      nub (map squareFile ss) `shouldBe` [1]
+
+    it "возвращает 2 для колонки 'c'" $ do
+      let ss = map Square $ take 8 [2, 10..]
+      nub (map squareFile ss) `shouldBe` [2]
+
+    it "возвращает 3 для колонки 'd'" $ do
+      let ss = map Square $ take 8 [3, 11..]
+      nub (map squareFile ss) `shouldBe` [3]
+
+    it "возвращает 4 для колонки 'e'" $ do
+      let ss = map Square $ take 8 [4, 12..]
+      nub (map squareFile ss) `shouldBe` [4]
+
+    it "возвращает 5 для колонки 'f'" $ do
+      let ss = map Square $ take 8 [5, 13..]
+      nub (map squareFile ss) `shouldBe` [5]
+
+    it "возвращает 6 для колонки 'g'" $ do
+      let ss = map Square $ take 8 [6, 14..]
+      nub (map squareFile ss) `shouldBe` [6]
+
+    it "возвращает 7 для колонки 'h'" $ do
+      let ss = map Square $ take 8 [7, 15..]
+      nub (map squareFile ss) `shouldBe` [7]
+
+  describe "squareRank" $ do
+    it "возвращает 0 для ряда '1'" $ do
+      let ss = map Square $ take 8 [0..]
+      nub (map squareRank ss) `shouldBe` [0]
+
+    it "возвращает 1 для ряда '2'" $ do
+      let ss = map Square $ take 8 [8..]
+      nub (map squareRank ss) `shouldBe` [1]
+
+    it "возвращает 2 для ряда '3'" $ do
+      let ss = map Square $ take 8 [16..]
+      nub (map squareRank ss) `shouldBe` [2]
+
+    it "возвращает 3 для ряда '4'" $ do
+      let ss = map Square $ take 8 [24..]
+      nub (map squareRank ss) `shouldBe` [3]
+
+    it "возвращает 4 для ряда '5'" $ do
+      let ss = map Square $ take 8 [32..]
+      nub (map squareRank ss) `shouldBe` [4]
+
+    it "возвращает 5 для ряда '6'" $ do
+      let ss = map Square $ take 8 [40..]
+      nub (map squareRank ss) `shouldBe` [5]
+
+    it "возвращает 6 для ряда '7'" $ do
+      let ss = map Square $ take 8 [48..]
+      nub (map squareRank ss) `shouldBe` [6]
+
+    it "возвращает 7 для ряда '8'" $ do
+      let ss = map Square $ take 8 [56..]
+      nub (map squareRank ss) `shouldBe` [7]
 
   describe "takenBy" $ do
     context "[поле не занято ни белыми, ни чёрными]" $ do
       it "возращает False, при запросе занято ли белыми" $ do
-        takenBy White emptyBoard ('e', 2) `shouldBe` False
+        takenBy White emptyBoard (read "e2") `shouldBe` False
 
       it "возращает False, при запросе занято ли чёрными" $ do
-        takenBy Black emptyBoard ('e', 2) `shouldBe` False
+        takenBy Black emptyBoard (read "e2") `shouldBe` False
 
     context "[поле занято белыми]" $ do
       it "возращает True, при запросе занято ли белыми" $ do
-        takenBy White initialBoard ('e', 2) `shouldBe` True
+        takenBy White initialBoard (read "e2") `shouldBe` True
 
       it "возращает False, при запросе занято ли чёрными" $ do
-        takenBy Black initialBoard ('e', 2) `shouldBe` False
+        takenBy Black initialBoard (read "e2") `shouldBe` False
 
     context "[поле занято чёрными]" $ do
       it "возращает False, при запросе занято ли белыми" $ do
-        takenBy White initialBoard ('e', 7) `shouldBe` False
+        takenBy White initialBoard (read "e7") `shouldBe` False
 
       it "возращает True, при запросе занято ли чёрными" $ do
-        takenBy Black initialBoard ('e', 7) `shouldBe` True
+        takenBy Black initialBoard (read "e7") `shouldBe` True
 
   describe "pawnSquares" $ do
     it "возращает пустой список, если доска пустая белых пешек" $
       pawnSquares White emptyBoard `shouldBe` []
 
     it "возращает пустой список, если на доске не пешек данного цвета" $ do
-      let board = placePiece ('e', 2) pawnWhite emptyBoard
+      let board = placePiece (read "e2") pawnWhite emptyBoard
       pawnSquares Black board `shouldBe` []
 
     it "возращает все поля занятые пешками данного цвета" $ do
-      let board = placePieces [(('d', 2), pawnWhite), (('e', 2), pawnWhite)] emptyBoard
-      pawnSquares White board `shouldBe` [('e', 2), ('d', 2)]
+      let board = placePieces [((read "d2"), pawnWhite), ((read "e2"), pawnWhite)] emptyBoard
+      map show (pawnSquares White board) `shouldBe` ["d2", "e2"]
 
   describe "placePiece" $ do
     it "ставит фигуру на заданную клетку" $ do
-      let sqs = squares $ placePiece ('d', 4) pawnWhite emptyBoard
-      M.lookup ('d', 4) sqs `shouldBe` Just pawnWhite
+      let sqs = squares $ placePiece (read "d4") pawnWhite emptyBoard
+      (sqs !! 27) `shouldBe` Just pawnWhite
 
   describe "placePieces" $ do
     it "ставит фигуры на заданные клетки" $ do
-      let sqs = squares $ placePieces [(('a', 2), pawnWhite), (('a', 7), pawnBlack)] emptyBoard
-      M.lookup ('a', 2) sqs `shouldBe` Just pawnWhite
-      M.lookup ('a', 7) sqs `shouldBe` Just pawnBlack
+      let sqs = squares $ placePieces [((read "a2"), pawnWhite), ((read "a7"), pawnBlack)] emptyBoard
+      (sqs !! 8) `shouldBe` Just pawnWhite
+      (sqs !! 48) `shouldBe` Just pawnBlack
 
   describe "kingAt" $ do
     it "возращает позицию короля" $ do
-      kingAt White initialBoard `shouldBe` ('e', 1)
-      kingAt Black initialBoard `shouldBe` ('e', 8)
+      kingAt White initialBoard `shouldBe` Square 4
+      kingAt Black initialBoard `shouldBe` Square 60
 
   describe "disableKingsideCastling" $ do
     context "белые" $ do
@@ -163,132 +230,141 @@ spec = do
 
       context "[взятие на a6]" $ do
         it "возращает Fasle, если на b5 нет белой пешки" $
-          pawnsToEnPassantAt ('a', 6) White initialBoard `shouldBe` False
+          pawnsToEnPassantAt (read "a6") initialBoard `shouldBe` False
+
+        it "возращает False, если белая пешка стоит на c5" $
+          pawnsToEnPassantAt (read "a6") (placePiece (read "c5") pawnWhite initialBoard) `shouldBe` False
 
         it "возращает True если белая пешка стоит на b5" $
-          pawnsToEnPassantAt ('a', 6) White (placePiece ('b', 5) pawnWhite initialBoard) `shouldBe` True
+          pawnsToEnPassantAt (read "a6") (placePiece (read "b5") pawnWhite initialBoard) `shouldBe` True
 
       context "[взятие на e6]" $ do
         it "возращает Fasle, если на d5 и на f5 нет белых пешек" $
-          pawnsToEnPassantAt ('e', 6) White initialBoard `shouldBe` False
+          pawnsToEnPassantAt (read "e6") initialBoard `shouldBe` False
 
-        it "возращает True если белая пешка стоит на d5" $
-          pawnsToEnPassantAt ('e', 6) White (placePiece ('d', 5) pawnWhite initialBoard) `shouldBe` True
+        it "возращает False, если белая пешка стоит на c5" $
+          pawnsToEnPassantAt (read "e6") (placePiece (read "c5") pawnWhite initialBoard) `shouldBe` False
+
+        it "возращает False, если белая пешка стоит на g5" $
+          pawnsToEnPassantAt (read "e6") (placePiece (read "g5") pawnWhite initialBoard) `shouldBe` False
+
+        it "возращает True, если белая пешка стоит на d5" $
+          pawnsToEnPassantAt (read "e6") (placePiece (read "d5") pawnWhite initialBoard) `shouldBe` True
 
         it "возращает True если белая пешка стоит на f5" $
-          pawnsToEnPassantAt ('e', 6) White (placePiece ('f', 5) pawnWhite initialBoard) `shouldBe` True
+          pawnsToEnPassantAt (read "e6") (placePiece (read "f5") pawnWhite initialBoard) `shouldBe` True
 
       context "[взятие на h6]" $ do
         it "возращает Fasle, если на g5 нет белой пешки" $
-          pawnsToEnPassantAt ('h', 6) White initialBoard `shouldBe` False
+          pawnsToEnPassantAt (read "h6") initialBoard `shouldBe` False
 
         it "возращает True если белая пешка стоит на g5" $
-          pawnsToEnPassantAt ('h', 6) White (placePiece ('g', 5) pawnWhite initialBoard) `shouldBe` True
+          pawnsToEnPassantAt (read "h6") (placePiece (read "g5") pawnWhite initialBoard) `shouldBe` True
 
     context "[чёрные]" $ do
       context "[взятие на a3]" $ do
         it "возращает Fasle, если на b4 нет чёрной пешки" $
-          pawnsToEnPassantAt ('a', 3) Black initialBoard `shouldBe` False
+          pawnsToEnPassantAt (read "a3") initialBoard `shouldBe` False
 
         it "возращает True если чёрная пешка стоит на b4" $
-          pawnsToEnPassantAt ('a', 3) Black (placePiece ('b', 4) pawnBlack initialBoard) `shouldBe` True
+          pawnsToEnPassantAt (read "a3") (placePiece (read "b4") pawnBlack initialBoard) `shouldBe` True
 
       context "[взятие на d3]" $ do
         it "возращает Fasle, если на c5 и на e5 нет чёрных пешек" $
-          pawnsToEnPassantAt ('d', 3) Black initialBoard `shouldBe` False
+          pawnsToEnPassantAt (read "d3") initialBoard `shouldBe` False
 
         it "возращает True если белая пешка стоит на c4" $
-          pawnsToEnPassantAt ('d', 3) Black (placePiece ('c', 4) pawnBlack initialBoard) `shouldBe` True
+          pawnsToEnPassantAt (read "d3") (placePiece (read "c4") pawnBlack initialBoard) `shouldBe` True
 
         it "возращает True если белая пешка стоит на e4" $
-          pawnsToEnPassantAt ('d', 3) Black (placePiece ('e', 4) pawnBlack initialBoard) `shouldBe` True
+          pawnsToEnPassantAt (read "d3") (placePiece (read "e4") pawnBlack initialBoard) `shouldBe` True
 
       context "[взятие на h3]" $ do
         it "возращает Fasle, если на g4 нет белой пешки" $
-          pawnsToEnPassantAt ('h', 3) Black initialBoard `shouldBe` False
+          pawnsToEnPassantAt (read "h3") initialBoard `shouldBe` False
 
         it "возращает True если белая пешка стоит на g4" $
-          pawnsToEnPassantAt ('h', 3) Black (placePiece ('g', 4) pawnBlack initialBoard) `shouldBe` True
+          pawnsToEnPassantAt (read "h3") (placePiece (read "g4") pawnBlack initialBoard) `shouldBe` True
 
   describe "move" $ do
     context "[белые]" $ do
       context "[взятие на проходе]" $ do
         let board = foldl move initialBoard
-                [ Move pawnWhite ('e', 2) ('e', 4)
-                , Move pawnBlack ('a', 7) ('a', 6)
-                , Move pawnWhite ('e', 4) ('e', 5)
-                , Move pawnBlack ('d', 7) ('d', 5)
+                [ Move pawnWhite (read "e2") (read "e4")
+                , Move pawnBlack (read "a7") (read "a6")
+                , Move pawnWhite (read "e4") (read "e5")
+                , Move pawnBlack (read "d7") (read "d5")
                 ]
 
         it "выставление enPassantTarget после хода через поле" $
-          enPassantTarget board `shouldBe` Just ('d', 6)
+          enPassantTarget board `shouldBe` Just (read "d6", read "d5")
 
         it "обнуляет enPassantTarget после взятия на проходе" $ do
-          let b = move board (EnPassantCapture pawnWhite ('e', 5) ('d', 6))
+          let b = move board (EnPassantCapture pawnWhite (read "e5") (read "d6"))
           enPassantTarget b `shouldBe` Nothing
 
         it "обнуляет enPassantTarget после любого хода" $ do
-          let b = move board (Move pawnWhite ('a', 2) ('a', 3))
+          let b = move board (Move pawnWhite (read "a2") (read "a3"))
           enPassantTarget b `shouldBe` Nothing
 
         it "обнуляет enPassantTarget после любого взятия" $ do
-          let b = move board (Capture bishopWhite ('f', 1) ('a', 6))
+          let b = move board (Capture bishopWhite (read "f1") (read "a6"))
           enPassantTarget b `shouldBe` Nothing
 
         it "высталяет enPassantTarget только если есть пешка, которая может сделать взятие на проходе" $ do
-          let b = move board (Move pawnWhite ('a', 2) ('a', 4))
+          let b = move board (Move pawnWhite (read "a2") (read "a4"))
           enPassantTarget b `shouldBe` Nothing
 
       it "белая пешка с начальной позиции" $ do
-        let sqs = Map.delete ('e', 2) $ Map.insert ('e', 4) pawnWhite $ squares initialBoard
-        move initialBoard (Move pawnWhite ('e',2) ('e',4)) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Nothing, nextMove = Black, history = [Move (Piece Pawn White) ('e',2) ('e',4)], fens = Map.fromList [("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq -", 1)] })
+        let sqs = insertAt (read "e4") pawnWhite $ deleteAt (read "e2") $ squares initialBoard
+        move initialBoard (Move pawnWhite (read "e2") (read "e4")) `shouldBe` (initialBoard { squares = sqs, enPassantTarget = Nothing, nextMove = Black, history = [Move (Piece Pawn White) (read "e2") (read "e4")], fens = Map.fromList [("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq -", 1)] })
 
       it "после хода пешкой через поле, значение enPassantTarget не устанавливается, если нет пешки противника готовой взять на проходе" $ do
-        enPassantTarget (move initialBoard $ Move pawnWhite ('a',2) ('a',4)) `shouldBe` Nothing
+        enPassantTarget (move initialBoard $ Move pawnWhite (read "a2") (read "a4")) `shouldBe` Nothing
 
       it "(белые) после хода пешкой через поле устанавливается значение enPassantTarget в случае, если есть пешка противника готовая взять на проходе" $ do
-        let board = placePiece ('b', 4) pawnBlack initialBoard
-        enPassantTarget (move board $ Move pawnWhite ('a',2) ('a',4)) `shouldBe` Just ('a', 3)
+        let board = placePiece (read "b4") pawnBlack initialBoard
+        enPassantTarget (move board $ Move pawnWhite (read "a2") (read "a4")) `shouldBe` Just (read "a3", read "a4")
 
       it "(чёрные) после хода пешкой через поле устанавливается значение enPassantTarget в случае, если есть пешка противника готовая взять на проходе" $ do
-        let board = placePiece ('b', 5) pawnWhite initialBoard
-        enPassantTarget (move board $ Move pawnBlack ('c', 7) ('c', 5)) `shouldBe` Just ('c', 6)
+        let board = placePiece (read "b5") pawnWhite initialBoard
+        enPassantTarget (move board $ Move pawnBlack (read "c7") (read "c5")) `shouldBe` Just (read "c6", read "c5")
 
       it "ход королём меняет поля whiteCanCastleKingside и whiteCanCastleQueenside на False" $ do
-        whiteCanCastleKingside (move initialBoard $ Move kingWhite ('e', 1) ('e', 2)) `shouldBe` False
-        whiteCanCastleQueenside (move initialBoard $ Move kingWhite ('e', 1) ('e', 2)) `shouldBe` False
+        whiteCanCastleKingside (move initialBoard $ Move kingWhite (read "e1") (read "e2")) `shouldBe` False
+        whiteCanCastleQueenside (move initialBoard $ Move kingWhite (read "e1") (read "e2")) `shouldBe` False
 
       it "ход королевской ладьёй меняет поле whiteCanCastleKingside на False" $
-        whiteCanCastleKingside (move initialBoard $ Move rookWhite ('h', 1) ('h', 2)) `shouldBe` False
+        whiteCanCastleKingside (move initialBoard $ Move rookWhite (read "h1") (read "h2")) `shouldBe` False
 
       it "ход королевской ладьёй не меняет поле whiteCanCastleQueenside на False" $
-        whiteCanCastleQueenside (move initialBoard $ Move rookWhite ('h', 1) ('h', 2)) `shouldBe` True
+        whiteCanCastleQueenside (move initialBoard $ Move rookWhite (read "h1") (read "h2")) `shouldBe` True
 
       it "ход ферзевой ладьёй меняет поле whiteCanCastleQueenside на False" $
-        whiteCanCastleQueenside (move initialBoard $ Move rookWhite ('a', 1) ('a', 2)) `shouldBe` False
+        whiteCanCastleQueenside (move initialBoard $ Move rookWhite (read "a1") (read "a2")) `shouldBe` False
 
       it "ход ферзевой ладьёй не меняет поле whiteCanCastleKingside на False" $
-        whiteCanCastleKingside (move initialBoard $ Move rookWhite ('a', 1) ('a', 2)) `shouldBe` True
+        whiteCanCastleKingside (move initialBoard $ Move rookWhite (read "a1") (read "a2")) `shouldBe` True
 
       context "[halfmoveClock]" $ do
         it "ход королём увеличивает счётчик полуходов на 1" $ do
-          halfmoveClock (move initialBoard $ Move kingWhite ('e', 1) ('e', 2)) `shouldBe` 1
+          halfmoveClock (move initialBoard $ Move kingWhite (read "e1") (read "e2")) `shouldBe` 1
 
         it "ход королевской ладьёй увеличивает счётчик полуходов на 1" $
-          halfmoveClock (move initialBoard $ Move rookWhite ('h', 1) ('g', 1)) `shouldBe` 1
+          halfmoveClock (move initialBoard $ Move rookWhite (read "h1") (read "g1")) `shouldBe` 1
 
         it "ход ферзевой ладьёй увеличивает счётчик полуходов на 1" $
-          halfmoveClock (move initialBoard $ Move rookWhite ('a', 1) ('b', 1)) `shouldBe` 1
+          halfmoveClock (move initialBoard $ Move rookWhite (read "a1") (read "b1")) `shouldBe` 1
 
       context "[fens]" $ do
         it "повторение позиции увеличивает счётчик на 1" $ do
-          let board = placePieces [(('a', 1), queenWhite), (('b', 1), kingWhite), (('h', 1), kingBlack)] emptyBoard
+          let board = placePieces [((read "a1"), queenWhite), ((read "b1"), kingWhite), ((read "h1"), kingBlack)] emptyBoard
           let moves =
-                [ Move kingWhite ('b', 1) ('c', 1) -- 1st
-                , Move kingBlack ('h', 1) ('g', 1)
-                , Move kingWhite ('c', 1) ('b', 1)
-                , Move kingBlack ('g', 1) ('h', 1)
-                , Move kingWhite ('b', 1) ('c', 1) -- 2nd
+                [ Move kingWhite (read "b1") (read "c1") -- 1st
+                , Move kingBlack (read "h1") (read "g1")
+                , Move kingWhite (read "c1") (read "b1")
+                , Move kingBlack (read "g1") (read "h1")
+                , Move kingWhite (read "b1") (read "c1") -- 2nd
                 ]
           -- https://lichess.org/analysis/fromPosition/8/8/8/8/8/8/8/Q1K4k_b_-_-_0_1
           M.lookup "8/8/8/8/8/8/8/Q1K4k b - -" (fens (applyMoves board moves)) `shouldBe` Just 2
@@ -316,30 +392,30 @@ spec = do
       it "протестировать все возможные ходы" pending
 
       it "ход королём меняет поля blackCanCastleKingside и blackCanCastleQueenside на False" $ do
-        blackCanCastleKingside (move initialBoard $ Move kingBlack ('e', 8) ('d', 8)) `shouldBe` False
-        blackCanCastleQueenside (move initialBoard $ Move kingBlack ('e', 8) ('d', 8)) `shouldBe` False
+        blackCanCastleKingside (move initialBoard $ Move kingBlack (read "e8") (read "d8")) `shouldBe` False
+        blackCanCastleQueenside (move initialBoard $ Move kingBlack (read "e8") (read "d8")) `shouldBe` False
 
       it "ход королевской ладьёй меняет поле blackCanCastleKingside на False" $
-        blackCanCastleKingside (move initialBoard $ Move rookBlack ('h', 8) ('g', 8)) `shouldBe` False
+        blackCanCastleKingside (move initialBoard $ Move rookBlack (read "h8") (read "g8")) `shouldBe` False
 
       it "ход королевской ладьёй не меняет поле blackCanCastleQueenside на False" $
-        blackCanCastleQueenside (move initialBoard $ Move rookWhite ('h', 8) ('g', 8)) `shouldBe` True
+        blackCanCastleQueenside (move initialBoard $ Move rookWhite (read "h8") (read "g8")) `shouldBe` True
 
       it "ход ферзевой ладьёй меняет поле blackCanCastleQueenside на False" $
-        blackCanCastleQueenside (move initialBoard $ Move rookBlack ('a', 8) ('b', 8)) `shouldBe` False
+        blackCanCastleQueenside (move initialBoard $ Move rookBlack (read "a8") (read "b8")) `shouldBe` False
 
       it "ход ферзевой ладьёй не меняет поле blackCanCastleKingside на False" $
-        blackCanCastleKingside (move initialBoard $ Move rookBlack ('a', 8) ('b', 8)) `shouldBe` True
+        blackCanCastleKingside (move initialBoard $ Move rookBlack (read "a8") (read "b8")) `shouldBe` True
 
       context "[halfmoveClock]" $ do
         it "ход королём увеличивает счётчик полуходов на 1" $ do
-          halfmoveClock (move initialBoard $ Move kingBlack ('e', 8) ('e', 7)) `shouldBe` 1
+          halfmoveClock (move initialBoard $ Move kingBlack (read "e8") (read "e7")) `shouldBe` 1
 
         it "ход королевской ладьёй увеличивает счётчик полуходов на 1" $
-          halfmoveClock (move initialBoard $ Move rookBlack ('h', 8) ('g', 8)) `shouldBe` 1
+          halfmoveClock (move initialBoard $ Move rookBlack (read "h8") (read "g8")) `shouldBe` 1
 
         it "ход ферзевой ладьёй увеличивает счётчик полуходов на 1" $
-          halfmoveClock (move initialBoard $ Move rookBlack ('a', 8) ('b', 8)) `shouldBe` 1
+          halfmoveClock (move initialBoard $ Move rookBlack (read "a8") (read "b8")) `shouldBe` 1
 
       context "[рокировка]" $ do
         it "короткая рокировка чёрных выставляет поле blackCanCastleKingside в False" $

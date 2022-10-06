@@ -20,12 +20,16 @@ bishopBlack :: Piece
 knightBlack :: Piece
 pawnBlack :: Piece
 
-type Square = (Char, Int)
+newtype Square = Square Int
+
+instance Read Square
+instance Show Square
+
 data Board
   = Board
   { squares                 :: [Maybe Piece]
   , nextMove                :: Color
-  , enPassantTarget         :: Maybe Square
+  , enPassantTarget         :: Maybe (Square, Square)
   , whiteCanCastleKingside  :: Bool
   , whiteCanCastleQueenside :: Bool
   , blackCanCastleKingside  :: Bool
@@ -62,6 +66,15 @@ data Move
 cols :: [Char]
 rows :: [Int]
 
+squareFile :: Square -> Int
+squareRank :: Square -> Int
+
+firstFile :: Int
+lastFile :: Int
+
+firstRank :: Int
+lastRank :: Int
+
 emptyBoard :: Board
 
 opponent :: Color -> Color
@@ -72,29 +85,21 @@ findPiece :: Board -> Square -> Maybe Piece
 
 takenBy :: Color -> Board -> Square -> Bool
 
-takenByWhites :: Board -> Square -> Bool
-
-takenByBlacks :: Board -> Square -> Bool
-
-takenByPiece :: Piece -> Square -> Board -> Bool
-
--- Занято ли поле. Для хода пешкой вперёд, если поле занято,
--- то ходить вперёд нельзя (неважно какой фигурой занято поле).
 taken :: Board -> Square -> Bool
 
-pawnSquares :: Color -> Board -> [Int]
+pawnSquares :: Color -> Board -> [Square]
 
-knightSquares :: Color -> Board -> [Int]
+knightSquares :: Color -> Board -> [Square]
 
-bishopSquares :: Color -> Board -> [Int]
+bishopSquares :: Color -> Board -> [Square]
 
-rookSquares :: Color -> Board -> [Int]
+rookSquares :: Color -> Board -> [Square]
 
-queenSquares :: Color -> Board -> [Int]
+queenSquares :: Color -> Board -> [Square]
 
-kingSquares :: Color -> Board -> [Int]
+kingSquares :: Color -> Board -> [Square]
 
-pieceTypeSquares :: PieceType -> Color -> Board -> [Int]
+pieceTypeSquares :: PieceType -> Color -> Board -> [Square]
 
 pieces :: Color -> Board -> [(Square, Piece)]
 
@@ -121,8 +126,9 @@ disableQueensideCastling :: Color -> Board -> Board
 
 disableCastling :: Color -> Board -> Board
 
+-- FIXME: нужна ли эта функция?
 -- Стоят ли пешки соперника для взятие на проходе на данном поле
-pawnsToEnPassantAt :: Square -> Color -> Board -> Bool
+--pawnsToEnPassantAt :: Square -> Color -> Board -> Bool
 
 moveColor :: Move -> Color
 

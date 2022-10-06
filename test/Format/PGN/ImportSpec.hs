@@ -23,6 +23,15 @@ spec = do
           , Move 2 Black (PlyAnnotated (Ply Queen Nothing Nothing ('h', 4)) Nothing Nothing)
           ] BlackWon
 
+    it "возращает игру со списком ходов и результатом (в конце перевод строки)" $
+      parseGame' "1. d4 f5 2. Nc3 Qh4 0-1\n" `shouldParse`
+        Game
+          [ Move 1 White (PlyAnnotated (Ply Pawn Nothing Nothing ('d', 4)) Nothing Nothing)
+          , Move 1 Black (PlyAnnotated (Ply Pawn Nothing Nothing ('f', 5)) Nothing Nothing)
+          , Move 2 White (PlyAnnotated (Ply Knight Nothing Nothing ('c', 3)) Nothing Nothing)
+          , Move 2 Black (PlyAnnotated (Ply Queen Nothing Nothing ('h', 4)) Nothing Nothing)
+          ] BlackWon
+
   describe "parseResult" $ do
     let parseResult' = parse parseResult "PGN"
 
@@ -41,6 +50,11 @@ spec = do
     context "[ход белых отделён от хода чёрных]" $ do
         it "возращает белую пешку и поле" $ do
           parseMove' "1. e4" `shouldParse`
+            [ Move 1 White (PlyAnnotated (Ply Pawn Nothing Nothing ('e', 4)) Nothing Nothing)
+            ]
+
+        it "возращает белую пешку и поле (без пробела)" $ do
+          parseMove' "1.e4" `shouldParse`
             [ Move 1 White (PlyAnnotated (Ply Pawn Nothing Nothing ('e', 4)) Nothing Nothing)
             ]
 

@@ -36,9 +36,12 @@ rowToDisplay board = concatMap (maybe " " pieceToDisplay . findPiece board)
 
 -- |Имена полей в порядке, который удобен для вывода доски на экран
 squaresDisplayOrder :: [[Square]]
-squaresDisplayOrder = map colName $ reverse rows
+squaresDisplayOrder = reorderSquares [0..63] []
   where
-    colName row = map (, row) cols
+    reorderSquares :: [Int] -> [[Square]] -> [[Square]] 
+    reorderSquares [] result = result
+    reorderSquares xs result = reorderSquares rest $ (map Square row) : result
+      where (row, rest) = splitAt 8 xs 
 
 pieceToDisplay :: Piece -> String
 pieceToDisplay (Piece King White)   = "♔"

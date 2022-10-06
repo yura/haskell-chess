@@ -8,13 +8,37 @@ import {-# SOURCE #-} qualified Laws as L
 import qualified Laws.Queen as Q
 import           Laws.Util
 
-initialRow :: Color -> Int
-initialRow White = 1
-initialRow Black = 8
+kingHome :: Color -> Square
+kingHome White = Square 4
+kingHome Black = Square 60
 
-initialPosition :: Color -> Square
-initialPosition White = ('e', 1)
-initialPosition Black = ('e', 8)
+queenHome :: Color -> Square
+queenHome White = Square 3
+queenHome Black = Square 59
+
+kingsideRookHome :: Color -> Square
+kingsideRookHome White = Square 7
+kingsideRookHome Black = Square 63
+
+kingsideBishopHome :: Color -> Square
+kingsideBishopHome White = Square 5
+kingsideBishopHome Black = Square 61
+
+kingsideKnightHome :: Color -> Square
+kingsideKnightHome White = Square 6
+kingsideKnightHome Black = Square 62
+
+queensideBishopHome :: Color -> Square
+queensideBishopHome White = Square 2
+queensideBishopHome Black = Square 58
+
+queensideKnightHome :: Color -> Square
+queensideKnightHome White = Square 1
+queensideKnightHome Black = Square 57
+
+queensideRookHome :: Color -> Square
+queensideRookHome White = Square 0
+queensideRookHome Black = Square 56
 
 pieceType :: PieceType
 pieceType = King
@@ -35,39 +59,37 @@ captureThreatSquares color square board
 
 canCastleKingside :: Board -> Color -> Bool
 canCastleKingside board color
-  =  findPiece board ('e', row) == Just (Piece King color)
-  && findPiece board ('h', row) == Just (Piece Rook color)
+  =  findPiece board (kingHome color) == Just (Piece King color)
+  && findPiece board (kingsideRookHome color) == Just (Piece Rook color)
   -- король и ладья раньше не ходили
   && B.canCastleKingside color board
   -- нет фигур между королём и ладьёй
-  && not (taken board ('f', row)) && not (taken board ('g', row))
+  && not (taken board (kingsideBishopHome color)) && not (taken board (kingsideKnightHome color))
   -- король не под шахом
   -- можно использовать isCheck:
   -- && not (isCheck color board)
-  && ('e', row) `notElem` L.allCheckThreatSquares (opponent color) board
+  && kingHome color `notElem` L.allCheckThreatSquares (opponent color) board
   -- пройдёт не через битое поле
-  && ('f', row) `notElem` L.allCheckThreatSquares (opponent color) board  
+  && kingsideBishopHome color `notElem` L.allCheckThreatSquares (opponent color) board  
   -- встанет не под шах
-  && ('g', row) `notElem` L.allCheckThreatSquares (opponent color) board  
-  where row = initialRow color
+  && kingsideKnightHome color `notElem` L.allCheckThreatSquares (opponent color) board  
 
 canCastleQueenside :: Board -> Color -> Bool
 canCastleQueenside board color
-  =  findPiece board ('e', row) == Just (Piece King color)
-  && findPiece board ('a', row) == Just (Piece Rook color)
+  =  findPiece board (kingHome color) == Just (Piece King color)
+  && findPiece board (queensideRookHome color) == Just (Piece Rook color)
   -- король и ладья раньше не ходили
   && B.canCastleQueenside color board
   -- нет фигур между королём и ладьёй
-  && not (taken board ('d', row)) && not (taken board ('c', row)) && not (taken board ('b', row))
+  && not (taken board (queenHome color)) && not (taken board (queensideBishopHome color)) && not (taken board (queensideKnightHome color))
   -- король не под шахом
   -- можно использовать isCheck:
   -- && not (isCheck color board)
-  && ('e', row) `notElem` L.allCheckThreatSquares (opponent color) board
+  && (kingHome color) `notElem` L.allCheckThreatSquares (opponent color) board
   -- пройдёт не через битое поле
-  && ('d', row) `notElem` L.allCheckThreatSquares (opponent color) board  
+  && (queenHome color) `notElem` L.allCheckThreatSquares (opponent color) board  
   -- встанет не под шах
-  && ('c', row) `notElem` L.allCheckThreatSquares (opponent color) board  
-  where row = initialRow color
+  && (queensideBishopHome color) `notElem` L.allCheckThreatSquares (opponent color) board  
 
 possibleMoves :: Board -> Color -> Square -> [Move]
 possibleMoves board color square = castlings ++ captures ++ moves

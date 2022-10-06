@@ -1,11 +1,7 @@
 module Laws.Pawn where
 
-import Board
+import Board hiding ( lastRank )
 import Laws.Util
-
-initialRow :: Color -> Int
-initialRow White = 2
-initialRow Black = 7
 
 finalRow :: Color -> Int
 finalRow White = 8
@@ -15,29 +11,37 @@ predFinalRow :: Color -> Int
 predFinalRow White = 7
 predFinalRow Black = 2
 
-nextSquare :: Color -> Int -> Int
-nextSquare White = succ
-nextSquare Black = pred
+nextSquare :: Color -> Square -> Square
+nextSquare White (Square s) = Square $ s + 8
+nextSquare Black (Square s) = Square $ s - 8
 
-enPassantRow :: Color -> Int
-enPassantRow White = 5
-enPassantRow Black = 4
+enPassantRank :: Color -> Int
+enPassantRank White = 4
+enPassantRank Black = 3
+
+atHomeRank :: Color -> Square -> Bool
+atHomeRank White (Square s) = s > 7 && s < 16
+atHomeRank Black (Square s) = s > 47 && s < 56
+
+atPredFinalRow :: Color -> Square -> Bool
+atPredFinalRow White (Square s) = s > 47 && s < 56
+atPredFinalRow Black (Square s) = s > 7  && s < 16
 
 moveSquares :: Color -> Square -> [Square]
-moveSquares color (col, row)
-  | row == initialRow color = [(col, nextSquare color row), (col, nextSquare color $ nextSquare color row)]
-  | otherwise               = [(col, nextSquare color row)]
-
-whitePawnMoveSquares :: Square -> [Square]
-whitePawnMoveSquares = moveSquares White
-
-blackPawnMoveSquares :: Square -> [Square]
-blackPawnMoveSquares = moveSquares Black
+moveSquares color square
+  | atHomeRank color square = [nextSquare color square, nextSquare color $ nextSquare color square]
+  | otherwise               = [nextSquare color square]
 
 captureSquares :: Color -> Square -> [Square]
-captureSquares color ('a', row) = [('b', nextSquare color row)]
-captureSquares color ('h', row) = [('g', nextSquare color row)]
-captureSquares color (col, row) = [(pred col, nextSquare color row), (succ col, nextSquare color row)]
+captureSquares White square@(Square s) | file == firstFile = [Square $ s + 9] -- колонка 'a'
+                                       | file == lastFile  = [Square $ s + 7] -- колонка 'h'
+                                       | otherwise         = map Square [s + 7, s + 9]
+  where file = squareFile square
+
+captureSquares Black square@(Square s) | file == firstFile = [Square $ s - 7] -- колонка 'a'
+                                       | file == lastFile  = [Square $ s - 9] -- колонка 'h'
+                                       | otherwise         = map Square [s - 9, s - 7]
+  where file = squareFile square
 
 -- Поля, которые атакует пешка находясь в данной позиции
 underAttackSquares :: Board -> Color -> Square -> [Square]
@@ -47,30 +51,33 @@ underAttackSquares _ = captureSquares
 captureThreatSquares :: Color -> Square -> Board -> [Square]
 captureThreatSquares color square board = filterThreats color board $ captureSquares color square
 
-whitePawnCaptureSquares :: Square -> [Square]
-whitePawnCaptureSquares = captureSquares White
-
-blackPawnCaptureSquares :: Square -> [Square]
-blackPawnCaptureSquares = captureSquares Black
-
 moves :: Color -> Square -> Board -> [Move]
-moves color from@(col, row) board
-  | row == initialRow color && taken board (col, nextSquare color row) = [] -- этот случай рассматривается отдельно, чтобы избежать "перепрыгиваний"
-  | row == predFinalRow color && taken board (col, finalRow color) = []
-  | row == predFinalRow color = map (Promotion from (col, finalRow color)) [Piece Queen color, Piece Rook color, Piece Bishop color, Piece Knight color]
+moves color from board
+  | atHomeRank color from && taken board (nextSquare color from) = [] -- этот случай рассматривается отдельно, чтобы избежать "перепрыгиваний"
+  | atPredFinalRow color from && taken board (nextSquare color from) = []
+  | atPredFinalRow color from = map (Promotion from (nextSquare color from)) [Piece Queen color, Piece Rook color, Piece Bishop color, Piece Knight color]
   | otherwise = map (Move (Piece Pawn color) from) $ filter (not . taken board) $ moveSquares color from
 
 captures :: Color -> Square -> Board -> [Move]
-captures color from@(_, row) board
-  | nextSquare color row == finalRow color = [f piece | f <- capturePromotions, piece <- [Piece Queen color, Piece Rook color, Piece Bishop color, Piece Knight color]]
+captures color from board
+  | atPredFinalRow color from = [f piece | f <- capturePromotions, piece <- [Piece Queen color, Piece Rook color, Piece Bishop color, Piece Knight color]]
   | otherwise = map (Capture (Piece Pawn color) from) squares
   where
     capturePromotions = map (CapturePromotion from) squares
     squares = captureThreatSquares color from board
 
 enPassantCapture :: Color -> Square -> Board -> [Move]
-enPassantCapture color (col, row) (Board{enPassantTarget = (Just target@(targetCol, _))})
-  = [EnPassantCapture (Piece Pawn color) (col, enPassantRow color) target | row == enPassantRow color && (succ targetCol == col || pred targetCol == col)]
+enPassantCapture color from (Board{enPassantTarget = (Just (target, to))})
+  = [EnPassantCapture (Piece Pawn color) from target | rankCondition && fileCondition]
+  where
+    rankCondition = squareRank from == enPassantRank color
+    fromFile =  squareFile from
+    targetFile = squareFile target
+    fileCondition
+      =  (targetFile == firstFile && fromFile == targetFile + 1)
+      || (targetFile == lastFile  && fromFile == targetFile - 1)
+      || (targetFile /= firstFile && targetFile /= lastFile && (fromFile == targetFile + 1 || fromFile == targetFile - 1))
+    
 enPassantCapture _ _ _ = []
 
 pawnPossibleMoves :: Color -> Square -> Board -> [Move]
@@ -79,6 +86,8 @@ pawnPossibleMoves color from board
   ++ captures color from board
   ++ moves color from board
 
+
+-- Для упрощения и структуризации тестов
 whitePawnPossibleMoves :: Square -> Board -> [Move]
 whitePawnPossibleMoves = pawnPossibleMoves White
 

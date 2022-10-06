@@ -24,7 +24,6 @@ maxValue :: Board -> Int -> (Value, Move)
 maxValue board depth | isJust (isOver board) || depth == 0 = (evaluatePosition board, head $ history board)
                      | otherwise = result
   where
-    -- result = last $ traceShow ((if null (history board) then "" else show (moveToDisplay (head (history board)))) ++ " max: " ++ show (map (second moveToDisplay) results)) results
     result = last results
     results = sortOn fst
       $ map (\m -> ((-1) * fst (minValue (move board m) (pred depth)), m))
@@ -34,7 +33,6 @@ minValue :: Board -> Int -> (Value, Move)
 minValue board depth | isJust (isOver board) || depth == 0 = (evaluatePosition board, head $ history board)
                      | otherwise = result
   where
-    -- result = last $ traceShow ((if null (history board) then "" else show (moveToDisplay (head (history board)))) ++ " min: " ++ show (map (second moveToDisplay) results)) results
     result = last results
     results = sortOn fst
       $ map (\m -> ((-1) * fst (maxValue (move board m) (pred depth)), m))

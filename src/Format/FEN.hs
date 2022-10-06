@@ -74,8 +74,8 @@ blackQueensideCastling board = if blackCanCastleKingside board then "q" else ""
 
 enPassantTargetSquare :: Board -> String
 enPassantTargetSquare board = case enPassantTarget board of
-  Just s -> squareToPGN s
-  _      -> "-"
+  Just (s, _) -> squareToPGN s
+  _           -> "-"
 
 fullmoveNumber :: Board -> String
 fullmoveNumber Board{..} = show moveNumber
