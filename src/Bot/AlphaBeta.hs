@@ -20,7 +20,7 @@ makeMove board@Board{..} = do
 
   return $ if v1 == abs mateValue then move board m1 else move board m3
 
-maxValue :: Board -> Int -> Int -> Int -> (Value, Move)
+maxValue :: Board -> Value -> Value -> Int -> (Value, Move)
 maxValue board alpha beta depth | isJust (isOver board) || depth == 0 = (evaluatePosition board, head $ history board)
                                 | otherwise = maxIteration (possibleMoves board) mateValue (QueensideCastling White) alpha beta
   where
@@ -29,7 +29,7 @@ maxValue board alpha beta depth | isJust (isOver board) || depth == 0 = (evaluat
         (minVal, minMove) = minValue (move board m) alpha beta (pred depth)
         (bestValue', bestMove', currentAlpha) = if minVal > bestValue then (minVal, minMove, max alpha minVal) else (bestValue, bestMove, alpha)
 
-minValue :: Board -> Int -> Int -> Int -> (Value, Move)
+minValue :: Board -> Value -> Value -> Int -> (Value, Move)
 minValue board alpha beta depth | isJust (isOver board) || depth == 0 = (evaluatePosition board, head $ history board)
                                 | otherwise = result
   where

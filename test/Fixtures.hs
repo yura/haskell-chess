@@ -55,8 +55,6 @@ whiteCanAvoidMate = fromFEN "Q7/8/8/8/8/3k4/8/3K3r w - - 0 1"
 -- Мат в один ход
 
 -- * белые
-
--- Один ход до мата
 -- https://lichess.org/editor/7k/5K2/8/8/8/6Q1/8/8_w_-_-_0_1
 blackMatedByQueenIn1 :: Board
 blackMatedByQueenIn1 = fromFEN "7k/5K2/8/8/8/6Q1/8/8 w - - 0 1"
@@ -84,13 +82,16 @@ blackLadderMatesIn2 :: Board
 blackLadderMatesIn2 = fromFEN "8/k7/8/6K1/8/8/5r2/4r3 b - - 0 1"
 
 -- Мат в три хода хода
+-- https://lichess.org/editor/8/K7/5k2/8/8/8/3R4/4R3_w_-_-_0_1
+whiteLadderMatesIn3 :: Board
+whiteLadderMatesIn3 = fromFEN "8/K7/5k2/8/8/8/3R4/4R3 w - - 0 1"
 
 -- * белые
 
--- Линейный мат в три хода
+-- Линейный мат в 4 хода
 -- https://lichess.org/editor/8/K7/5k2/8/8/8/3R4/4R3_w_-_-_0_1
-whiteLadderMatesIn3 :: Board
-whiteLadderMatesIn3 = fromFEN "8/K7/8/5k2/8/8/3R4/4R3 w - - 0 1"
+whiteLadderMatesIn4 :: Board
+whiteLadderMatesIn4 = fromFEN "8/K7/8/5k2/8/8/3R4/4R3 w - - 0 1"
 
 -- * чёрные
 
@@ -98,3 +99,10 @@ whiteLadderMatesIn3 = fromFEN "8/K7/8/5k2/8/8/3R4/4R3 w - - 0 1"
 -- https://lichess.org/editor/8/k4K2/8/8/8/8/3r4/4r3_b_-_-_0_1
 blackLadderMatesIn3 :: Board
 blackLadderMatesIn3 = fromFEN "8/k4K2/8/8/8/8/3r4/4r3 b - - 0 1"
+
+
+-- Защита от мата в один ход
+
+-- Белые должны потерять ферзя, чтобы спастись от мата в 1 ход
+whiteMustLostQueenToPreventMateIn1 :: Board
+whiteMustLostQueenToPreventMateIn1 = fromFEN "r6k/pp1b2bp/2pQp1p1/2N3qn/8/1B1P1P2/P4P1P/3RRK2 b - - 2 24"
