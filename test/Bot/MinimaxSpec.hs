@@ -18,7 +18,7 @@ spec = do
         fst (maxValue initialBoard 1) `shouldBe` 0
 
       it "возращает 0 как максимальное возможное значение для хода для глубины 2" $ do
-        fst (maxValue initialBoard 1) `shouldBe` 0
+        fst (maxValue initialBoard 2) `shouldBe` 0
 
     context "[белые]" $ do
       context "[мат в один ход]" $ do
@@ -34,13 +34,6 @@ spec = do
           pendingWith "медленный тест"
           maxValue whiteLadderMatesIn3 5 `shouldBe` (-mateValue, Move (Piece Rook White) ('d',2) ('f',2))
 
-      context "[мат в 4 хода]" $ do
-        it "находит линейный мат в четыре хода" $ do
-          pendingWith "медленный тест"
-          -- Чёрные подыгрывают белым, совершая ходы, приводящие к мату [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]"
-          -- [Move (Piece Rook White) ('d',1) ('h',1),Move (Piece King Black) ('g',4) ('h',5),Move (Piece Rook White) ('d',2) ('g',2),Move (Piece King Black) ('f',5) ('g',4),Move (Piece Rook White) ('e',1) ('d',1)]
-          maxValue whiteLadderMatesIn4 7 `shouldBe` (-mateValue, Move (Piece Rook White) ('d',2) ('f',2))
-
       context "[мат один ход (github issue #1)]" $ do
         it "ход 49" $ do
           let board = fromFEN "8/7K/1Q6/8/k7/2p5/PPPP1PPP/1RB3NR w - - 0 49"
@@ -55,6 +48,10 @@ spec = do
         it "находит линейный мат в два хода" $ do
           maxValue blackLadderMatesIn2 3 `shouldBe` (-mateValue, Move (Piece Rook Black) ('e',1) ('g',1))
 
+        it "белые ставят мат в два хода, но чёрные защищаются, пытаясь взять ладью" $ do
+          let board = move whiteLadderMatesIn2ButBlackCanTakeRook $ Move (Piece Rook White) ('e', 1) ('g', 1)
+          maxValue board  2 `shouldBe` (-10000, Move (Piece King Black) ('g', 4) ('h', 3))
+
       context "[мат в три хода]" $ do
         it "находит линейный мат в два хода" $ do
           pendingWith "Slow test"
@@ -62,8 +59,4 @@ spec = do
 
       context "защита от мата в 1 ход" $ do
         it "чёрные должны найти возможный мат в 2 хода, белые должны найти защиту от мата в 1 ход" $ do
-          let result@(_, blackMove) = maxValue whiteMustLostQueenToPreventMateIn1 3
-          result `shouldBe` (1997, Move (Piece Knight Black) ('h', 5) ('f', 4))
-
-          let result' = maxValue (move whiteMustLostQueenToPreventMateIn1 blackMove) 2
-          result' `shouldBe` (2, Capture (Piece Queen White) ('d', 6) ('f', 4))
+          pendingWith "найти нормальный пример, в котором противник будет жертвовать качеством, чтобы избежать мата"
